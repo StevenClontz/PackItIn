@@ -13,11 +13,16 @@ class AbilityTest < ActiveSupport::TestCase
     assert ability.can?(:read, families(:two))
   end
 
-  test "signed-in family can manage only itself" do
+  test "signed-in family can update only itself" do
     ability = Ability.new(families(:one))
     assert ability.can?(:update, families(:one))
-    assert ability.can?(:destroy, families(:one))
     assert ability.cannot?(:update, families(:two))
+  end
+
+  test "no family can be destroyed, even by itself" do
+    ability = Ability.new(families(:one))
+    assert ability.cannot?(:destroy, families(:one))
     assert ability.cannot?(:destroy, families(:two))
+    assert ability.cannot?(:destroy, Family)
   end
 end

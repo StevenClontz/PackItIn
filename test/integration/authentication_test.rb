@@ -44,4 +44,32 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     post family_session_path, params: { family: { username: "smiths", password: "nope" } }
     assert_response :unprocessable_entity
   end
+
+  test "signed-in family cannot destroy its own account" do
+    post family_session_path, params: { family: { username: "smiths", password: "password123" } }
+
+    assert_no_difference "Family.count" do
+      delete family_registration_path
+    end
+    assert_redirected_to root_path
+    follow_redirect!
+    assert_match "not authorized", response.body
+    assert_match "smiths", response.body, "should still be signed in"
+  end
+
+  test "edit account page has no cancel account button" do
+    post family_session_path, params: { family: { username: "smiths", password: "password123" } }
+    get edit_family_registration_path
+    assert_response :success
+    assert_select "input[type=submit][value=Update]"
+    assert_select "button, input[type=submit]", text: /cancel my account/i, count: 0
+    assert_select "input[name=_method][value=delete]", count: 0
+  end
+
+  test "guest cannot destroy a family either" do
+    assert_no_difference "Family.count" do
+      delete family_registration_path
+    end
+    assert_redirected_to new_family_session_path
+  end
 end

@@ -9,5 +9,8 @@ class Ability
 
     can :read, Family
     can :manage, Family, id: family.id
+
+    # Families can never be deleted, not even by themselves.
+    cannot :destroy, Family
   end
 end
