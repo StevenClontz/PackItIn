@@ -37,7 +37,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
   # --- non-admin: read only, own family only ---
 
   test "non-admin sees their own family's people, with no controls" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
     get family_people_path(families(:one))
     assert_response :success
@@ -57,7 +57,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
   end
 
   test "non-admin cannot see another family's people" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
     get family_people_path(families(:two))
     assert_denied
@@ -67,7 +67,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
   end
 
   test "non-admin cannot add, edit or delete anyone's people" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
     [ families(:one), families(:two) ].each do |family|
       get new_family_person_path(family)
@@ -95,7 +95,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
   end
 
   test "family page links to people only for the own family" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
     get family_path(families(:one))
     assert_select "a[href=?]", family_people_path(families(:one)), text: "People (2)"
@@ -109,7 +109,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
   # --- admin: everything, for any family ---
 
   test "admin sees and links to any family's people with all controls" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     get family_path(families(:two))
     assert_select "a[href=?]", family_people_path(families(:two)), text: "People (1)"
@@ -123,7 +123,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
   end
 
   test "admin adds a person to any family" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     get new_family_person_path(families(:two))
     assert_response :success
@@ -140,7 +140,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
   end
 
   test "admin edits and deletes a person in any family" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     get edit_person_path(people(:jones_bear))
     assert_response :success
@@ -160,14 +160,14 @@ class PeopleTest < ActionDispatch::IntegrationTest
   end
 
   test "the family cannot be reassigned through params" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     patch person_path(people(:jones_bear)), params: { person: { family_id: families(:one).id, first_name: "Ben" } }
     assert_equal families(:two), people(:jones_bear).reload.family
   end
 
   test "invalid input re-renders the form" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     assert_no_difference "Person.count" do
       post family_people_path(families(:one)), params: { person: { first_name: "", last_name: "Smith", position: "" } }
@@ -186,7 +186,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
   end
 
   test "deleting a family through the app removes its people" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     assert_difference "Person.count", -2 do
       delete family_path(families(:one))

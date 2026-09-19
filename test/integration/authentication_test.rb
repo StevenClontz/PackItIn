@@ -24,10 +24,10 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test "sign in and sign out" do
-    post family_session_path, params: { family: { username: "smiths", password: "password123" } }
+    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
     assert_redirected_to root_path
     follow_redirect!
-    assert_match "smiths", response.body
+    assert_match "examplefamily", response.body
 
     delete destroy_family_session_path
     assert_redirected_to root_path
@@ -36,17 +36,17 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test "username sign in is case insensitive" do
-    post family_session_path, params: { family: { username: "SMITHS", password: "password123" } }
+    post family_session_path, params: { family: { username: "ExampleFamily", password: "password123" } }
     assert_redirected_to root_path
   end
 
   test "wrong password is rejected" do
-    post family_session_path, params: { family: { username: "smiths", password: "nope" } }
+    post family_session_path, params: { family: { username: "examplefamily", password: "nope" } }
     assert_response :unprocessable_entity
   end
 
   test "signed-in family cannot destroy its own account" do
-    post family_session_path, params: { family: { username: "smiths", password: "password123" } }
+    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
 
     assert_no_difference "Family.count" do
       delete family_registration_path
@@ -54,11 +54,11 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     follow_redirect!
     assert_match "not authorized", response.body
-    assert_match "smiths", response.body, "should still be signed in"
+    assert_match "examplefamily", response.body, "should still be signed in"
   end
 
   test "edit account page has no cancel account button" do
-    post family_session_path, params: { family: { username: "smiths", password: "password123" } }
+    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
     get edit_family_registration_path
     assert_response :success
     assert_select "input[type=submit][value=Update]"
@@ -72,13 +72,13 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test "account update cannot make a family an admin" do
-    post family_session_path, params: { family: { username: "smiths", password: "password123" } }
-    put family_registration_path, params: { family: { username: "smiths", admin: "1", current_password: "password123" } }
+    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
+    put family_registration_path, params: { family: { username: "examplefamily", admin: "1", current_password: "password123" } }
     assert_not families(:one).reload.admin?
   end
 
   test "admin family cannot destroy its own account either" do
-    post family_session_path, params: { family: { username: "admins", password: "password123" } }
+    post family_session_path, params: { family: { username: "adminfamily", password: "password123" } }
 
     assert_no_difference "Family.count" do
       delete family_registration_path

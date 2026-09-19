@@ -1,6 +1,9 @@
+# These fixtures are also the development sample data: `bin/rails db:seed` loads them
+# (see db/seeds.rb), so `examplefamily` and `adminfamily` are the dev logins.
+# Usernames are stored lowercase, as Devise would store them.
 # Fixture passwords are all "password123".
 one:
-  username: smiths
+  username: examplefamily
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 two:
@@ -8,6 +11,6 @@ two:
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 admin:
-  username: admins
+  username: adminfamily
   admin: true
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>

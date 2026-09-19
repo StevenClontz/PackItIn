@@ -23,12 +23,12 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   # --- viewing ---
 
   test "any signed-in family can view the index and show pages" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
     get families_path
     assert_response :success
     assert_select "a", "joneses"
-    assert_select "a", "admins"
+    assert_select "a", "adminfamily"
 
     get family_path(families(:two))
     assert_response :success
@@ -36,7 +36,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   end
 
   test "non-admin index shows only the controls they may use" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
     get families_path
 
     assert_select "a", text: "New family", count: 0
@@ -46,7 +46,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   end
 
   test "admin index shows New, Edit everywhere and Delete for others but not themselves" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
     get families_path
 
     assert_select "a", text: "New family", count: 1
@@ -59,7 +59,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   # --- new / create ---
 
   test "non-admin cannot open new or create" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
     get new_family_path
     assert_denied
@@ -71,7 +71,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   end
 
   test "admin creates a family, optionally an admin" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     get new_family_path
     assert_response :success
@@ -86,7 +86,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   end
 
   test "creating with invalid data re-renders the form" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     assert_no_difference "Family.count" do
       post families_path, params: { family: { username: "", password: "x", password_confirmation: "y" } }
@@ -98,7 +98,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   # --- editing others ---
 
   test "non-admin cannot edit or update another family" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
     get edit_family_path(families(:two))
     assert_denied
@@ -109,7 +109,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   end
 
   test "admin edits another family without a current password" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     get edit_family_path(families(:two))
     assert_response :success
@@ -123,7 +123,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   end
 
   test "blank password on edit keeps the existing password" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     patch family_path(families(:two)), params: { family: { username: "joneses2", password: "", password_confirmation: "" } }
     assert_redirected_to family_path(families(:two))
@@ -133,15 +133,15 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   # --- editing yourself ---
 
   test "non-admin can rename themselves without a current password" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
-    patch family_path(families(:one)), params: { family: { username: "smiths2" } }
+    patch family_path(families(:one)), params: { family: { username: "examplefamily2" } }
     assert_redirected_to family_path(families(:one))
-    assert_equal "smiths2", families(:one).reload.username
+    assert_equal "examplefamily2", families(:one).reload.username
   end
 
   test "changing your own password requires the current password and keeps you signed in" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
     get edit_family_path(families(:one))
     assert_select "input[name=?]", "family[current_password]"
@@ -155,7 +155,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   end
 
   test "changing your own password with a wrong or missing current password is rejected" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
     [ "wrong", "" ].each do |current|
       patch family_path(families(:one)), params: { family: { password: "newpassword1", password_confirmation: "newpassword1", current_password: current } }
@@ -168,14 +168,14 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   # --- the admin flag ---
 
   test "non-admin cannot grant themselves admin" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
-    patch family_path(families(:one)), params: { family: { username: "smiths", admin: "1" } }
+    patch family_path(families(:one)), params: { family: { username: "examplefamily", admin: "1" } }
     assert_not families(:one).reload.admin?
   end
 
   test "admin can promote and demote another family" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     patch family_path(families(:two)), params: { family: { admin: "1" } }
     assert families(:two).reload.admin?
@@ -185,12 +185,12 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   end
 
   test "admin cannot demote themselves and sees no admin checkbox on their own form" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     get edit_family_path(families(:admin))
     assert_select "input[type=checkbox][name=?]", "family[admin]", count: 0
 
-    patch family_path(families(:admin)), params: { family: { username: "admins", admin: "0" } }
+    patch family_path(families(:admin)), params: { family: { username: "adminfamily", admin: "0" } }
     assert families(:admin).reload.admin?
 
     get edit_family_path(families(:two))
@@ -200,7 +200,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   # --- destroy ---
 
   test "admin deletes another family" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     assert_difference "Family.count", -1 do
       delete family_path(families(:two))
@@ -210,7 +210,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   end
 
   test "admin cannot delete themselves" do
-    sign_in_as "admins"
+    sign_in_as "adminfamily"
 
     assert_no_difference "Family.count" do
       delete family_path(families(:admin))
@@ -219,7 +219,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   end
 
   test "non-admin cannot delete any family, even themselves" do
-    sign_in_as "smiths"
+    sign_in_as "examplefamily"
 
     assert_no_difference "Family.count" do
       delete family_path(families(:two))
