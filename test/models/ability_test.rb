@@ -26,6 +26,12 @@ class AbilityTest < ActiveSupport::TestCase
     assert ability.cannot?(:destroy, Family)
   end
 
+  test "non-admin family cannot create families" do
+    ability = Ability.new(families(:one))
+    assert ability.cannot?(:new, Family.new)
+    assert ability.cannot?(:create, Family.new)
+  end
+
   test "non-admin family cannot manage everything" do
     assert Ability.new(families(:one)).cannot?(:manage, :all)
   end

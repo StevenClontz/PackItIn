@@ -11,11 +11,10 @@ class Ability
       can :manage, :all
       cannot :destroy, Family, id: family.id
     else
+      # Not :manage: with an `id` condition CanCan would build `Family.new(id: family.id)`
+      # for :new, which would then pass the check.
       can :read, Family
-      can :manage, Family, id: family.id
-
-      # Families can never be deleted by themselves.
-      cannot :destroy, Family
+      can :update, Family, id: family.id
     end
   end
 end

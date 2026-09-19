@@ -1,0 +1,23 @@
+<div class="mx-auto w-full max-w-md">
+  <h2 class="mb-6 text-2xl font-bold"><%= @family.username %></h2>
+
+  <dl class="mb-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
+    <dt class="font-medium">Username</dt>
+    <dd><%= @family.username %></dd>
+    <dt class="font-medium">Administrator</dt>
+    <dd><%= @family.admin? ? "Yes" : "No" %></dd>
+    <dt class="font-medium">Created</dt>
+    <dd><%= l @family.created_at.to_date, format: :long %></dd>
+  </dl>
+
+  <div class="flex items-center gap-4">
+    <% if can? :update, @family %>
+      <%= link_to "Edit", edit_family_path(@family), class: "text-blue-600 hover:underline" %>
+    <% end %>
+    <% if can? :destroy, @family %>
+      <%= button_to "Delete", family_path(@family), method: :delete, data: { turbo_confirm: "Delete #{@family.username}? This cannot be undone." }, class: "text-red-600 hover:underline cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <p class="mt-6 text-sm"><%= link_to "Back to families", families_path, class: "text-blue-600 hover:underline" %></p>
+</div>

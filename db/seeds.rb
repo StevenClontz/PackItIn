@@ -13,4 +13,9 @@ if Rails.env.development?
   # (which does the same) to keep this idempotent.
   Family.find_for_authentication(username: "ExampleFamily") ||
     Family.create!(username: "ExampleFamily", password: "password123")
+
+  # Re-running the seed also restores the admin flag if it was removed.
+  admin = Family.find_for_authentication(username: "AdminFamily") ||
+    Family.new(username: "AdminFamily", password: "password123")
+  admin.update!(admin: true)
 end

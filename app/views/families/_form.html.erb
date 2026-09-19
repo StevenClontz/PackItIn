@@ -1,0 +1,41 @@
+<% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+<% editing_self = family.persisted? && family == current_family %>
+
+<%= form_with(model: family) do |f| %>
+  <%= render "devise/shared/error_messages", resource: family %>
+
+  <div class="mb-4">
+    <%= f.label :username, class: "mb-1 block font-medium" %>
+    <%= f.text_field :username, autofocus: true, autocomplete: "off", class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :password, class: "mb-1 block font-medium" %>
+    <% if family.persisted? %>
+      <p class="mb-1 text-sm text-gray-500">Leave blank to keep the current password.</p>
+    <% end %>
+    <%= f.password_field :password, autocomplete: "new-password", class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :password_confirmation, class: "mb-1 block font-medium" %>
+    <%= f.password_field :password_confirmation, autocomplete: "new-password", class: input_class %>
+  </div>
+
+  <% if editing_self %>
+    <div class="mb-4">
+      <%= f.label :current_password, class: "mb-1 block font-medium" %>
+      <p class="mb-1 text-sm text-gray-500">Required only if you are changing your password.</p>
+      <%= f.password_field :current_password, autocomplete: "current-password", class: input_class %>
+    </div>
+  <% end %>
+
+  <% if current_family.admin? && family != current_family %>
+    <div class="mb-4 flex items-center gap-2">
+      <%= f.check_box :admin %>
+      <%= f.label :admin, "Administrator", class: "font-medium" %>
+    </div>
+  <% end %>
+
+  <%= f.submit class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+<% end %>
