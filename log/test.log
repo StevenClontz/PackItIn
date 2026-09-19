@@ -1,0 +1,662 @@
+Using vips to process variants requires the libvips library. Please install libvips using the instructions on the libvips website.
+Using vips to process variants requires the libvips library. Please install libvips using the instructions on the libvips website.
+  [1m[35m (0.5ms)[0m  [1m[35mDROP TABLE IF EXISTS "families"[0m
+  [1m[35m (2.7ms)[0m  [1m[35mCREATE TABLE "families" ("id" integer PRIMARY KEY AUTOINCREMENT NOT NULL, "created_at" datetime(6) NOT NULL, "encrypted_password" varchar DEFAULT '' NOT NULL, "remember_created_at" datetime(6), "updated_at" datetime(6) NOT NULL, "username" varchar NOT NULL)[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE UNIQUE INDEX "index_families_on_username" ON "families" ("username")[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE TABLE "schema_migrations" ("version" varchar NOT NULL PRIMARY KEY)[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[35m (0.2ms)[0m  [1m[32mINSERT INTO "schema_migrations" (version) VALUES (20260919020330)[0m
+  [1m[35m (0.2ms)[0m  [1m[35mCREATE TABLE "ar_internal_metadata" ("key" varchar NOT NULL PRIMARY KEY, "value" varchar, "created_at" datetime(6) NOT NULL, "updated_at" datetime(6) NOT NULL)[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "environment"]]
+  [1m[36mActiveRecord::InternalMetadata Create (0.2ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ('environment', 'test', '2026-09-19 02:05:39.537541', '2026-09-19 02:05:39.537544') RETURNING "key"[0m
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "environment"]]
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "schema_sha1"]]
+  [1m[36mActiveRecord::InternalMetadata Create (0.1ms)[0m  [1m[32mINSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ('schema_sha1', '1e967638f7ea97e4dcc9dde04dd3f1e083b57fc8', '2026-09-19 02:05:39.538759', '2026-09-19 02:05:39.538761') RETURNING "key"[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mBEGIN immediate TRANSACTION[0m
+  [1m[35m (0.3ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[36mFixtures Load (0.1ms)[0m  [1m[31mDELETE FROM "families";
+INSERT INTO "families" ("id", "created_at", "encrypted_password", "remember_created_at", "updated_at", "username") VALUES (980190962, '2026-09-19 02:05:39.636848', '$2a$04$cpPf69/jExTTZ5kEjAgvRuwfq9HGhdh1lI22XjdevN17Zqz/vVngu', NULL, '2026-09-19 02:05:39.636848', 'smiths'), (298486374, '2026-09-19 02:05:39.636848', '$2a$04$2cC5JoeAvsuezs0U/JCL7OqfcvrjQyE9qGfJnzVgo1qu1BVtvDgLa', NULL, '2026-09-19 02:05:39.636848', 'joneses')[0m
+  [1m[35m (0.1ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.1ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mTRANSACTION (11.2ms)[0m  [1m[36mCOMMIT TRANSACTION[0m
+  [1m[35m (0.1ms)[0m  [1m[35mPRAGMA foreign_key_check[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------
+AbilityTest: test_guests_have_no_abilities
+------------------------------------------
+  [1m[36mFamily Load (0.2ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------------------
+AbilityTest: test_signed-in_family_can_manage_only_itself
+---------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 298486374], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------------------
+AbilityTest: test_signed-in_family_can_read_any_family
+------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 298486374], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.7ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------
+AuthenticationTest: test_sign_in_and_sign_out
+---------------------------------------------
+Started POST "/families/sign_in" for 127.0.0.1 at 2026-09-19 02:05:39 +0000
+Processing by Devise::SessionsController#create as HTML
+  Parameters: {"family" => {"username" => "smiths", "password" => "[FILTERED]"}}
+  [1m[36mFamily Load (0.2ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."username" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+Redirected to http://www.example.com/
+Completed 303 See Other in 40ms (ActiveRecord: 0.2ms (1 query, 0 cached) | GC: 0.0ms)
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:05:39 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  Rendered home/index.html.erb within layouts/application (Duration: 0.9ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.1ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 5ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------------------------------
+AuthenticationTest: test_sign_up_with_invalid_data_re-renders_form
+------------------------------------------------------------------
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+Started POST "/families" for 127.0.0.1 at 2026-09-19 02:05:39 +0000
+Processing by Devise::RegistrationsController#create as HTML
+  Parameters: {"family" => {"username" => "", "password" => "[FILTERED]", "password_confirmation" => "[FILTERED]"}}
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mFamily Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", ""], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  Rendering layout layouts/application.html.erb
+  Rendering devise/registrations/new.html.erb within layouts/application
+  Rendered devise/shared/_error_messages.html.erb (Duration: 1.6ms | GC: 0.0ms)
+  Rendered devise/shared/_links.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered devise/registrations/new.html.erb within layouts/application (Duration: 9.5ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 16.7ms | GC: 0.0ms)
+Completed 422 Unprocessable Content in 21ms (Views: 17.5ms | ActiveRecord: 0.3ms (1 query, 0 cached) | GC: 0.0ms)
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------------------
+AuthenticationTest: test_username_sign_in_is_case_insensitive
+-------------------------------------------------------------
+Started POST "/families/sign_in" for 127.0.0.1 at 2026-09-19 02:05:39 +0000
+Processing by Devise::SessionsController#create as HTML
+  Parameters: {"family" => {"username" => "SMITHS", "password" => "[FILTERED]"}}
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."username" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+Redirected to http://www.example.com/
+Completed 303 See Other in 3ms (ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+--------------------------------------------
+AuthenticationTest: test_home_page_is_public
+--------------------------------------------
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:05:39 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  Rendered home/index.html.erb within layouts/application (Duration: 0.5ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.2ms | GC: 0.0ms)
+Completed 200 OK in 2ms (Views: 1.6ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-----------------------------------------------------------
+AuthenticationTest: test_sign_up_with_username_and_password
+-----------------------------------------------------------
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+Started POST "/families" for 127.0.0.1 at 2026-09-19 02:05:39 +0000
+Processing by Devise::RegistrationsController#create as HTML
+  Parameters: {"family" => {"username" => "brandnew", "password" => "[FILTERED]", "password_confirmation" => "[FILTERED]"}}
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mFamily Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "brandnew"], ["LIMIT", 1]]
+  [1m[36mFamily Create (0.2ms)[0m  [1m[32mINSERT INTO "families" ("created_at", "encrypted_password", "remember_created_at", "updated_at", "username") VALUES (?, ?, ?, ?, ?) RETURNING "id"[0m  [["created_at", "2026-09-19 02:05:39.966635"], ["encrypted_password", "[FILTERED]"], ["remember_created_at", nil], ["updated_at", "2026-09-19 02:05:39.966635"], ["username", "brandnew"]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_1[0m
+Redirected to http://www.example.com/
+Completed 303 See Other in 6ms (ActiveRecord: 0.6ms (2 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:05:39 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  Rendered home/index.html.erb within layouts/application (Duration: 0.7ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.0ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 2ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------------
+AuthenticationTest: test_wrong_password_is_rejected
+---------------------------------------------------
+Started POST "/families/sign_in" for 127.0.0.1 at 2026-09-19 02:05:39 +0000
+Processing by Devise::SessionsController#create as HTML
+  Parameters: {"family" => {"username" => "smiths", "password" => "[FILTERED]"}}
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."username" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+Completed 401 Unauthorized in 3ms (ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+Processing by Devise::SessionsController#new as HTML
+  Parameters: {"family" => {"username" => "smiths", "password" => "[FILTERED]"}}
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 4.3ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 5.0ms | GC: 0.0ms)
+Completed 200 OK in 8ms (Views: 6.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------------------------------
+FamilyTest: test_existing_family_can_be_updated_without_a_password
+------------------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mFamily Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) AND "families"."id" != ? LIMIT ?[0m  [["username", "renamed"], ["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Update (0.1ms)[0m  [1m[33mUPDATE "families" SET "updated_at" = ?, "username" = ? WHERE "families"."id" = ?[0m  [["updated_at", "2026-09-19 02:05:39.997538"], ["username", "renamed"], ["id", 980190962]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_1[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------
+FamilyTest: test_valid_with_username_and_password
+-------------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------
+FamilyTest: test_password_must_be_long_enough
+---------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-----------------------------------------------------------
+FamilyTest: test_authenticates_with_the_right_password_only
+-----------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+----------------------------------------------
+FamilyTest: test_requires_a_password_on_create
+----------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------
+FamilyTest: test_password_must_match_confirmation
+-------------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+----------------------------------------------------
+FamilyTest: test_username_rejects_invalid_characters
+----------------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "bad name!"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------
+FamilyTest: test_requires_a_username
+------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE "families"."username" IS NULL LIMIT ?[0m  [["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------------
+FamilyTest: test_username_must_be_unique,_ignoring_case
+-------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+Using vips to process variants requires the libvips library. Please install libvips using the instructions on the libvips website.
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "schema_sha1"]]
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mBEGIN immediate TRANSACTION[0m
+  [1m[35m (0.3ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[36mFixtures Load (0.1ms)[0m  [1m[31mDELETE FROM "families";
+INSERT INTO "families" ("id", "created_at", "encrypted_password", "remember_created_at", "updated_at", "username") VALUES (980190962, '2026-09-19 02:05:48.785956', '$2a$04$45RKdhInMX5dPVJp1RCkXOkkqSsiDZ2kJ/8vAqbLp7qVJBYx8i0mC', NULL, '2026-09-19 02:05:48.785956', 'smiths'), (298486374, '2026-09-19 02:05:48.785956', '$2a$04$HF1ZJ5hbi1iTHJ1Zvr5nlOcYLuwPfr15b5oiblgVED0IjOxbep7IO', NULL, '2026-09-19 02:05:48.785956', 'joneses')[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mTRANSACTION (7.9ms)[0m  [1m[36mCOMMIT TRANSACTION[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_key_check[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-----------------------------------------------------------
+AuthenticationTest: test_sign_up_with_username_and_password
+-----------------------------------------------------------
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+Started POST "/families" for 127.0.0.1 at 2026-09-19 02:05:48 +0000
+Processing by Devise::RegistrationsController#create as HTML
+  Parameters: {"family" => {"username" => "brandnew", "password" => "[FILTERED]", "password_confirmation" => "[FILTERED]"}}
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mFamily Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "brandnew"], ["LIMIT", 1]]
+  [1m[36mFamily Create (0.1ms)[0m  [1m[32mINSERT INTO "families" ("created_at", "encrypted_password", "remember_created_at", "updated_at", "username") VALUES (?, ?, ?, ?, ?) RETURNING "id"[0m  [["created_at", "2026-09-19 02:05:48.927022"], ["encrypted_password", "[FILTERED]"], ["remember_created_at", nil], ["updated_at", "2026-09-19 02:05:48.927022"], ["username", "brandnew"]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_1[0m
+Redirected to http://www.example.com/
+Completed 303 See Other in 21ms (ActiveRecord: 0.6ms (2 queries, 0 cached) | GC: 1.3ms)
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:05:48 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  Rendered home/index.html.erb within layouts/application (Duration: 0.9ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.1ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 4ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.3ms)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+Using vips to process variants requires the libvips library. Please install libvips using the instructions on the libvips website.
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "schema_sha1"]]
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mBEGIN immediate TRANSACTION[0m
+  [1m[35m (0.3ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[36mFixtures Load (0.1ms)[0m  [1m[31mDELETE FROM "families";
+INSERT INTO "families" ("id", "created_at", "encrypted_password", "remember_created_at", "updated_at", "username") VALUES (980190962, '2026-09-19 02:06:42.470112', '$2a$04$4O.SC5/PVlLXmlxb6JpgfuWffsVqP72lh59ud.GhlnFKLPBXH8NNW', NULL, '2026-09-19 02:06:42.470112', 'smiths'), (298486374, '2026-09-19 02:06:42.470112', '$2a$04$o6MnQQnWaJ3G8W0qVFtB9OOwoHmd4PaOofMWgcrj.bUANuU4Lji2.', NULL, '2026-09-19 02:06:42.470112', 'joneses')[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mTRANSACTION (7.5ms)[0m  [1m[36mCOMMIT TRANSACTION[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_key_check[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-----------------------------------------------------------
+AuthenticationTest: test_sign_up_with_username_and_password
+-----------------------------------------------------------
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+Started POST "/families" for 127.0.0.1 at 2026-09-19 02:06:42 +0000
+Processing by Devise::RegistrationsController#create as HTML
+  Parameters: {"family" => {"username" => "brandnew", "password" => "[FILTERED]", "password_confirmation" => "[FILTERED]"}}
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mFamily Exists? (0.4ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "brandnew"], ["LIMIT", 1]]
+  [1m[36mFamily Create (0.1ms)[0m  [1m[32mINSERT INTO "families" ("created_at", "encrypted_password", "remember_created_at", "updated_at", "username") VALUES (?, ?, ?, ?, ?) RETURNING "id"[0m  [["created_at", "2026-09-19 02:06:42.570803"], ["encrypted_password", "[FILTERED]"], ["remember_created_at", nil], ["updated_at", "2026-09-19 02:06:42.570803"], ["username", "brandnew"]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_1[0m
+Redirected to http://www.example.com/
+Completed 303 See Other in 20ms (ActiveRecord: 0.6ms (2 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:06:42 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["id", 980190963], ["LIMIT", 1]]
+  Rendered home/index.html.erb within layouts/application (Duration: 7.8ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 15.7ms | GC: 0.0ms)
+Completed 200 OK in 18ms (Views: 16.7ms | ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------
+AuthenticationTest: test_sign_in_and_sign_out
+---------------------------------------------
+Started POST "/families/sign_in" for 127.0.0.1 at 2026-09-19 02:06:42 +0000
+Processing by Devise::SessionsController#create as HTML
+  Parameters: {"family" => {"username" => "smiths", "password" => "[FILTERED]"}}
+  [1m[36mFamily Load (0.2ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."username" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+Redirected to http://www.example.com/
+Completed 303 See Other in 3ms (ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:06:42 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  Rendered home/index.html.erb within layouts/application (Duration: 0.8ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.3ms | GC: 0.0ms)
+Completed 200 OK in 2ms (Views: 1.5ms | ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+Started DELETE "/families/sign_out" for 127.0.0.1 at 2026-09-19 02:06:42 +0000
+Processing by Devise::SessionsController#destroy as HTML
+  [1m[36mCACHE Family Load (0.0ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+Redirected to http://www.example.com/
+Completed 303 See Other in 3ms (ActiveRecord: 0.0ms (1 query, 1 cached) | GC: 0.0ms)
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:06:42 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  Rendered home/index.html.erb within layouts/application (Duration: 0.3ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 0.8ms | GC: 0.0ms)
+Completed 200 OK in 1ms (Views: 1.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------------------------------
+AuthenticationTest: test_sign_up_with_invalid_data_re-renders_form
+------------------------------------------------------------------
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+Started POST "/families" for 127.0.0.1 at 2026-09-19 02:06:42 +0000
+Processing by Devise::RegistrationsController#create as HTML
+  Parameters: {"family" => {"username" => "", "password" => "[FILTERED]", "password_confirmation" => "[FILTERED]"}}
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mFamily Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", ""], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  Rendering layout layouts/application.html.erb
+  Rendering devise/registrations/new.html.erb within layouts/application
+  Rendered devise/shared/_error_messages.html.erb (Duration: 1.6ms | GC: 0.0ms)
+  Rendered devise/shared/_links.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered devise/registrations/new.html.erb within layouts/application (Duration: 6.7ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 7.2ms | GC: 0.0ms)
+Completed 422 Unprocessable Content in 11ms (Views: 7.9ms | ActiveRecord: 0.3ms (1 query, 0 cached) | GC: 0.0ms)
+  [1m[36mFamily Count (0.0ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------------------
+AuthenticationTest: test_username_sign_in_is_case_insensitive
+-------------------------------------------------------------
+Started POST "/families/sign_in" for 127.0.0.1 at 2026-09-19 02:06:42 +0000
+Processing by Devise::SessionsController#create as HTML
+  Parameters: {"family" => {"username" => "SMITHS", "password" => "[FILTERED]"}}
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."username" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+Redirected to http://www.example.com/
+Completed 303 See Other in 2ms (ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------------
+AuthenticationTest: test_wrong_password_is_rejected
+---------------------------------------------------
+Started POST "/families/sign_in" for 127.0.0.1 at 2026-09-19 02:06:42 +0000
+Processing by Devise::SessionsController#create as HTML
+  Parameters: {"family" => {"username" => "smiths", "password" => "[FILTERED]"}}
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."username" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+Completed 401 Unauthorized in 2ms (ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+Processing by Devise::SessionsController#new as HTML
+  Parameters: {"family" => {"username" => "smiths", "password" => "[FILTERED]"}}
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 1.9ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 2.5ms | GC: 0.0ms)
+Completed 200 OK in 4ms (Views: 3.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+--------------------------------------------
+AuthenticationTest: test_home_page_is_public
+--------------------------------------------
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:06:42 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  Rendered home/index.html.erb within layouts/application (Duration: 0.3ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 0.9ms | GC: 0.0ms)
+Completed 200 OK in 1ms (Views: 1.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+----------------------------------------------
+FamilyTest: test_requires_a_password_on_create
+----------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------------------------------
+FamilyTest: test_existing_family_can_be_updated_without_a_password
+------------------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mFamily Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) AND "families"."id" != ? LIMIT ?[0m  [["username", "renamed"], ["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Update (0.1ms)[0m  [1m[33mUPDATE "families" SET "updated_at" = ?, "username" = ? WHERE "families"."id" = ?[0m  [["updated_at", "2026-09-19 02:06:42.656277"], ["username", "renamed"], ["id", 980190962]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_1[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------
+FamilyTest: test_requires_a_username
+------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE "families"."username" IS NULL LIMIT ?[0m  [["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------
+FamilyTest: test_password_must_match_confirmation
+-------------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------
+FamilyTest: test_password_must_be_long_enough
+---------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------------
+FamilyTest: test_username_must_be_unique,_ignoring_case
+-------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------
+FamilyTest: test_valid_with_username_and_password
+-------------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+----------------------------------------------------
+FamilyTest: test_username_rejects_invalid_characters
+----------------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "bad name!"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-----------------------------------------------------------
+FamilyTest: test_authenticates_with_the_right_password_only
+-----------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------------------
+AbilityTest: test_signed-in_family_can_read_any_family
+------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 298486374], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------------------
+AbilityTest: test_signed-in_family_can_manage_only_itself
+---------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 298486374], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------
+AbilityTest: test_guests_have_no_abilities
+------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+Using vips to process variants requires the libvips library. Please install libvips using the instructions on the libvips website.
+  [1m[36mActiveRecord::InternalMetadata Load (0.2ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = ? ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1[0m  [[nil, "schema_sha1"]]
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mBEGIN immediate TRANSACTION[0m
+  [1m[35m (0.3ms)[0m  [1m[35mPRAGMA foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA defer_foreign_keys = ON[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = OFF[0m
+  [1m[36mFixtures Load (0.1ms)[0m  [1m[31mDELETE FROM "families";
+INSERT INTO "families" ("id", "created_at", "encrypted_password", "remember_created_at", "updated_at", "username") VALUES (980190962, '2026-09-19 02:07:30.200733', '$2a$04$boEo.ruPONCKEO6yJOoDvukreL4rCPC6nw9U1fWl3uDooACSBB8aG', NULL, '2026-09-19 02:07:30.200733', 'smiths'), (298486374, '2026-09-19 02:07:30.200733', '$2a$04$58HipL1zkHzbSt8mpdB87.lHg9rQS5/TsMdfRx0FuSxj0phLTGVJm', NULL, '2026-09-19 02:07:30.200733', 'joneses')[0m
+  [1m[35m (0.1ms)[0m  [1m[35mPRAGMA defer_foreign_keys = 0[0m
+  [1m[35m (0.0ms)[0m  [1m[35mPRAGMA foreign_keys = 1[0m
+  [1m[36mTRANSACTION (15.2ms)[0m  [1m[36mCOMMIT TRANSACTION[0m
+  [1m[35m (0.1ms)[0m  [1m[35mPRAGMA foreign_key_check[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------
+FamilyTest: test_requires_a_username
+------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE "families"."username" IS NULL LIMIT ?[0m  [["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-----------------------------------------------------------
+FamilyTest: test_authenticates_with_the_right_password_only
+-----------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------------
+FamilyTest: test_username_must_be_unique,_ignoring_case
+-------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------
+FamilyTest: test_password_must_be_long_enough
+---------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------
+FamilyTest: test_password_must_match_confirmation
+-------------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------
+FamilyTest: test_valid_with_username_and_password
+-------------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+----------------------------------------------
+FamilyTest: test_requires_a_password_on_create
+----------------------------------------------
+  [1m[36mFamily Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "newfamily"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+----------------------------------------------------
+FamilyTest: test_username_rejects_invalid_characters
+----------------------------------------------------
+  [1m[36mFamily Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "bad name!"], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------------------------------
+FamilyTest: test_existing_family_can_be_updated_without_a_password
+------------------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mFamily Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) AND "families"."id" != ? LIMIT ?[0m  [["username", "renamed"], ["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Update (0.1ms)[0m  [1m[33mUPDATE "families" SET "updated_at" = ?, "username" = ? WHERE "families"."id" = ?[0m  [["updated_at", "2026-09-19 02:07:30.251827"], ["username", "renamed"], ["id", 980190962]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_1[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------
+AbilityTest: test_guests_have_no_abilities
+------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------------------
+AbilityTest: test_signed-in_family_can_read_any_family
+------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 298486374], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------------------
+AbilityTest: test_signed-in_family_can_manage_only_itself
+---------------------------------------------------------
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? LIMIT ?[0m  [["id", 298486374], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-------------------------------------------------------------
+AuthenticationTest: test_username_sign_in_is_case_insensitive
+-------------------------------------------------------------
+Started POST "/families/sign_in" for 127.0.0.1 at 2026-09-19 02:07:30 +0000
+Processing by Devise::SessionsController#create as HTML
+  Parameters: {"family" => {"username" => "SMITHS", "password" => "[FILTERED]"}}
+  [1m[36mFamily Load (0.2ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."username" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+Redirected to http://www.example.com/
+Completed 303 See Other in 16ms (ActiveRecord: 0.2ms (1 query, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+------------------------------------------------------------------
+AuthenticationTest: test_sign_up_with_invalid_data_re-renders_form
+------------------------------------------------------------------
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+Started POST "/families" for 127.0.0.1 at 2026-09-19 02:07:30 +0000
+Processing by Devise::RegistrationsController#create as HTML
+  Parameters: {"family" => {"username" => "", "password" => "[FILTERED]", "password_confirmation" => "[FILTERED]"}}
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mFamily Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", ""], ["LIMIT", 1]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TO SAVEPOINT active_record_1[0m
+  Rendering layout layouts/application.html.erb
+  Rendering devise/registrations/new.html.erb within layouts/application
+  Rendered devise/shared/_error_messages.html.erb (Duration: 1.6ms | GC: 0.0ms)
+  Rendered devise/shared/_links.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered devise/registrations/new.html.erb within layouts/application (Duration: 7.3ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 14.6ms | GC: 0.0ms)
+Completed 422 Unprocessable Content in 21ms (Views: 16.8ms | ActiveRecord: 0.3ms (1 query, 0 cached) | GC: 0.0ms)
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+--------------------------------------------
+AuthenticationTest: test_home_page_is_public
+--------------------------------------------
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:07:30 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  Rendered home/index.html.erb within layouts/application (Duration: 0.7ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.2ms | GC: 0.0ms)
+Completed 200 OK in 2ms (Views: 2.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------------
+AuthenticationTest: test_wrong_password_is_rejected
+---------------------------------------------------
+Started POST "/families/sign_in" for 127.0.0.1 at 2026-09-19 02:07:30 +0000
+Processing by Devise::SessionsController#create as HTML
+  Parameters: {"family" => {"username" => "smiths", "password" => "[FILTERED]"}}
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."username" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+Completed 401 Unauthorized in 2ms (ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+Processing by Devise::SessionsController#new as HTML
+  Parameters: {"family" => {"username" => "smiths", "password" => "[FILTERED]"}}
+  Rendering layout layouts/application.html.erb
+  Rendering devise/sessions/new.html.erb within layouts/application
+  Rendered devise/shared/_links.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered devise/sessions/new.html.erb within layouts/application (Duration: 2.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 2.5ms | GC: 0.0ms)
+Completed 200 OK in 5ms (Views: 3.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+---------------------------------------------
+AuthenticationTest: test_sign_in_and_sign_out
+---------------------------------------------
+Started POST "/families/sign_in" for 127.0.0.1 at 2026-09-19 02:07:30 +0000
+Processing by Devise::SessionsController#create as HTML
+  Parameters: {"family" => {"username" => "smiths", "password" => "[FILTERED]"}}
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."username" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["username", "smiths"], ["LIMIT", 1]]
+Redirected to http://www.example.com/
+Completed 303 See Other in 3ms (ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:07:30 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+  Rendered home/index.html.erb within layouts/application (Duration: 2.7ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 3.3ms | GC: 0.0ms)
+Completed 200 OK in 4ms (Views: 3.4ms | ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+Started DELETE "/families/sign_out" for 127.0.0.1 at 2026-09-19 02:07:30 +0000
+Processing by Devise::SessionsController#destroy as HTML
+  [1m[36mCACHE Family Load (0.0ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["id", 980190962], ["LIMIT", 1]]
+Redirected to http://www.example.com/
+Completed 303 See Other in 22ms (ActiveRecord: 0.0ms (1 query, 1 cached) | GC: 19.2ms)
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:07:30 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  Rendered home/index.html.erb within layouts/application (Duration: 0.5ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.1ms | GC: 0.0ms)
+Completed 200 OK in 2ms (Views: 1.5ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mBEGIN deferred TRANSACTION[0m
+-----------------------------------------------------------
+AuthenticationTest: test_sign_up_with_username_and_password
+-----------------------------------------------------------
+  [1m[36mFamily Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+Started POST "/families" for 127.0.0.1 at 2026-09-19 02:07:30 +0000
+Processing by Devise::RegistrationsController#create as HTML
+  Parameters: {"family" => {"username" => "brandnew", "password" => "[FILTERED]", "password_confirmation" => "[FILTERED]"}}
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mSAVEPOINT active_record_1[0m
+  [1m[36mFamily Exists? (0.3ms)[0m  [1m[34mSELECT 1 AS one FROM "families" WHERE LOWER("families"."username") = LOWER(?) LIMIT ?[0m  [["username", "brandnew"], ["LIMIT", 1]]
+  [1m[36mFamily Create (0.2ms)[0m  [1m[32mINSERT INTO "families" ("created_at", "encrypted_password", "remember_created_at", "updated_at", "username") VALUES (?, ?, ?, ?, ?) RETURNING "id"[0m  [["created_at", "2026-09-19 02:07:30.446770"], ["encrypted_password", "[FILTERED]"], ["remember_created_at", nil], ["updated_at", "2026-09-19 02:07:30.446770"], ["username", "brandnew"]]
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mRELEASE SAVEPOINT active_record_1[0m
+Redirected to http://www.example.com/
+Completed 303 See Other in 6ms (ActiveRecord: 0.5ms (2 queries, 0 cached) | GC: 0.8ms)
+  [1m[36mFamily Count (0.0ms)[0m  [1m[34mSELECT COUNT(*) FROM "families"[0m
+Started GET "/" for 127.0.0.1 at 2026-09-19 02:07:30 +0000
+Processing by HomeController#index as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering home/index.html.erb within layouts/application
+  [1m[36mFamily Load (0.1ms)[0m  [1m[34mSELECT "families".* FROM "families" WHERE "families"."id" = ? ORDER BY "families"."id" ASC LIMIT ?[0m  [["id", 980190963], ["LIMIT", 1]]
+  Rendered home/index.html.erb within layouts/application (Duration: 1.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 1.6ms | GC: 0.0ms)
+Completed 200 OK in 2ms (Views: 1.8ms | ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[31mROLLBACK TRANSACTION[0m
