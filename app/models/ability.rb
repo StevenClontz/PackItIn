@@ -7,10 +7,15 @@ class Ability
     # Guests (no signed-in family) have no abilities.
     return unless family.present?
 
-    can :read, Family
-    can :manage, Family, id: family.id
+    if family.admin?
+      can :manage, :all
+      cannot :destroy, Family, id: family.id
+    else
+      can :read, Family
+      can :manage, Family, id: family.id
 
-    # Families can never be deleted, not even by themselves.
-    cannot :destroy, Family
+      # Families can never be deleted by themselves.
+      cannot :destroy, Family
+    end
   end
 end

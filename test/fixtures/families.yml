@@ -6,3 +6,8 @@ one:
 two:
   username: joneses
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
+
+admin:
+  username: admins
+  admin: true
+  encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>

@@ -66,6 +66,28 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "input[name=_method][value=delete]", count: 0
   end
 
+  test "sign up cannot make a family an admin" do
+    post family_registration_path, params: { family: { username: "sneaky", password: "password123", password_confirmation: "password123", admin: "1" } }
+    assert_not Family.find_by!(username: "sneaky").admin?
+  end
+
+  test "account update cannot make a family an admin" do
+    post family_session_path, params: { family: { username: "smiths", password: "password123" } }
+    put family_registration_path, params: { family: { username: "smiths", admin: "1", current_password: "password123" } }
+    assert_not families(:one).reload.admin?
+  end
+
+  test "admin family cannot destroy its own account either" do
+    post family_session_path, params: { family: { username: "admins", password: "password123" } }
+
+    assert_no_difference "Family.count" do
+      delete family_registration_path
+    end
+    assert_redirected_to root_path
+    follow_redirect!
+    assert_match "not authorized", response.body
+  end
+
   test "guest cannot destroy a family either" do
     assert_no_difference "Family.count" do
       delete family_registration_path

@@ -9,6 +9,12 @@ class FamilyTest < ActiveSupport::TestCase
     assert build_family.valid?
   end
 
+  test "is not an admin by default" do
+    assert_not build_family.admin?
+    assert_not families(:one).admin?
+    assert families(:admin).admin?
+  end
+
   test "requires a username" do
     family = build_family(username: nil)
     assert_not family.valid?
