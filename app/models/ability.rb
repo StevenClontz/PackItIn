@@ -15,6 +15,9 @@ class Ability
       # for :new, which would then pass the check.
       can :read, Family
       can :update, Family, id: family.id
+
+      # People are only visible to their own family, and only admins can change them.
+      can :read, Person, family_id: family.id
     end
   end
 end

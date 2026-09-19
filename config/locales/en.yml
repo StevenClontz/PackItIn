@@ -29,3 +29,13 @@
 
 en:
   hello: "Hello world"
+  people:
+    positions:
+      adult: "Adult"
+      lion: "Lion"
+      tiger: "Tiger"
+      wolf: "Wolf"
+      bear: "Bear"
+      webelos: "Webelos"
+      aol: "AOL"
+      youth: "Youth"

@@ -53,4 +53,36 @@ class AbilityTest < ActiveSupport::TestCase
     assert ability.can?(:update, families(:admin))
     assert ability.can?(:read, families(:admin))
   end
+
+  test "guests have no abilities on people" do
+    ability = Ability.new(nil)
+    assert ability.cannot?(:read, people(:smith_dad))
+    assert ability.cannot?(:read, Person)
+  end
+
+  test "non-admin family can read only its own people" do
+    ability = Ability.new(families(:one))
+    assert ability.can?(:read, people(:smith_dad))
+    assert ability.can?(:read, Person.new(family: families(:one)))
+    assert ability.cannot?(:read, people(:jones_bear))
+    assert ability.cannot?(:read, Person.new(family: families(:two)))
+  end
+
+  test "non-admin family cannot change any person, even its own" do
+    ability = Ability.new(families(:one))
+    %i[create new update destroy].each do |action|
+      assert ability.cannot?(action, people(:smith_dad)), "own person: #{action}"
+      assert ability.cannot?(action, people(:jones_bear)), "other person: #{action}"
+      assert ability.cannot?(action, Person.new(family: families(:one))), "new own person: #{action}"
+    end
+  end
+
+  test "admin family can manage every person" do
+    ability = Ability.new(families(:admin))
+    %i[read create update destroy].each do |action|
+      assert ability.can?(action, people(:smith_dad)), action
+      assert ability.can?(action, people(:jones_bear)), action
+    end
+    assert ability.can?(:create, Person.new(family: families(:two)))
+  end
 end

@@ -2,7 +2,9 @@ Rails.application.routes.draw do
   # Devise lives under /account so that /families is free for the resourceful CRUD below
   # (Devise's sign-up would otherwise claim POST /families).
   devise_for :families, path: "account", controllers: { registrations: "families/registrations" }
-  resources :families
+  resources :families do
+    resources :people, shallow: true
+  end
 
   root "home#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

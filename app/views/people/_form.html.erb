@@ -1,0 +1,23 @@
+<% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+<% url = person.persisted? ? person_path(person) : family_people_path(family) %>
+
+<%= form_with(model: person, url: url) do |f| %>
+  <%= render "devise/shared/error_messages", resource: person %>
+
+  <div class="mb-4">
+    <%= f.label :first_name, class: "mb-1 block font-medium" %>
+    <%= f.text_field :first_name, autofocus: true, class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :last_name, class: "mb-1 block font-medium" %>
+    <%= f.text_field :last_name, class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :position, class: "mb-1 block font-medium" %>
+    <%= f.select :position, Person.position_options, { prompt: "Select a position" }, class: input_class %>
+  </div>
+
+  <%= f.submit class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+<% end %>

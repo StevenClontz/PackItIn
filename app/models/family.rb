@@ -3,6 +3,8 @@ class Family < ApplicationRecord
   # (:recoverable, :confirmable); validations are declared below.
   devise :database_authenticatable, :registerable, :rememberable
 
+  has_many :people, dependent: :destroy
+
   validates :username, presence: true,
                        uniqueness: { case_sensitive: false },
                        length: { in: 3..30 },
