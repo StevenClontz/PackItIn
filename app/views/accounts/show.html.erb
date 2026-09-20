@@ -1,5 +1,5 @@
 <div class="mx-auto w-full max-w-2xl">
-  <h2 class="mb-1 text-2xl font-bold"><%= @family.name %> account</h2>
+  <h2 class="mb-1 text-2xl font-bold"><%= @family.name %> Scout Account</h2>
   <p class="mb-6 text-sm text-gray-500">Family: <%= link_to @family.username, family_path(@family), class: "text-blue-600 hover:underline" %></p>
 
   <p class="mb-6 text-lg">Balance: <strong><%= money(@family.balance) %></strong></p>

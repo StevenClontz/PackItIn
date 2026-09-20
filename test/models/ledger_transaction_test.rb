@@ -157,7 +157,7 @@ class LedgerTransactionTest < ActiveSupport::TestCase
   test "account options list outside, every family and every fund" do
     options = LedgerTransaction.account_options
     assert_equal [ "Outside the pack (money in or out)", "outside" ], options.first
-    assert_includes options, [ "Family: The Joneses", ledger_ref(families(:two)) ]
+    assert_includes options, [ "Scout Account: The Joneses", ledger_ref(families(:two)) ]
     assert_includes options, [ "Fund: Campout Fund", ledger_ref(funds(:campout)) ]
     assert_equal 1 + Family.count + Fund.count, options.size
   end

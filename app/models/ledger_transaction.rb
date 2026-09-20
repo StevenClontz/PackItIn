@@ -14,7 +14,7 @@ class LedgerTransaction
   # [[label, value], ...] for the From and To selects.
   def self.account_options
     [ [ "Outside the pack (money in or out)", OUTSIDE ] ] +
-      Family.order(:name).map { |family| [ "Family: #{family.name}", "family:#{family.id}" ] } +
+      Family.order(:name).map { |family| [ "Scout Account: #{family.name}", "family:#{family.id}" ] } +
       Fund.order(:name).map { |fund| [ "Fund: #{fund.name}", "fund:#{fund.id}" ] }
   end
 

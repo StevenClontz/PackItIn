@@ -24,7 +24,7 @@ class AccountsTest < ActionDispatch::IntegrationTest
 
     get family_account_path(families(:one))
     assert_response :success
-    assert_select "h2", "The Example Family account"
+    assert_select "h2", "The Example Family Scout Account"
     assert_match "Balance:", response.body
     assert_select "strong", text: "$75.00"
 
@@ -73,32 +73,32 @@ class AccountsTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "New transaction", count: 0
   end
 
-  test "the family page shows the balance only to that family and to admins" do
+  test "the family page shows the Scout Account only to that family and to admins" do
     transact from: :outside, to: families(:two), dollars: 80
     sign_in_as "examplefamily"
 
     get family_path(families(:two))
     assert_response :success
-    assert_select "dt", text: "Balance", count: 0
+    assert_select "dt", text: "Scout Account", count: 0
     assert_select "a[href=?]", family_account_path(families(:two)), count: 0
     assert_no_match "$80.00", response.body
 
     get family_path(families(:one))
-    assert_select "dt", "Balance"
+    assert_select "dt", "Scout Account"
     assert_select "a[href=?]", family_account_path(families(:one))
 
     delete destroy_family_session_path
     sign_in_as "adminfamily"
     get family_path(families(:two))
-    assert_select "dt", "Balance"
+    assert_select "dt", "Scout Account"
     assert_match "$80.00", response.body
   end
 
-  test "the home page links to funds and to the family's own balance" do
+  test "the home page links to funds and to the family's own Scout Account" do
     sign_in_as "examplefamily"
     get root_path
     assert_select "a[href=?]", funds_path, text: "Funds"
-    assert_select "a[href=?]", family_account_path(families(:one)), text: "My balance"
+    assert_select "a[href=?]", family_account_path(families(:one)), text: "My Scout Account"
   end
 
   test "statements show only the latest 200 lines" do

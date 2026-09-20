@@ -52,8 +52,8 @@ class LedgerTransactionsTest < ActionDispatch::IntegrationTest
     %w[from to].each do |field|
       assert_select "select[name=?]", "ledger_transaction[#{field}]" do
         assert_select "option", text: /Outside the pack/
-        assert_select "option[value=?]", ledger_ref(families(:one)), text: "Family: The Example Family"
-        assert_select "option[value=?]", ledger_ref(families(:two)), text: "Family: The Joneses"
+        assert_select "option[value=?]", ledger_ref(families(:one)), text: "Scout Account: The Example Family"
+        assert_select "option[value=?]", ledger_ref(families(:two)), text: "Scout Account: The Joneses"
         assert_select "option[value=?]", ledger_ref(funds(:general)), text: "Fund: General"
         assert_select "option[value=?]", ledger_ref(funds(:campout)), text: "Fund: Campout Fund"
       end

@@ -22,6 +22,11 @@ module HasLedgerAccount
     DoubleEntry::Line.where(account: ledger_account.identifier.to_s, scope: ledger_account.scope_identity).order(id: :desc)
   end
 
+  # What the UI calls this record's account; models override it (a Family's is its "Scout Account").
+  def ledger_account_label
+    "account"
+  end
+
   def ledger_activity?
     ledger_lines.exists?
   end
@@ -32,7 +37,7 @@ module HasLedgerAccount
   def ensure_no_ledger_activity
     return unless ledger_activity?
 
-    errors.add(:base, "#{name} has account activity and can't be deleted")
+    errors.add(:base, "#{name} has #{ledger_account_label} activity and can't be deleted")
     throw :abort
   end
 end

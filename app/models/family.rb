@@ -45,6 +45,11 @@ class Family < ApplicationRecord
     I18n.t("families.states.#{state}") if state
   end
 
+  # A family's money account is called its Scout Account in the UI.
+  def ledger_account_label
+    "Scout Account"
+  end
+
   private
 
   def password_required?

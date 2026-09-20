@@ -6,7 +6,7 @@
       <%= link_to "Events", events_path, class: "text-blue-600 hover:underline" %>
       <%= link_to "Families", families_path, class: "text-blue-600 hover:underline" %>
       <%= link_to "Funds", funds_path, class: "text-blue-600 hover:underline" %>
-      <%= link_to "My balance", family_account_path(current_family), class: "text-blue-600 hover:underline" %>
+      <%= link_to "My Scout Account", family_account_path(current_family), class: "text-blue-600 hover:underline" %>
       <%= link_to "Manage my family", family_path(current_family), class: "text-blue-600 hover:underline" %>
       <%= button_to "Log out", destroy_family_session_path, method: :delete, class: "text-blue-600 hover:underline cursor-pointer" %>
     </div>

@@ -16,7 +16,7 @@ class Ability
       can :read, Family
       can :update, Family, id: family.id
 
-      # A family's own money account is private to it; pack funds are readable by every family.
+      # A family's own Scout Account is private to it; pack funds are readable by every family.
       can :view_account, Family, id: family.id
       can :read, Fund
 

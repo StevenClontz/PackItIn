@@ -310,7 +310,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to family_path(families(:two))
     follow_redirect!
-    assert_match "has account activity and can&#39;t be deleted", response.body
+    assert_match "has Scout Account activity and can&#39;t be deleted", response.body
     assert_equal Money.new(25_00), families(:two).reload.balance
   end
 

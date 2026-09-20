@@ -139,7 +139,7 @@ class FamilyTest < ActiveSupport::TestCase
     assert_no_difference [ "Family.count", "Person.count" ] do
       assert_not families(:one).destroy
     end
-    assert_includes families(:one).errors.full_messages, "The Example Family has account activity and can't be deleted"
+    assert_includes families(:one).errors.full_messages, "The Example Family has Scout Account activity and can't be deleted"
   end
 
   test "activity on the other side of a transfer also protects the account" do

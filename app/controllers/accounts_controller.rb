@@ -1,4 +1,4 @@
-# A family's money account statement. Fund statements are on the fund page.
+# A family's Scout Account statement. Fund statements are on the fund page.
 class AccountsController < ApplicationController
   STATEMENT_LINES = 200
 
