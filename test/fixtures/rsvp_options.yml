@@ -1,9 +1,11 @@
 day_trip:
   event: weekend_trip
   name: Day trip only
+  cost_cents: 2500
   description: Saturday only, home by dinner.
 
 full_weekend:
   event: weekend_trip
   name: Full weekend
+  cost_cents: 6000
   description: Both days, with the overnight camp.

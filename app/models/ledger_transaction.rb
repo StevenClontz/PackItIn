@@ -1,10 +1,9 @@
-# One credit, debit or transfer, as entered by an admin. Accounts are chosen as "outside", "family:<id>" or
-# "fund:<id>": from outside is a deposit (credit), to outside is a withdrawal (debit), anything else a transfer.
+# One credit, debit or transfer, as entered by an admin. Accounts are chosen as "outside", "family:<id>",
+# "fund:<id>" or "event:<id>": from outside is a deposit (credit), to outside is a withdrawal (debit), anything else a transfer.
 class LedgerTransaction
   include ActiveModel::Model
 
   OUTSIDE = "outside".freeze
-  AMOUNT_FORMAT = /\A\d{1,9}(\.\d{1,2})?\z/
 
   attr_accessor :from, :to, :amount, :memo, :admin
 
@@ -15,7 +14,8 @@ class LedgerTransaction
   def self.account_options
     [ [ "Outside the pack (money in or out)", OUTSIDE ] ] +
       Family.order(:name).map { |family| [ "Scout Account: #{family.name}", "family:#{family.id}" ] } +
-      Fund.order(:name).map { |fund| [ "Fund: #{fund.name}", "fund:#{fund.id}" ] }
+      Fund.order(:name).map { |fund| [ "Fund: #{fund.name}", "fund:#{fund.id}" ] } +
+      Event.order(:starts_at).map { |event| [ "Event Account: #{event.title}", "event:#{event.id}" ] }
   end
 
   # The gem's error messages are for developers; every expected failure is validated for up front.
@@ -38,19 +38,15 @@ class LedgerTransaction
   end
 
   def money
-    Money.from_amount(BigDecimal(cleaned_amount))
+    Ledger.parse_dollars(amount)
   end
 
-  # The family or fund whose statement is most relevant afterwards: where the money went, or came from.
+  # The family, fund or event whose statement is most relevant afterwards: where the money went, or came from.
   def subject
     to_record == :outside ? from_record : to_record
   end
 
   private
-
-  def cleaned_amount
-    amount.to_s.strip.delete("$,")
-  end
 
   def from_record
     resolve(from)
@@ -65,6 +61,7 @@ class LedgerTransaction
     when OUTSIDE then :outside
     when /\Afamily:(\d+)\z/ then Family.find_by(id: $1)
     when /\Afund:(\d+)\z/ then Fund.find_by(id: $1)
+    when /\Aevent:(\d+)\z/ then Event.find_by(id: $1)
     end
   end
 
@@ -88,11 +85,11 @@ class LedgerTransaction
   end
 
   def amount_is_valid
-    if cleaned_amount.blank?
+    if amount.to_s.strip.blank?
       errors.add(:amount, "can't be blank")
-    elsif !cleaned_amount.match?(AMOUNT_FORMAT)
+    elsif money.nil?
       errors.add(:amount, "must be a dollar amount such as 25 or 25.50")
-    elsif BigDecimal(cleaned_amount).zero?
+    elsif money.zero?
       errors.add(:amount, "must be greater than zero")
     end
   end

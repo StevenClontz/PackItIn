@@ -9,6 +9,12 @@
   </div>
 
   <div class="mb-4">
+    <%= f.label :cost_dollars, "Cost (dollars)", class: "mb-1 block font-medium" %>
+    <p class="mb-1 text-sm text-gray-500">Optional. Per person. Leave blank if free.</p>
+    <%= f.text_field :cost_dollars, inputmode: "decimal", placeholder: "25.00", autocomplete: "off", class: input_class %>
+  </div>
+
+  <div class="mb-4">
     <%= f.label :description, class: "mb-1 block font-medium" %>
     <p class="mb-1 text-sm text-gray-500">Optional. Shown to families choosing between options.</p>
     <%= f.text_area :description, rows: 3, class: input_class %>

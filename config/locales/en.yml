@@ -39,11 +39,16 @@ en:
       webelos: "Webelos"
       aol: "AOL"
       youth: "Youth"
+  activerecord:
+    attributes:
+      rsvp_option:
+        cost_dollars: "Cost"
   ledger:
     codes:
       deposit: "Deposit"
       withdrawal: "Withdrawal"
       transfer: "Transfer"
+      payment: "Payment"
   rsvps:
     statuses:
       attending: "Attending"

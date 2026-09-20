@@ -51,4 +51,66 @@ class RsvpOptionTest < ActiveSupport::TestCase
       events(:weekend_trip).destroy!
     end
   end
+
+  # --- cost ---
+
+  test "cost is optional" do
+    option = RsvpOption.new(event: events(:campout), name: "Overnight")
+    assert option.valid?
+    assert_nil option.cost
+    assert_not option.costed?
+    assert_nil option.cost_dollars
+  end
+
+  test "cost is stored in cents and read back as money and dollars" do
+    option = RsvpOption.new(event: events(:campout), name: "Overnight", cost_dollars: "$1,250.5")
+    assert option.valid?
+    assert_equal 125_050, option.cost_cents
+    assert_equal Money.new(1_250_50), option.cost
+    assert option.costed?
+
+    option.save!
+    assert_equal "1250.50", RsvpOption.find(option.id).cost_dollars
+    assert_equal "Overnight ($1,250.50)", option.label
+    assert_equal "Day trip only ($25.00)", rsvp_options(:day_trip).label
+  end
+
+  test "a free option's label is just its name" do
+    assert_equal "Overnight", RsvpOption.new(name: "Overnight").label
+    assert_equal "Overnight", RsvpOption.new(name: "Overnight", cost_cents: 0).label
+  end
+
+  test "zero is free and blank clears the cost" do
+    option = RsvpOption.new(event: events(:campout), name: "Overnight", cost_dollars: "0")
+    assert option.valid?
+    assert_equal 0, option.cost_cents
+    assert_not option.costed?
+
+    option.cost_dollars = ""
+    assert_nil option.cost_cents
+    assert option.valid?
+  end
+
+  test "a malformed cost is rejected and remembered for the form" do
+    [ "abc", "-5", "1.234", "1e3", "12.", "9999999999" ].each do |input|
+      option = RsvpOption.new(event: events(:campout), name: "Overnight", cost_dollars: input)
+      assert_not option.valid?, input
+      assert_includes option.errors.full_messages, "Cost must be a dollar amount such as 25 or 25.50", input
+      assert_equal input, option.cost_dollars, "shows what was typed"
+    end
+  end
+
+  test "a cost above the maximum is rejected" do
+    assert RsvpOption.new(event: events(:campout), name: "A", cost_dollars: "100000").valid?
+
+    option = RsvpOption.new(event: events(:campout), name: "B", cost_dollars: "100000.01")
+    assert_not option.valid?
+    assert_includes option.errors[:cost_dollars], "must be between $0 and $100,000"
+  end
+
+  test "a negative cost can't be set directly either" do
+    option = RsvpOption.new(event: events(:campout), name: "Overnight", cost_cents: -1)
+    assert_not option.valid?
+    assert_includes option.errors[:cost_dollars], "must be between $0 and $100,000"
+  end
 end

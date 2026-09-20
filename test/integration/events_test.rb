@@ -196,4 +196,38 @@ class EventsTest < ActionDispatch::IntegrationTest
 
     assert_match(/\w{3}, \w{3} \d+, 5:00 PM C[DS]T to \w{3}, \w{3} \d+, 11:00 AM C[DS]T/, response.body)
   end
+
+  # --- event account ---
+
+  test "every family sees the event's account balance and activity, with family names" do
+    transact from: :outside, to: events(:campout), dollars: 100, memo: "Sponsor gift"
+    transact from: families(:two), to: events(:campout), dollars: 20, memo: "Firewood"
+    sign_in_as "examplefamily"
+
+    get event_path(events(:campout))
+    assert_response :success
+    assert_select "h3", "Event Account"
+    assert_select "p", text: /Balance:\s*\$120\.00/
+    assert_select "td", text: /Deposit\s*Sponsor gift/
+    assert_select "td", text: /Transfer from The Joneses\s*Firewood/
+  end
+
+  test "an event with no activity shows a zero balance" do
+    sign_in_as "examplefamily"
+    get event_path(events(:campout))
+    assert_select "p", text: /Balance:\s*\$0\.00/
+    assert_match "No activity yet", response.body
+  end
+
+  test "an admin can't delete an event that has account activity" do
+    transact from: :outside, to: events(:campout), dollars: 5
+    sign_in_as "adminfamily"
+
+    assert_no_difference [ "Event.count", "Rsvp.count" ] do
+      delete event_path(events(:campout))
+    end
+    assert_redirected_to event_path(events(:campout))
+    follow_redirect!
+    assert_match "Fall Campout has Event Account activity and can&#39;t be deleted", response.body
+  end
 end

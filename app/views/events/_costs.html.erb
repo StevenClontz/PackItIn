@@ -1,0 +1,44 @@
+<% balance = current_family.balance %>
+<h3 class="mb-2 text-lg font-semibold">Costs</h3>
+<div class="mb-6 rounded-md border border-gray-200 p-4">
+  <% if payment.line_items.any? %>
+    <ul class="mb-3 divide-y divide-gray-100 text-sm">
+      <% payment.line_items.each do |item| %>
+        <li class="flex justify-between py-1">
+          <span><%= item.person.full_name %> <span class="text-gray-500">- <%= item.option.name %></span></span>
+          <span><%= money(item.cost) %></span>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <dl class="mb-3 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-sm">
+    <dt class="font-medium">Total</dt>
+    <dd class="text-right"><%= money(payment.total) %></dd>
+    <dt class="font-medium">Already paid</dt>
+    <dd class="text-right"><%= money(payment.paid) %></dd>
+    <dt class="font-medium">Still to pay</dt>
+    <dd class="text-right font-semibold"><%= money([ payment.outstanding, Money.new(0) ].max) %></dd>
+  </dl>
+
+  <% if payment.blockers.any? %>
+    <p class="text-sm text-gray-700">
+      Before paying, mark everyone as attending or not attending (and save the RSVPs):
+      <%= payment.blockers.to_sentence %>.
+    </p>
+  <% elsif payment.overpaid? %>
+    <p class="text-sm text-gray-700">
+      We have paid <%= money(-payment.outstanding) %> more than the current cost. Ask a pack administrator about a refund.
+    </p>
+  <% elsif payment.payable? %>
+    <p class="mb-2 text-sm text-gray-700">
+      Our Scout Account balance is <%= money(balance) %>.
+      <% if (balance - payment.outstanding).negative? %>
+        <strong>This will leave our Scout Account at <%= money(balance - payment.outstanding) %>.</strong>
+      <% end %>
+    </p>
+    <%= button_to "Pay #{payment.outstanding.format} from our Scout Account", event_payment_path(event), params: { amount_cents: payment.outstanding.fractional }, class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+  <% else %>
+    <p class="text-sm text-gray-700">Paid in full.</p>
+  <% end %>
+</div>

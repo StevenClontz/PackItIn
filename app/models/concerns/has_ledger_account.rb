@@ -1,4 +1,4 @@
-# Gives a record (a Family or a Fund) its own account in the double-entry ledger.
+# Gives a record (a Family, a Fund or an Event) its own account in the double-entry ledger.
 module HasLedgerAccount
   extend ActiveSupport::Concern
 
@@ -27,6 +27,11 @@ module HasLedgerAccount
     "account"
   end
 
+  # How messages name this record; Event overrides it, since events have a title rather than a name.
+  def ledger_account_name
+    name
+  end
+
   def ledger_activity?
     ledger_lines.exists?
   end
@@ -37,7 +42,7 @@ module HasLedgerAccount
   def ensure_no_ledger_activity
     return unless ledger_activity?
 
-    errors.add(:base, "#{name} has #{ledger_account_label} activity and can't be deleted")
+    errors.add(:base, "#{ledger_account_name} has #{ledger_account_label} activity and can't be deleted")
     throw :abort
   end
 end

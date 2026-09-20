@@ -11,6 +11,8 @@ class EventsController < ApplicationController
     @options = @event.rsvp_options.to_a
     @people = current_family.people.order(:last_name, :first_name)
     @rsvps = @event.rsvps.where(person: @people).includes(:rsvp_option).index_by(&:person_id)
+    @payment = EventPayment.new(event: @event, family: current_family)
+    @lines = @event.ledger_lines.limit(AccountsController::STATEMENT_LINES)
 
     if current_family.admin?
       @everyone = Person.includes(:family).order(:last_name, :first_name)
@@ -41,8 +43,11 @@ class EventsController < ApplicationController
   end
 
   def destroy
-    @event.destroy!
-    redirect_to events_path, notice: "Event deleted.", status: :see_other
+    if @event.destroy
+      redirect_to events_path, notice: "Event deleted.", status: :see_other
+    else
+      redirect_to @event, alert: @event.errors.full_messages.to_sentence, status: :see_other
+    end
   end
 
   private

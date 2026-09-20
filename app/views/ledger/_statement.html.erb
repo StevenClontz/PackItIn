@@ -21,7 +21,7 @@
             <td class="whitespace-nowrap px-4 py-2"><%= format_ledger_time(line.created_at) %></td>
             <td class="px-4 py-2">
               <%= t("ledger.codes.#{line.code}") %>
-              <% if line.code == :transfer %>
+              <% if %i[transfer payment].include?(line.code) %>
                 <%= line.amount.positive? ? "from" : "to" %> <%= counterparty.call(line) %>
               <% end %>
               <% if memo.present? %>

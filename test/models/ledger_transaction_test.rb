@@ -9,6 +9,7 @@ class LedgerTransactionTest < ActiveSupport::TestCase
   def assert_ledger_balanced
     total = Family.all.sum { |family| family.balance.fractional } +
             Fund.all.sum { |fund| fund.balance.fractional } +
+            Event.all.sum { |event| event.balance.fractional } +
             Ledger.external.balance.fractional
     assert_equal 0, total
   end
@@ -159,6 +160,48 @@ class LedgerTransactionTest < ActiveSupport::TestCase
     assert_equal [ "Outside the pack (money in or out)", "outside" ], options.first
     assert_includes options, [ "Scout Account: The Joneses", ledger_ref(families(:two)) ]
     assert_includes options, [ "Fund: Campout Fund", ledger_ref(funds(:campout)) ]
-    assert_equal 1 + Family.count + Fund.count, options.size
+    assert_includes options, [ "Event Account: Fall Campout", ledger_ref(events(:campout)) ]
+    assert_equal 1 + Family.count + Fund.count + Event.count, options.size
+  end
+
+  # --- event accounts ---
+
+  test "money can be deposited into and withdrawn from an event's account" do
+    assert build(to: events(:campout), amount: "40").save
+    assert_equal Money.new(40_00), events(:campout).balance
+
+    transaction = build(from: events(:campout), to: :outside, amount: "15")
+    assert transaction.save
+    assert_equal :withdrawal, transaction.code
+    assert_equal Money.new(25_00), events(:campout).balance
+    assert_ledger_balanced
+  end
+
+  test "transfers work between events, families and funds" do
+    transact from: :outside, to: events(:campout), dollars: 100
+
+    [ families(:one), funds(:general), events(:weekend_trip) ].each do |to|
+      transaction = build(from: events(:campout), to: to, amount: "10")
+      assert transaction.save, transaction.errors.full_messages.to_sentence
+      assert_equal :transfer, transaction.code
+    end
+    assert_equal Money.new(70_00), events(:campout).balance
+    assert build(from: families(:one), to: events(:campout), amount: "5").save, "a family can also be transferred to an event"
+    assert_ledger_balanced
+  end
+
+  test "an event can't transfer to itself" do
+    transaction = build(from: events(:campout), to: events(:campout))
+    assert_not transaction.valid?
+    assert_includes transaction.errors[:to], "must be different from the From account"
+  end
+
+  test "an unknown event is rejected" do
+    assert_not build(to: "event:0").valid?
+  end
+
+  test "the subject can be an event" do
+    assert_equal events(:campout), build(to: events(:campout)).subject
+    assert_equal events(:campout), build(from: events(:campout), to: :outside).subject
   end
 end

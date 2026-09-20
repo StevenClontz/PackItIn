@@ -150,4 +150,35 @@ class LedgerTransactionsTest < ActionDispatch::IntegrationTest
     post ledger_transactions_path, params: { ledger_transaction: { from: "outside", to: ledger_ref(families(:one)), amount: "5", admin: families(:two).id } }
     assert_equal families(:admin).id, families(:one).ledger_lines.first.metadata["admin_id"]
   end
+
+  # --- event accounts ---
+
+  test "the form lists every event's account" do
+    sign_in_as "adminfamily"
+
+    get new_ledger_transaction_path
+    %w[from to].each do |field|
+      assert_select "select[name=?] option[value=?]", "ledger_transaction[#{field}]", ledger_ref(events(:campout)), text: "Event Account: Fall Campout"
+    end
+  end
+
+  test "admin deposits into an event's account and lands on the event page" do
+    sign_in_as "adminfamily"
+
+    post_transaction from: :outside, to: events(:campout), amount: "75", memo: "Sponsor gift"
+    assert_redirected_to event_path(events(:campout))
+    follow_redirect!
+    assert_match "Transaction recorded.", response.body
+    assert_equal Money.new(75_00), events(:campout).balance
+  end
+
+  test "admin refunds a family from an event's account" do
+    transact from: families(:one), to: events(:campout), dollars: 40
+    sign_in_as "adminfamily"
+
+    post_transaction from: events(:campout), to: families(:one), amount: "40", memo: "refund"
+    assert_redirected_to family_account_path(families(:one))
+    assert_equal Money.new(0), events(:campout).balance
+    assert_equal Money.new(0), families(:one).balance
+  end
 end

@@ -91,4 +91,34 @@ class EventTest < ActiveSupport::TestCase
       events(:pack_meeting).destroy!
     end
   end
+
+  # --- account ---
+
+  test "an event has its own account, starting at zero" do
+    assert_equal Money.new(0), events(:campout).balance
+    assert_not events(:campout).ledger_activity?
+    assert_equal "Event Account", events(:campout).ledger_account_label
+  end
+
+  test "an event's balance follows the ledger" do
+    transact from: :outside, to: events(:campout), dollars: 40
+    transact from: families(:one), to: events(:campout), dollars: 10
+    assert_equal Money.new(50_00), events(:campout).balance
+    assert_equal Money.new(40_00), Ledger.total_held, "the transfer from a family doesn't change what the pack holds"
+  end
+
+  test "an event with account activity can't be destroyed" do
+    transact from: :outside, to: events(:campout), dollars: 5
+
+    assert_no_difference [ "Event.count", "Rsvp.count" ] do
+      assert_not events(:campout).destroy
+    end
+    assert_includes events(:campout).errors.full_messages, "Fall Campout has Event Account activity and can't be deleted"
+  end
+
+  test "an event without activity can still be destroyed" do
+    assert_difference "Event.count", -1 do
+      assert events(:campout).destroy
+    end
+  end
 end

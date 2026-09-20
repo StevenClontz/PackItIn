@@ -24,6 +24,10 @@ class LedgerTransactionsController < ApplicationController
   end
 
   def statement_path_for(account_owner)
-    account_owner.is_a?(Family) ? family_account_path(account_owner) : fund_path(account_owner)
+    case account_owner
+    when Family then family_account_path(account_owner)
+    when Event then event_path(account_owner)
+    else fund_path(account_owner)
+    end
   end
 end

@@ -26,6 +26,7 @@ class Ability
       # Events are read-only for families, who RSVP their own people until the event's RSVP deadline
       # passes (a block: the deadline falls back to ends_at, which a hash condition can't express).
       can :read, Event
+      can :pay, Event # its own RSVPs' costs, from its own Scout Account (EventPaymentsController)
       can :read, RsvpOption
       can :read, Rsvp, person: { family_id: family.id }
       can %i[create update], Rsvp do |rsvp|

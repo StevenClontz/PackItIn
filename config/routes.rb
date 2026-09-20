@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   resources :ledger_transactions, only: %i[new create]
   resources :events do
     resource :rsvp, only: :update
+    resource :payment, only: :create, controller: "event_payments"
     resources :rsvp_options, except: %i[index show]
   end
 

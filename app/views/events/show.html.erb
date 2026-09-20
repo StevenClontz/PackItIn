@@ -17,6 +17,9 @@
           <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
             <span>
               <span class="font-medium"><%= option.name %></span>
+              <% if option.costed? %>
+                <span class="text-sm text-gray-700">- <%= money(option.cost) %> per person</span>
+              <% end %>
               <% if option.description.present? %>
                 <span class="block text-sm text-gray-500"><%= option.description %></span>
               <% end %>
@@ -84,7 +87,7 @@
               <% option_id = "rsvps_#{person.id}_rsvp_option_id" %>
               <span class="flex w-full flex-wrap items-center gap-2 text-sm">
                 <%= label_tag option_id, "Option for #{person.first_name}", class: "text-gray-700" %>
-                <%= select_tag "rsvps[#{person.id}][rsvp_option_id]", options_for_select(@options.map { |option| [ option.name, option.id ] }, rsvp&.rsvp_option_id), include_blank: "Choose an option", id: option_id, class: "rounded-md border border-gray-300 px-2 py-1" %>
+                <%= select_tag "rsvps[#{person.id}][rsvp_option_id]", options_for_select(@options.map { |option| [ option.label, option.id ] }, rsvp&.rsvp_option_id), include_blank: "Choose an option", id: option_id, class: "rounded-md border border-gray-300 px-2 py-1" %>
                 <span class="text-gray-500">Needed if attending or maybe.</span>
               </span>
             <% end %>
@@ -93,6 +96,10 @@
       </div>
       <%= submit_tag "Save RSVPs", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
     <% end %>
+  <% end %>
+
+  <% if @people.any? && @payment.relevant? %>
+    <%= render "events/costs", payment: @payment, event: @event %>
   <% end %>
 
   <% if current_family.admin? %>
@@ -122,6 +129,10 @@
       <% end %>
     <% end %>
   <% end %>
+
+  <h3 class="mb-1 mt-8 text-lg font-semibold">Event Account</h3>
+  <p class="mb-3">Balance: <strong><%= money(@event.balance) %></strong></p>
+  <%= render "ledger/statement", lines: @lines %>
 
   <div class="mt-6 flex items-center gap-4">
     <% if can? :update, @event %>

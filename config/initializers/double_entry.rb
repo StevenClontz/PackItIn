@@ -21,15 +21,19 @@ DoubleEntry.configure do |config|
 
     accounts.define(identifier: :family, scope_identifier: scoped_to.call("Family"))
     accounts.define(identifier: :fund, scope_identifier: scoped_to.call("Fund"))
+    accounts.define(identifier: :event, scope_identifier: scoped_to.call("Event"))
     accounts.define(identifier: :external)
   end
 
   config.define_transfers do |transfers|
-    %i[family fund].each do |account|
+    %i[family fund event].each do |account|
       transfers.define(from: :external, to: account, code: :deposit)
       transfers.define(from: account, to: :external, code: :withdrawal)
 
-      %i[family fund].each { |other| transfers.define(from: account, to: other, code: :transfer) }
+      %i[family fund event].each { |other| transfers.define(from: account, to: other, code: :transfer) }
     end
+
+    # A family paying for what its RSVPs cost (EventPayment); its own code so statements can say "Payment".
+    transfers.define(from: :family, to: :event, code: :payment)
   end
 end

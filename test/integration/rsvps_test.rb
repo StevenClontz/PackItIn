@@ -290,8 +290,8 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     [ people(:smith_dad), people(:smith_lion) ].each do |person|
       assert_select "select[name=?]", "rsvps[#{person.id}][rsvp_option_id]" do
         assert_select "option", text: "Choose an option"
-        assert_select "option", text: "Day trip only"
-        assert_select "option", text: "Full weekend"
+        assert_select "option", text: "Day trip only ($25.00)"
+        assert_select "option", text: "Full weekend ($60.00)"
       end
     end
 

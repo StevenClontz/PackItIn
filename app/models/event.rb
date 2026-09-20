@@ -1,4 +1,6 @@
 class Event < ApplicationRecord
+  include HasLedgerAccount
+
   has_many :rsvps, dependent: :destroy
   has_many :rsvp_options, -> { order(:id) }, dependent: :destroy
 
@@ -15,6 +17,15 @@ class Event < ApplicationRecord
 
   def rsvp_open?
     Time.current <= rsvp_closes_at
+  end
+
+  # What the UI calls an event's money account, and how messages name the event.
+  def ledger_account_label
+    "Event Account"
+  end
+
+  def ledger_account_name
+    title
   end
 
   private

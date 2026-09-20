@@ -206,4 +206,14 @@ class AbilityTest < ActiveSupport::TestCase
     assert Ability.new(nil).cannot?(:read, rsvp_options(:day_trip))
     assert Ability.new(families(:admin)).can?(:manage, RsvpOption)
   end
+
+  test "families can pay for events, guests can't" do
+    assert Ability.new(families(:one)).can?(:pay, events(:weekend_trip))
+    assert Ability.new(families(:admin)).can?(:pay, events(:weekend_trip))
+    assert Ability.new(nil).cannot?(:pay, events(:weekend_trip))
+  end
+
+  test "any signed-in family can read an event, and so its account" do
+    assert Ability.new(families(:one)).can?(:read, events(:weekend_trip))
+  end
 end
