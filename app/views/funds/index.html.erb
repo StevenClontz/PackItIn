@@ -37,7 +37,38 @@
     </ul>
   <% end %>
 
-  <p class="mt-4 text-sm text-gray-700">Total held by the pack (families and funds): <strong><%= money(@total_held) %></strong></p>
+  <h3 class="mb-2 mt-8 text-lg font-semibold">Scout Accounts</h3>
+  <% if @families.empty? %>
+    <p class="text-gray-700">No Scout Accounts to show.</p>
+  <% else %>
+    <ul class="divide-y divide-gray-200 rounded-md border border-gray-200">
+      <% @families.each do |family| %>
+        <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+          <%= link_to family.name, family_account_path(family), class: "font-medium text-blue-600 hover:underline" %>
+          <strong class="text-sm"><%= money(family.balance) %></strong>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <h3 class="mb-2 mt-8 text-lg font-semibold">Event Accounts</h3>
+  <% if @events.empty? %>
+    <p class="text-gray-700">No events yet.</p>
+  <% else %>
+    <ul class="divide-y divide-gray-200 rounded-md border border-gray-200">
+      <% @events.each do |event| %>
+        <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+          <span>
+            <%= link_to event.title, event_account_path(event), class: "font-medium text-blue-600 hover:underline" %>
+            <span class="block text-sm text-gray-500"><%= format_event_time(event.starts_at) %></span>
+          </span>
+          <strong class="text-sm"><%= money(event.balance) %></strong>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <p class="mt-4 text-sm text-gray-700">Total held by the pack (Scout Accounts, funds and events): <strong><%= money(@total_held) %></strong></p>
 
   <p class="mt-6 text-sm"><%= link_to "Back", root_path, class: "text-blue-600 hover:underline" %></p>
 </div>

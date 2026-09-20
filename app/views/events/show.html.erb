@@ -58,7 +58,10 @@
     <ul class="mb-6 divide-y divide-gray-200 rounded-md border border-gray-200">
       <% @people.each do |person| %>
         <li class="flex items-center justify-between px-4 py-3">
-          <span class="font-medium"><%= person.full_name %></span>
+          <span class="flex items-center gap-2">
+            <span class="font-medium"><%= person.full_name %></span>
+            <%= position_badge(person) %>
+          </span>
           <span><%= @rsvps[person.id]&.summary || "No response" %></span>
         </li>
       <% end %>
@@ -73,7 +76,10 @@
           <% rsvp = @rsvps[person.id] %>
           <fieldset class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
             <legend class="sr-only"><%= person.full_name %></legend>
-            <span class="font-medium"><%= person.full_name %></span>
+            <span class="flex items-center gap-2">
+              <span class="font-medium"><%= person.full_name %></span>
+              <%= position_badge(person) %>
+            </span>
             <span class="flex items-center gap-4">
               <% Rsvp.status_options.each do |label, status| %>
                 <% id = "rsvps_#{person.id}_#{status}" %>
@@ -119,7 +125,7 @@
           <% people.each do |person| %>
             <% response = @responses[person.id] %>
             <li>
-              <%= person.full_name %> <span class="text-gray-500">(<%= person.family.name %>)</span>
+              <%= person.full_name %> <%= position_badge(person) %> <span class="text-gray-500">(<%= person.family.name %>)</span>
               <% if @options.any? && response && !response.not_attending? %>
                 - <%= response.rsvp_option&.name || "no option chosen" %>
               <% end %>
@@ -130,9 +136,10 @@
     <% end %>
   <% end %>
 
-  <h3 class="mb-1 mt-8 text-lg font-semibold">Event Account</h3>
-  <p class="mb-3">Balance: <strong><%= money(@event.balance) %></strong></p>
-  <%= render "ledger/statement", lines: @lines %>
+  <p class="mt-8 text-sm">
+    <%= link_to "View Event Account", event_account_path(@event), class: "text-blue-600 hover:underline" %>
+    <span class="text-gray-500">(balance <%= money(@event.balance) %>)</span>
+  </p>
 
   <div class="mt-6 flex items-center gap-4">
     <% if can? :update, @event %>

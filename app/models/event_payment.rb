@@ -8,6 +8,13 @@
 class EventPayment
   Item = Data.define(:person, :option, :cost)
 
+  # Someone who still needs an answer of attending or not attending; `to_s` is e.g. "Sam Smith (maybe)".
+  Blocker = Data.define(:person, :status) do
+    def to_s
+      "#{person.full_name} (#{status})"
+    end
+  end
+
   attr_reader :event, :family
 
   def initialize(event:, family:)
@@ -40,13 +47,13 @@ class EventPayment
     total - paid
   end
 
-  # People who still need an answer of attending or not attending, e.g. "Sam Smith (maybe)".
+  # The people who still need an answer of attending or not attending.
   def blockers
     people.filter_map do |person|
       rsvp = rsvps[person.id]
       next if rsvp&.attending? || rsvp&.not_attending?
 
-      "#{person.full_name} (#{rsvp ? rsvp.status_label.downcase : 'no response'})"
+      Blocker.new(person, rsvp ? rsvp.status_label.downcase : "no response")
     end
   end
 

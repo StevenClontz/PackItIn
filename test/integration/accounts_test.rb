@@ -111,4 +111,58 @@ class AccountsTest < ActionDispatch::IntegrationTest
     assert_match "Showing the latest #{limit}", response.body
     assert_select "strong", text: "$#{limit + 3}.00", count: 1
   end
+
+  # --- event accounts ---
+
+  test "guests are sent to sign in from an event account" do
+    get event_account_path(events(:campout))
+    assert_redirected_to new_family_session_path
+  end
+
+  test "every family sees an event's account balance and activity, with family names" do
+    transact from: :outside, to: events(:campout), dollars: 100, memo: "Sponsor gift"
+    transact from: families(:two), to: events(:campout), dollars: 20, memo: "Firewood"
+    sign_in_as "examplefamily"
+
+    get event_account_path(events(:campout))
+    assert_response :success
+    assert_select "h2", "Fall Campout Event Account"
+    assert_select "p", text: /Event:\s*Fall Campout/
+    assert_select "a[href=?]", event_path(events(:campout)), text: "Fall Campout"
+    assert_select "p", text: /Balance:\s*\$120\.00/
+    assert_select "td", text: /Deposit\s*Sponsor gift/
+    assert_select "td", text: /Transfer from The Joneses\s*Firewood/
+    assert_select "a", text: "Back to event"
+  end
+
+  test "an event account with no activity shows a zero balance" do
+    sign_in_as "examplefamily"
+    get event_account_path(events(:campout))
+    assert_select "p", text: /Balance:\s*\$0\.00/
+    assert_match "No activity yet", response.body
+  end
+
+  test "only admins get a New transaction link on an event account" do
+    sign_in_as "examplefamily"
+    get event_account_path(events(:campout))
+    assert_select "a", text: "New transaction", count: 0
+
+    delete destroy_family_session_path
+    sign_in_as "adminfamily"
+    get event_account_path(events(:campout))
+    assert_select "a[href=?]", new_ledger_transaction_path, text: "New transaction"
+  end
+
+  test "an event that doesn't exist is a 404" do
+    sign_in_as "examplefamily"
+    get event_account_path(event_id: 0)
+    assert_response :not_found
+  end
+
+  test "a family's own account page still links back to the family" do
+    sign_in_as "examplefamily"
+    get family_account_path(families(:one))
+    assert_select "h2", "The Example Family Scout Account"
+    assert_select "a", text: "Back to family"
+  end
 end

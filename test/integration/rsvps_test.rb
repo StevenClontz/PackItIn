@@ -192,7 +192,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     travel_to events(:campout).rsvp_deadline_at + 1.minute do
       get event_path(events(:campout))
       assert_select "form[action=?]", event_rsvp_path(events(:campout)), count: 0
-      assert_select "li", text: /Sam Smith\s*No response/
+      assert_select "li", text: /Sam Smith\s*Adult\s*No response/
     end
   end
 
@@ -250,8 +250,8 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     assert_select "p", text: /Maybe \(1\)/
     assert_select "p", text: /Not attending \(1\)/
     assert_select "p", text: /No response \(0\)/
-    assert_select "li", text: /Sam Smith\s*\(The Example Family\)/
-    assert_select "li", text: /Ben Jones\s*\(The Joneses\)/
+    assert_select "li", text: /Sam Smith\s*Adult\s*\(The Example Family\)/
+    assert_select "li", text: /Ben Jones\s*Bear\s*\(The Joneses\)/
 
     get event_path(events(:campout))
     assert_select "p", text: /No response \(3\)/
@@ -397,8 +397,8 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     travel_to events(:weekend_trip).ends_at + 1.minute do
       get event_path(events(:weekend_trip))
       assert_select "form[action=?]", event_rsvp_path(events(:weekend_trip)), count: 0
-      assert_select "li", text: /Sam Smith\s*Attending - Full weekend/
-      assert_select "li", text: /Lily Smith\s*No response/
+      assert_select "li", text: /Sam Smith\s*Adult\s*Attending - Full weekend/
+      assert_select "li", text: /Lily Smith\s*Lion\s*No response/
     end
   end
 
@@ -410,7 +410,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
 
     travel_to events(:weekend_trip).ends_at + 1.minute do
       get event_path(events(:weekend_trip))
-      assert_select "li", text: /Sam Smith\s*Attending - choose an option/
+      assert_select "li", text: /Sam Smith\s*Adult\s*Attending - choose an option/
     end
   end
 
@@ -422,9 +422,9 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     get event_path(events(:weekend_trip))
     assert_select "p", text: /Attending \(2\)/ # Ben (fixture, day trip) and Sam (full weekend)
     assert_select "p", text: /Day trip only: 1, Full weekend: 1/
-    assert_select "li", text: /Sam Smith\s*\(The Example Family\)\s*- Full weekend/
-    assert_select "li", text: /Ben Jones\s*\(The Joneses\)\s*- Day trip only/
-    assert_select "li", text: /Lily Smith\s*\(The Example Family\)\s*- Day trip only/
+    assert_select "li", text: /Sam Smith\s*Adult\s*\(The Example Family\)\s*- Full weekend/
+    assert_select "li", text: /Ben Jones\s*Bear\s*\(The Joneses\)\s*- Day trip only/
+    assert_select "li", text: /Lily Smith\s*Lion\s*\(The Example Family\)\s*- Day trip only/
     assert_select "p", text: /Maybe \(1\)/
   end
 
@@ -434,7 +434,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
 
     get event_path(events(:weekend_trip))
     assert_select "p", text: /No option chosen: 1/
-    assert_select "li", text: /Ben Jones\s*\(The Joneses\)\s*- no option chosen/
+    assert_select "li", text: /Ben Jones\s*Bear\s*\(The Joneses\)\s*- no option chosen/
   end
 
   test "events without options keep the plain roll-up" do
@@ -442,6 +442,37 @@ class RsvpsTest < ActionDispatch::IntegrationTest
 
     get event_path(events(:pack_meeting))
     assert_no_match "No option chosen", response.body
-    assert_select "li", text: /Sam Smith\s*\(The Example Family\)\s*\z/
+    assert_select "li", text: /Sam Smith\s*Adult\s*\(The Example Family\)\s*\z/
+  end
+
+  # --- position badges ---
+
+  test "the RSVP form shows each person's position next to their name" do
+    sign_in_as "examplefamily"
+
+    get event_path(events(:pack_meeting))
+    assert_select "fieldset span.rounded-full", text: "Adult", count: 1
+    assert_select "fieldset span.rounded-full", text: "Lion", count: 1
+    assert_select "fieldset", text: /Sam Smith\s*Adult/
+    assert_select "fieldset", text: /Lily Smith\s*Lion/
+  end
+
+  test "after the deadline the read-only list still shows the position badges" do
+    sign_in_as "examplefamily"
+
+    travel_to events(:pack_meeting).ends_at + 1.minute do
+      get event_path(events(:pack_meeting))
+      assert_select "li span.rounded-full", text: "Adult", count: 1
+      assert_select "li span.rounded-full", text: "Lion", count: 1
+    end
+  end
+
+  test "the admin roll-up shows each person's position" do
+    sign_in_as "adminfamily"
+
+    get event_path(events(:pack_meeting))
+    assert_select "li span.rounded-full", text: "Adult", count: 1
+    assert_select "li span.rounded-full", text: "Lion", count: 1
+    assert_select "li span.rounded-full", text: "Bear", count: 1
   end
 end

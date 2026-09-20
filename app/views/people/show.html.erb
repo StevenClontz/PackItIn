@@ -1,5 +1,8 @@
 <div class="mx-auto w-full max-w-md">
-  <h2 class="mb-6 text-2xl font-bold"><%= @person.full_name %></h2>
+  <h2 class="mb-6 flex flex-wrap items-center gap-3 text-2xl font-bold">
+    <%= @person.full_name %>
+    <%= position_badge(@person) %>
+  </h2>
 
   <dl class="mb-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
     <dt class="font-medium">First name</dt>

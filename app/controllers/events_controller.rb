@@ -12,7 +12,6 @@ class EventsController < ApplicationController
     @people = current_family.people.order(:last_name, :first_name)
     @rsvps = @event.rsvps.where(person: @people).includes(:rsvp_option).index_by(&:person_id)
     @payment = EventPayment.new(event: @event, family: current_family)
-    @lines = @event.ledger_lines.limit(AccountsController::STATEMENT_LINES)
 
     if current_family.admin?
       @everyone = Person.includes(:family).order(:last_name, :first_name)

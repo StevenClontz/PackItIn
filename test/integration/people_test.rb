@@ -192,4 +192,26 @@ class PeopleTest < ActionDispatch::IntegrationTest
       delete family_path(families(:one))
     end
   end
+
+  # --- position badges ---
+
+  test "the person page heading shows their position" do
+    sign_in_as "examplefamily"
+
+    get person_path(people(:smith_lion))
+    assert_select "h2", text: /Lily Smith\s*Lion/ do
+      assert_select "span.rounded-full", text: "Lion"
+    end
+    assert_select "dt", "Position"
+  end
+
+  test "the people list shows one position badge per person" do
+    sign_in_as "examplefamily"
+
+    get family_people_path(families(:one))
+    assert_select "li", 2
+    assert_select "li span.rounded-full", 2
+    assert_select "li", text: /Sam Smith\s*Adult/
+    assert_select "li", text: /Lily Smith\s*Lion/
+  end
 end

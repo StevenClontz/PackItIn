@@ -42,7 +42,7 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     get event_path(trip)
     assert_response :success
     assert_select "h3", "Costs"
-    assert_select "li", text: /Sam Smith\s*- Full weekend\s*\$60\.00/
+    assert_select "li", text: /Sam Smith\s*Adult\s*- Full weekend\s*\$60\.00/
     assert_select "dd", text: "$60.00", minimum: 2 # total and still to pay
     assert_select "dd", text: "$0.00", count: 1 # already paid
     assert_select "p", text: /Our Scout Account balance is \$100\.00\./
@@ -88,7 +88,7 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
 
     get event_path(trip)
     assert_match "Before paying, mark everyone as attending or not attending", response.body
-    assert_match "Lily Smith (maybe)", response.body
+    assert_select "li", text: /Lily Smith\s*Lion\s*\(maybe\)/
     assert_select "button", text: /Pay/, count: 0
 
     assert_no_difference "DoubleEntry::Line.count" do
@@ -104,7 +104,7 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     sign_in_as "examplefamily"
 
     get event_path(trip)
-    assert_match "Lily Smith (no response)", response.body
+    assert_select "li", text: /Lily Smith\s*Lion\s*\(no response\)/
     assert_select "button", text: /Pay/, count: 0
   end
 
@@ -139,7 +139,11 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     assert_select "span.text-red-600", text: "-$60.00", minimum: 1
 
     get event_path(trip)
-    assert_select "h3", "Event Account"
+    assert_select "a[href=?]", event_account_path(trip), text: "View Event Account"
+    assert_select "td", text: /Payment from/, count: 0 # the event page doesn't list transactions
+
+    get event_account_path(trip)
+    assert_select "h2", "Weekend Trip Event Account"
     assert_select "p", text: /Balance:\s*\$60\.00/
     assert_select "td", text: /Payment from The Example Family/
   end
@@ -151,7 +155,7 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     delete destroy_family_session_path
     sign_in_as "joneses"
 
-    get event_path(trip)
+    get event_account_path(trip)
     assert_select "p", text: /Balance:\s*\$60\.00/
     assert_select "td", text: /Payment from The Example Family/
   end
@@ -198,7 +202,7 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     sign_in_as "joneses"
 
     get event_path(trip)
-    assert_select "li", text: /Ben Jones\s*- Day trip only\s*\$25\.00/
+    assert_select "li", text: /Ben Jones\s*Bear\s*- Day trip only\s*\$25\.00/
     assert_select "li", text: /Sam Smith/, count: 0
 
     pay 2500
@@ -268,12 +272,34 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     sign_in_as "examplefamily"
 
     get event_path(trip)
-    assert_select "li", text: /Sam Smith\s*- Full weekend\s*\$60\.00/
-    assert_select "li", text: /Lily Smith\s*- Full weekend\s*\$30\.00/
+    assert_select "li", text: /Sam Smith\s*Adult\s*- Full weekend\s*\$60\.00/
+    assert_select "li", text: /Lily Smith\s*Lion\s*- Full weekend\s*\$30\.00/
     assert_select "button", "Pay $90.00 from our Scout Account"
 
     pay 9000
     assert_equal Money.new(-90_00), families(:one).balance
     assert_equal Money.new(90_00), trip.balance
+  end
+
+  # --- position badges ---
+
+  test "the Costs line items show each person's position" do
+    answer people(:smith_dad), "attending", rsvp_options(:full_weekend)
+    answer people(:smith_lion), "attending", rsvp_options(:full_weekend)
+    sign_in_as "examplefamily"
+
+    get event_path(trip)
+    assert_select "li span.rounded-full", text: "Adult", count: 1
+    assert_select "li span.rounded-full", text: "Lion", count: 1
+  end
+
+  test "each person blocking payment is listed with their position" do
+    answer people(:smith_dad), "attending", rsvp_options(:full_weekend)
+    sign_in_as "examplefamily"
+
+    get event_path(trip)
+    assert_select "li", text: /Lily Smith\s*Lion\s*\(no response\)/ do
+      assert_select "span.rounded-full", text: "Lion"
+    end
   end
 end

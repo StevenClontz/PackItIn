@@ -186,4 +186,82 @@ class FundsTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_match "General has account activity and can&#39;t be deleted", response.body
   end
+
+  # --- the three lists: funds, Scout Accounts, Event Accounts ---
+
+  test "the index has Funds, Scout Accounts and Event Accounts lists" do
+    sign_in_as "examplefamily"
+
+    get funds_path
+    assert_select "h2", "Funds"
+    assert_select "h3", "Scout Accounts"
+    assert_select "h3", "Event Accounts"
+    assert_select "a[href=?]", fund_path(funds(:general)), text: "General"
+  end
+
+  test "a family sees only its own Scout Account, with its balance" do
+    transact from: :outside, to: families(:one), dollars: 40
+    transact from: :outside, to: families(:two), dollars: 999
+    sign_in_as "examplefamily"
+
+    get funds_path
+    assert_select "a[href=?]", family_account_path(families(:one)), text: "The Example Family"
+    assert_select "li", text: /The Example Family\s*\$40\.00/
+    assert_select "a[href=?]", family_account_path(families(:two)), count: 0
+    assert_select "a[href=?]", family_account_path(families(:admin)), count: 0
+    assert_no_match "The Joneses", response.body
+    assert_no_match "$999.00", response.body
+  end
+
+  test "an admin sees every family's Scout Account" do
+    transact from: :outside, to: families(:two), dollars: 25
+    sign_in_as "adminfamily"
+
+    get funds_path
+    Family.find_each do |family|
+      assert_select "a[href=?]", family_account_path(family), text: family.name
+    end
+    assert_select "li", text: /The Joneses\s*\$25\.00/
+  end
+
+  test "every family sees every event's account, with its date and balance" do
+    transact from: :outside, to: events(:campout), dollars: 60
+    sign_in_as "examplefamily"
+
+    get funds_path
+    Event.find_each do |event|
+      assert_select "a[href=?]", event_account_path(event), text: event.title
+    end
+    assert_select "li", text: /Fall Campout.*\$60\.00/m
+    assert_select "li", text: /Trail Hike/, minimum: 1
+  end
+
+  test "events are listed newest first" do
+    sign_in_as "examplefamily"
+
+    get funds_path
+    titles = css_select("a[href*='/account']").map(&:text) & Event.pluck(:title)
+    assert_equal Event.order(starts_at: :desc).pluck(:title), titles
+  end
+
+  test "the pack total covers every kind of account" do
+    transact from: :outside, to: families(:one), dollars: 10
+    transact from: :outside, to: funds(:general), dollars: 20
+    transact from: :outside, to: events(:campout), dollars: 30
+    sign_in_as "examplefamily"
+
+    get funds_path
+    assert_match "Total held by the pack (Scout Accounts, funds and events)", response.body
+    assert_select "strong", text: "$60.00"
+  end
+
+  test "the lists show a message when empty" do
+    Event.destroy_all
+    Fund.destroy_all
+    sign_in_as "examplefamily"
+
+    get funds_path
+    assert_match "No funds yet.", response.body
+    assert_match "No events yet.", response.body
+  end
 end

@@ -162,14 +162,15 @@ class LedgerTransactionsTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "admin deposits into an event's account and lands on the event page" do
+  test "admin deposits into an event's account and lands on its account page" do
     sign_in_as "adminfamily"
 
     post_transaction from: :outside, to: events(:campout), amount: "75", memo: "Sponsor gift"
-    assert_redirected_to event_path(events(:campout))
+    assert_redirected_to event_account_path(events(:campout))
     follow_redirect!
     assert_match "Transaction recorded.", response.body
-    assert_equal Money.new(75_00), events(:campout).balance
+    assert_select "p", text: /Balance:\s*\$75\.00/
+    assert_select "td", text: /Deposit\s*Sponsor gift/
   end
 
   test "admin refunds a family from an event's account" do

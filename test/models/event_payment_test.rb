@@ -65,11 +65,11 @@ class EventPaymentTest < ActiveSupport::TestCase
   # --- blockers ---
 
   test "everyone must be marked attending or not attending" do
-    assert_equal [ "Lily Smith (no response)", "Sam Smith (no response)" ], payment_for.blockers
+    assert_equal [ "Lily Smith (no response)", "Sam Smith (no response)" ], payment_for.blockers.map(&:to_s)
 
     answer people(:smith_dad), "attending", rsvp_options(:full_weekend)
     answer people(:smith_lion), "maybe", rsvp_options(:day_trip)
-    assert_equal [ "Lily Smith (maybe)" ], payment_for.blockers
+    assert_equal [ "Lily Smith (maybe)" ], payment_for.blockers.map(&:to_s)
     assert_not payment_for.payable?
 
     Rsvp.find_by!(person: people(:smith_lion), event: trip).update!(status: "not_attending")

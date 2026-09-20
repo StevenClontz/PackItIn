@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   resources :events do
     resource :rsvp, only: :update
     resource :payment, only: :create, controller: "event_payments"
+    resource :account, only: :show
     resources :rsvp_options, except: %i[index show]
   end
 

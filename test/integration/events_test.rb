@@ -199,24 +199,17 @@ class EventsTest < ActionDispatch::IntegrationTest
 
   # --- event account ---
 
-  test "every family sees the event's account balance and activity, with family names" do
+  test "the event page links to the event's account instead of listing its transactions" do
     transact from: :outside, to: events(:campout), dollars: 100, memo: "Sponsor gift"
-    transact from: families(:two), to: events(:campout), dollars: 20, memo: "Firewood"
     sign_in_as "examplefamily"
 
     get event_path(events(:campout))
     assert_response :success
-    assert_select "h3", "Event Account"
-    assert_select "p", text: /Balance:\s*\$120\.00/
-    assert_select "td", text: /Deposit\s*Sponsor gift/
-    assert_select "td", text: /Transfer from The Joneses\s*Firewood/
-  end
-
-  test "an event with no activity shows a zero balance" do
-    sign_in_as "examplefamily"
-    get event_path(events(:campout))
-    assert_select "p", text: /Balance:\s*\$0\.00/
-    assert_match "No activity yet", response.body
+    assert_select "a[href=?]", event_account_path(events(:campout)), text: "View Event Account"
+    assert_select "span", text: /balance\s*\$100\.00/
+    assert_select "table", count: 0
+    assert_no_match "Sponsor gift", response.body
+    assert_no_match "Statement", response.body
   end
 
   test "an admin can't delete an event that has account activity" do

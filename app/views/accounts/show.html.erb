@@ -1,8 +1,12 @@
 <div class="mx-auto w-full max-w-2xl">
-  <h2 class="mb-1 text-2xl font-bold"><%= @family.name %> Scout Account</h2>
-  <p class="mb-6 text-sm text-gray-500">Family: <%= link_to @family.username, family_path(@family), class: "text-blue-600 hover:underline" %></p>
+  <h2 class="mb-1 text-2xl font-bold"><%= @owner.ledger_account_name %> <%= @owner.ledger_account_label %></h2>
+  <% if @owner.is_a?(Family) %>
+    <p class="mb-6 text-sm text-gray-500">Family: <%= link_to @owner.username, family_path(@owner), class: "text-blue-600 hover:underline" %></p>
+  <% else %>
+    <p class="mb-6 text-sm text-gray-500">Event: <%= link_to @owner.title, event_path(@owner), class: "text-blue-600 hover:underline" %></p>
+  <% end %>
 
-  <p class="mb-6 text-lg">Balance: <strong><%= money(@family.balance) %></strong></p>
+  <p class="mb-6 text-lg">Balance: <strong><%= money(@owner.balance) %></strong></p>
 
   <h3 class="mb-2 text-lg font-semibold">Statement</h3>
   <%= render "ledger/statement", lines: @lines %>
@@ -10,5 +14,11 @@
   <% if can? :create, LedgerTransaction %>
     <p class="mt-6 text-sm"><%= link_to "New transaction", new_ledger_transaction_path, class: "text-blue-600 hover:underline" %></p>
   <% end %>
-  <p class="mt-2 text-sm"><%= link_to "Back to family", family_path(@family), class: "text-blue-600 hover:underline" %></p>
+  <p class="mt-2 text-sm">
+    <% if @owner.is_a?(Family) %>
+      <%= link_to "Back to family", family_path(@owner), class: "text-blue-600 hover:underline" %>
+    <% else %>
+      <%= link_to "Back to event", event_path(@owner), class: "text-blue-600 hover:underline" %>
+    <% end %>
+  </p>
 </div>
