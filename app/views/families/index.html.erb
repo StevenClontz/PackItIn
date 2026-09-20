@@ -10,7 +10,7 @@
     <% @families.each do |family| %>
       <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <span class="flex items-center gap-2">
-          <%= link_to family.username, family_path(family), class: "font-medium text-blue-600 hover:underline" %>
+          <%= link_to family.name, family_path(family), class: "font-medium text-blue-600 hover:underline" %>
           <% if family.admin? %>
             <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">Admin</span>
           <% end %>
