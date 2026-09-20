@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_015107) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_032028) do
+  create_table "events", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.datetime "ends_at", null: false
+    t.datetime "rsvp_deadline_at"
+    t.datetime "starts_at", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["starts_at"], name: "index_events_on_starts_at"
+  end
+
   create_table "families", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
     t.string "city", null: false
@@ -36,5 +47,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_015107) do
     t.index ["family_id"], name: "index_people_on_family_id"
   end
 
+  create_table "rsvps", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "event_id", null: false
+    t.integer "person_id", null: false
+    t.integer "status", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "person_id"], name: "index_rsvps_on_event_id_and_person_id", unique: true
+    t.index ["event_id"], name: "index_rsvps_on_event_id"
+    t.index ["person_id"], name: "index_rsvps_on_person_id"
+  end
+
   add_foreign_key "people", "families"
+  add_foreign_key "rsvps", "events"
+  add_foreign_key "rsvps", "people"
 end

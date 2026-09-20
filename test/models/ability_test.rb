@@ -85,4 +85,73 @@ class AbilityTest < ActiveSupport::TestCase
     end
     assert ability.can?(:create, Person.new(family: families(:two)))
   end
+
+  test "guests have no abilities on events or rsvps" do
+    ability = Ability.new(nil)
+    assert ability.cannot?(:read, events(:pack_meeting))
+    assert ability.cannot?(:read, Event)
+    assert ability.cannot?(:update, rsvps(:smith_dad_pack_meeting))
+  end
+
+  test "non-admin family can read events but not change them" do
+    ability = Ability.new(families(:one))
+    assert ability.can?(:read, events(:pack_meeting))
+    assert ability.can?(:read, Event)
+    %i[create new update destroy].each do |action|
+      assert ability.cannot?(action, events(:pack_meeting)), action
+      assert ability.cannot?(action, Event.new), "new: #{action}"
+    end
+  end
+
+  test "non-admin family can RSVP only its own people, and only read its own RSVPs" do
+    ability = Ability.new(families(:one))
+    assert ability.can?(:read, rsvps(:smith_dad_pack_meeting))
+    assert ability.can?(:update, rsvps(:smith_dad_pack_meeting))
+    assert ability.can?(:create, Rsvp.new(event: events(:campout), person: people(:smith_lion)))
+    assert ability.can?(:update, Rsvp.new(event: events(:campout), person: people(:smith_lion)))
+
+    assert ability.cannot?(:read, rsvps(:jones_bear_pack_meeting))
+    assert ability.cannot?(:update, rsvps(:jones_bear_pack_meeting))
+    assert ability.cannot?(:create, Rsvp.new(event: events(:campout), person: people(:jones_bear)))
+  end
+
+  test "non-admin family cannot destroy an RSVP" do
+    assert Ability.new(families(:one)).cannot?(:destroy, rsvps(:smith_dad_pack_meeting))
+  end
+
+  test "non-admin family cannot RSVP after the default deadline (the end time)" do
+    ability = Ability.new(families(:one))
+    rsvp = Rsvp.new(event: events(:pack_meeting), person: people(:smith_dad))
+
+    travel_to events(:pack_meeting).ends_at - 1.minute do
+      assert ability.can?(:update, rsvps(:smith_dad_pack_meeting))
+    end
+    travel_to events(:pack_meeting).ends_at + 1.minute do
+      assert ability.cannot?(:update, rsvps(:smith_dad_pack_meeting))
+      assert ability.cannot?(:create, rsvp)
+    end
+    assert ability.cannot?(:update, Rsvp.new(event: events(:past_hike), person: people(:smith_dad)))
+  end
+
+  test "non-admin family cannot RSVP after an explicit earlier deadline" do
+    ability = Ability.new(families(:one))
+    rsvp = Rsvp.new(event: events(:campout), person: people(:smith_dad)) # deadline is 2 weeks out, event 3 weeks out
+
+    travel_to events(:campout).rsvp_deadline_at - 1.minute do
+      assert ability.can?(:create, rsvp)
+    end
+    travel_to events(:campout).rsvp_deadline_at + 1.minute do
+      assert events(:campout).starts_at.future?, "the event itself hasn't started"
+      assert ability.cannot?(:create, rsvp)
+    end
+  end
+
+  test "admin family can manage events and every RSVP, even after the deadline" do
+    ability = Ability.new(families(:admin))
+    assert ability.can?(:manage, Event)
+    assert ability.can?(:create, Event.new)
+    assert ability.can?(:destroy, events(:pack_meeting))
+    assert ability.can?(:update, rsvps(:jones_bear_pack_meeting))
+    assert ability.can?(:create, Rsvp.new(event: events(:past_hike), person: people(:jones_bear)))
+  end
 end

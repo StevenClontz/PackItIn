@@ -1,0 +1,14 @@
+smith_dad_pack_meeting:
+  event: pack_meeting
+  person: smith_dad
+  status: attending
+
+smith_lion_pack_meeting:
+  event: pack_meeting
+  person: smith_lion
+  status: maybe
+
+jones_bear_pack_meeting:
+  event: pack_meeting
+  person: jones_bear
+  status: not_attending

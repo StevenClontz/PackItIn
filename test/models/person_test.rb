@@ -55,4 +55,16 @@ class PersonTest < ActiveSupport::TestCase
       families(:one).destroy
     end
   end
+
+  test "deleting a person deletes their rsvps" do
+    assert_difference "Rsvp.count", -1 do
+      people(:smith_dad).destroy
+    end
+  end
+
+  test "deleting a family deletes its people's rsvps" do
+    assert_difference "Rsvp.count", -2 do
+      families(:one).destroy
+    end
+  end
 end

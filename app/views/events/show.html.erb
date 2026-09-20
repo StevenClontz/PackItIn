@@ -1,0 +1,84 @@
+<div class="mx-auto w-full max-w-2xl">
+  <h2 class="mb-1 text-2xl font-bold"><%= @event.title %></h2>
+  <p class="mb-4 text-gray-700"><%= event_time_range(@event) %></p>
+
+  <% if @event.description.present? %>
+    <div class="mb-6"><%= simple_format(h(@event.description)) %></div>
+  <% end %>
+
+  <h3 class="mb-1 text-lg font-semibold">Your RSVPs</h3>
+  <p class="mb-3 text-sm text-gray-500">
+    <% if @event.rsvp_open? %>
+      RSVP by <%= format_event_time(@event.rsvp_closes_at) %>.
+    <% else %>
+      RSVPs closed <%= format_event_time(@event.rsvp_closes_at) %>.
+    <% end %>
+  </p>
+
+  <% if @people.empty? %>
+    <p class="mb-6 text-gray-700">Your family has no people yet. Ask a pack administrator to add them.</p>
+  <% elsif !@event.rsvp_open? && !current_family.admin? %>
+    <p class="mb-2 text-gray-700">Ask a pack administrator if you need to change a response.</p>
+    <ul class="mb-6 divide-y divide-gray-200 rounded-md border border-gray-200">
+      <% @people.each do |person| %>
+        <li class="flex items-center justify-between px-4 py-3">
+          <span class="font-medium"><%= person.full_name %></span>
+          <span><%= @rsvps[person.id]&.status_label || "No response" %></span>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <% unless @event.rsvp_open? %>
+      <p class="mb-2 text-sm text-gray-700">RSVPs are closed to families; you can still change them as an admin.</p>
+    <% end %>
+    <%= form_with(url: event_rsvp_path(@event), method: :patch, class: "mb-6") do %>
+      <div class="mb-4 divide-y divide-gray-200 rounded-md border border-gray-200">
+        <% @people.each do |person| %>
+          <fieldset class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+            <legend class="sr-only"><%= person.full_name %></legend>
+            <span class="font-medium"><%= person.full_name %></span>
+            <span class="flex items-center gap-4">
+              <% Rsvp.status_options.each do |label, status| %>
+                <% id = "rsvps_#{person.id}_#{status}" %>
+                <span class="flex items-center gap-1">
+                  <%= radio_button_tag "rsvps[#{person.id}]", status, @rsvps[person.id]&.status == status, id: id %>
+                  <%= label_tag id, label %>
+                </span>
+              <% end %>
+            </span>
+          </fieldset>
+        <% end %>
+      </div>
+      <%= submit_tag "Save RSVPs", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+    <% end %>
+  <% end %>
+
+  <% if current_family.admin? %>
+    <h3 class="mb-2 text-lg font-semibold">All responses</h3>
+    <% grouped = @everyone.group_by { |person| @responses[person.id]&.status || "none" } %>
+    <% (Rsvp.statuses.keys + [ "none" ]).each do |status| %>
+      <% people = grouped.fetch(status, []) %>
+      <p class="mt-3 font-medium">
+        <%= status == "none" ? "No response" : t("rsvps.statuses.#{status}") %> (<%= people.size %>)
+      </p>
+      <% if people.any? %>
+        <ul class="list-disc pl-5 text-sm text-gray-700">
+          <% people.each do |person| %>
+            <li><%= person.full_name %> <span class="text-gray-500">(<%= person.family.name %>)</span></li>
+          <% end %>
+        </ul>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <div class="mt-6 flex items-center gap-4">
+    <% if can? :update, @event %>
+      <%= link_to "Edit", edit_event_path(@event), class: "text-blue-600 hover:underline" %>
+    <% end %>
+    <% if can? :destroy, @event %>
+      <%= button_to "Delete", event_path(@event), method: :delete, data: { turbo_confirm: "Delete #{@event.title}? This also deletes its RSVPs." }, class: "text-red-600 hover:underline cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <p class="mt-6 text-sm"><%= link_to "Back to events", events_path, class: "text-blue-600 hover:underline" %></p>
+</div>

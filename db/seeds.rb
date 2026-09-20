@@ -29,9 +29,19 @@ if Rails.env.development?
   end
 
   # `family: one` in people.yml is a fixture label; resolve it to the family seeded above.
-  fixture_rows.call("people").each_value do |attrs|
+  people = fixture_rows.call("people").transform_values do |attrs|
     family = families.fetch(attrs.fetch("family"))
     attrs = attrs.except("family")
-    Person.find_or_initialize_by(family: family, first_name: attrs["first_name"], last_name: attrs["last_name"]).update!(attrs)
+    Person.find_or_initialize_by(family: family, first_name: attrs["first_name"], last_name: attrs["last_name"]).tap { |person| person.update!(attrs) }
+  end
+
+  # Event times in events.yml are relative to when the seeds run, so re-seeding moves them forward.
+  events = fixture_rows.call("events").transform_values do |attrs|
+    Event.find_or_initialize_by(title: attrs.fetch("title")).tap { |event| event.update!(attrs) }
+  end
+
+  # `event: pack_meeting` / `person: smith_dad` in rsvps.yml are fixture labels too.
+  fixture_rows.call("rsvps").each_value do |attrs|
+    Rsvp.find_or_initialize_by(event: events.fetch(attrs.fetch("event")), person: people.fetch(attrs.fetch("person"))).update!(status: attrs.fetch("status"))
   end
 end

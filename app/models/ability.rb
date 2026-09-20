@@ -18,6 +18,14 @@ class Ability
 
       # People are only visible to their own family, and only admins can change them.
       can :read, Person, family_id: family.id
+
+      # Events are read-only for families, who RSVP their own people until the event's RSVP deadline
+      # passes (a block: the deadline falls back to ends_at, which a hash condition can't express).
+      can :read, Event
+      can :read, Rsvp, person: { family_id: family.id }
+      can %i[create update], Rsvp do |rsvp|
+        rsvp.person&.family_id == family.id && rsvp.event&.rsvp_open?
+      end
     end
   end
 end

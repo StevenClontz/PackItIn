@@ -1,0 +1,35 @@
+<% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+
+<%= form_with(model: event) do |f| %>
+  <%= render "devise/shared/error_messages", resource: event %>
+
+  <div class="mb-4">
+    <%= f.label :title, class: "mb-1 block font-medium" %>
+    <%= f.text_field :title, autofocus: true, class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :description, class: "mb-1 block font-medium" %>
+    <%= f.text_area :description, rows: 4, class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :starts_at, "Start time", class: "mb-1 block font-medium" %>
+    <%= f.datetime_local_field :starts_at, class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :ends_at, "End time", class: "mb-1 block font-medium" %>
+    <%= f.datetime_local_field :ends_at, class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :rsvp_deadline_at, "RSVP deadline", class: "mb-1 block font-medium" %>
+    <p class="mb-1 text-sm text-gray-500">Optional. Leave blank to close RSVPs when the event ends. After this time only admins can change RSVPs.</p>
+    <%= f.datetime_local_field :rsvp_deadline_at, class: input_class %>
+  </div>
+
+  <p class="mb-4 text-sm text-gray-500">Times are in <%= Time.zone.name %>.</p>
+
+  <%= f.submit class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+<% end %>

@@ -39,6 +39,11 @@ en:
       webelos: "Webelos"
       aol: "AOL"
       youth: "Youth"
+  rsvps:
+    statuses:
+      attending: "Attending"
+      maybe: "Maybe"
+      not_attending: "Not attending"
   families:
     states:
       al: "Alabama"

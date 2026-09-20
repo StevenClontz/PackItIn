@@ -11,6 +11,9 @@ Rails.application.routes.draw do
   resources :families do
     resources :people, shallow: true
   end
+  resources :events do
+    resource :rsvp, only: :update
+  end
 
   root "home#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

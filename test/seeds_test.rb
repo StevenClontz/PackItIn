@@ -13,6 +13,10 @@ class SeedsTest < ActiveSupport::TestCase
   setup do
     @family_usernames = Family.order(:username).pluck(:username)
     @people = Person.order(:first_name).pluck(:first_name, :last_name, :position)
+    @event_titles = Event.order(:title).pluck(:title)
+    @rsvps = Rsvp.joins(:event, :person).order("events.title", "people.first_name").pluck("events.title", "people.first_name", :status)
+    Rsvp.delete_all
+    Event.delete_all
     Person.delete_all
     Family.delete_all
   end
@@ -24,6 +28,15 @@ class SeedsTest < ActiveSupport::TestCase
     assert_equal @people, Person.order(:first_name).pluck(:first_name, :last_name, :position)
     assert_equal %w[adminfamily], Family.where(admin: true).pluck(:username)
     assert_equal %w[Lily Sam], Family.find_by!(username: "examplefamily").people.pluck(:first_name).sort
+  end
+
+  test "seeds recreate the fixture events and RSVPs" do
+    run_dev_seeds
+
+    assert_equal @event_titles, Event.order(:title).pluck(:title)
+    assert_equal @rsvps, Rsvp.joins(:event, :person).order("events.title", "people.first_name").pluck("events.title", "people.first_name", :status)
+    assert Event.find_by!(title: "Fall Campout").rsvp_deadline_at
+    assert Event.find_by!(title: "Pack Meeting").starts_at.future?
   end
 
   test "sample families can sign in with password123" do
@@ -39,7 +52,7 @@ class SeedsTest < ActiveSupport::TestCase
     other = Family.create!(username: "someoneelse", password: "password123", **profile_params)
     other.people.create!(first_name: "Kit", last_name: "Else", position: :youth)
 
-    assert_no_difference [ "Family.count", "Person.count" ] do
+    assert_no_difference [ "Family.count", "Person.count", "Event.count", "Rsvp.count" ] do
       run_dev_seeds
     end
     assert Family.exists?(other.id)
@@ -62,5 +75,7 @@ class SeedsTest < ActiveSupport::TestCase
 
     assert_equal 0, Family.count
     assert_equal 0, Person.count
+    assert_equal 0, Event.count
+    assert_equal 0, Rsvp.count
   end
 end

@@ -1,5 +1,6 @@
 class Person < ApplicationRecord
   belongs_to :family
+  has_many :rsvps, dependent: :destroy
 
   enum :position, { adult: 0, lion: 1, tiger: 2, wolf: 3, bear: 4, webelos: 5, aol: 6, youth: 7 }, validate: true
 
