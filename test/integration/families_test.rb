@@ -221,11 +221,11 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     assert_select "input[name=_method][value=delete]", count: 0
   end
 
-  test "home page has Manage my family, not Edit account" do
+  test "home page has Manage our family, not Edit account" do
     sign_in_as "examplefamily"
 
     get root_path
-    assert_select "a[href=?]", family_path(families(:one)), text: "Manage my family"
+    assert_select "a[href=?]", family_path(families(:one)), text: "Manage our family"
     assert_select "a", text: "Edit account", count: 0
 
     get family_path(families(:one))

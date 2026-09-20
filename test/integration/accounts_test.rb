@@ -98,7 +98,7 @@ class AccountsTest < ActionDispatch::IntegrationTest
     sign_in_as "examplefamily"
     get root_path
     assert_select "a[href=?]", funds_path, text: "Funds"
-    assert_select "a[href=?]", family_account_path(families(:one)), text: "My Scout Account"
+    assert_select "a[href=?]", family_account_path(families(:one)), text: "Our Scout Account"
   end
 
   test "statements show only the latest 200 lines" do
