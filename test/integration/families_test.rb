@@ -196,6 +196,42 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     assert_equal "examplefamily2", families(:one).reload.username
   end
 
+  test "family information never needs the current password, however much of it changes" do
+    sign_in_as "examplefamily"
+
+    get edit_family_path(families(:one))
+    assert_select "input[name=?]", "family[current_password]" # offered, but only needed for a new password
+
+    patch family_path(families(:one)), params: { family: {
+      username: "examplefamily2", name: "The Examples", street_address: "9 Oak Ln", city: "Dallas", state: "tx", zip: "75201"
+    } }
+    assert_redirected_to family_path(families(:one))
+    families(:one).reload
+    assert_equal [ "examplefamily2", "The Examples", "9 Oak Ln", "Dallas", "tx", "75201" ],
+                 families(:one).values_at(:username, :name, :street_address, :city, :state, :zip)
+    assert families(:one).valid_password?("password123"), "password untouched"
+  end
+
+  test "a family's own edit page has no delete or cancel-account control" do
+    sign_in_as "examplefamily"
+
+    get edit_family_path(families(:one))
+    assert_response :success
+    assert_select "button, input[type=submit]", text: /delete|cancel/i, count: 0
+    assert_select "input[name=_method][value=delete]", count: 0
+  end
+
+  test "home page has Manage my family, not Edit account" do
+    sign_in_as "examplefamily"
+
+    get root_path
+    assert_select "a[href=?]", family_path(families(:one)), text: "Manage my family"
+    assert_select "a", text: "Edit account", count: 0
+
+    get family_path(families(:one))
+    assert_select "a[href=?]", edit_family_path(families(:one)), text: "Edit"
+  end
+
   test "changing your own password requires the current password and keeps you signed in" do
     sign_in_as "examplefamily"
 
@@ -298,10 +334,9 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # --- Devise moved to /account ---
+  # --- Devise only signs in and out, under /account ---
 
   test "devise pages live under /account" do
     assert_equal "/account/sign_in", new_family_session_path
-    assert_equal "/account/edit", edit_family_registration_path
   end
 end

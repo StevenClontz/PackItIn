@@ -160,55 +160,22 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "edit account page has no cancel account button" do
-    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
-    get edit_family_registration_path
-    assert_response :success
-    assert_select "input[type=submit][value=Update]"
-    assert_select "button, input[type=submit]", text: /cancel my account/i, count: 0
-    assert_select "input[name=_method][value=delete]", count: 0
-  end
-
-  test "edit account form includes the name and address fields" do
-    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
-    get edit_family_registration_path
-    assert_select "input[name=?][value=?]", "family[street_address]", "100 Main St"
-    assert_select "select[name=?] option[selected][value=tx]", "family[state]"
-  end
-
-  test "family can update its own name and address from the account page" do
-    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
-    put family_registration_path, params: { family: { name: "The Examples", street_address: "9 Oak Ln", city: "Dallas", state: "tx", zip: "75201", current_password: "password123" } }
-
-    assert_redirected_to root_path
-    families(:one).reload
-    assert_equal [ "The Examples", "9 Oak Ln", "Dallas", "tx", "75201" ], families(:one).values_at(:name, :street_address, :city, :state, :zip)
-  end
-
-  test "account update cannot make a family an admin" do
-    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
-    put family_registration_path, params: { family: { username: "examplefamily", admin: "1", current_password: "password123" } }
-    assert_not families(:one).reload.admin?
-  end
-
-  test "there is no route to delete your own account, for anyone" do
+  # Families are created and edited through FamiliesController; Devise only signs in and out.
+  test "there are no Devise routes to edit or delete an account" do
     assert_no_difference "Family.count" do
-      delete "/account"
-      assert_response :not_found
+      [ nil, "examplefamily", "adminfamily" ].each do |username|
+        post family_session_path, params: { family: { username: username, password: "password123" } } if username
 
-      [ "examplefamily", "adminfamily" ].each do |username|
-        post family_session_path, params: { family: { username: username, password: "password123" } }
-        delete "/account"
-        assert_response :not_found, username
+        get "/account/edit"
+        assert_response :not_found, "GET /account/edit as #{username.inspect}"
+        [ :patch, :put, :delete ].each do |verb|
+          public_send(verb, "/account", params: { family: { name: "Hijacked" } })
+          assert_response :not_found, "#{verb.upcase} /account as #{username.inspect}"
+        end
+        assert_equal "The Example Family", families(:one).reload.name
+
+        delete destroy_family_session_path if username
       end
     end
-  end
-
-  test "guests are sent to sign in from the edit account page" do
-    get edit_family_registration_path
-    assert_redirected_to new_family_session_path
-
-    put family_registration_path, params: { family: { name: "Hijacked" } }
-    assert_redirected_to new_family_session_path
   end
 end

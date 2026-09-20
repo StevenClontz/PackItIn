@@ -1,7 +1,7 @@
 class Family < ApplicationRecord
   # No :validatable (requires an email column) and no email-based modules
   # (:recoverable, :confirmable); validations are declared below.
-  devise :database_authenticatable, :registerable, :rememberable
+  devise :database_authenticatable, :rememberable
 
   include HasLedgerAccount
 
