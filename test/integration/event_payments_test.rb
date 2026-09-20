@@ -259,4 +259,21 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     end
     assert_equal Money.new(60_00), trip.balance
   end
+
+  # --- youth pricing ---
+
+  test "the Costs panel shows each person's own price and pays the mixed total" do
+    answer people(:smith_dad), "attending", rsvp_options(:full_weekend)
+    answer people(:smith_lion), "attending", rsvp_options(:full_weekend)
+    sign_in_as "examplefamily"
+
+    get event_path(trip)
+    assert_select "li", text: /Sam Smith\s*- Full weekend\s*\$60\.00/
+    assert_select "li", text: /Lily Smith\s*- Full weekend\s*\$30\.00/
+    assert_select "button", "Pay $90.00 from our Scout Account"
+
+    pay 9000
+    assert_equal Money.new(-90_00), families(:one).balance
+    assert_equal Money.new(90_00), trip.balance
+  end
 end

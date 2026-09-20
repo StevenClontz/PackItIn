@@ -40,7 +40,7 @@ class RsvpOptionsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h3", "Ways to attend"
     assert_select "li", text: /Day trip only\s*- \$25\.00 per person\s*Saturday only, home by dinner\./
-    assert_select "li", text: /Full weekend\s*- \$60\.00 per person\s*Both days, with the overnight camp\./
+    assert_select "li", text: /Full weekend\s*- \$60\.00 per adult, \$30\.00 per youth\s*Both days, with the overnight camp\./
     assert_select "a", text: "Add option", count: 0
     assert_select "a", text: "Edit", count: 0
     assert_select "button", text: "Delete", count: 0
@@ -185,7 +185,7 @@ class RsvpOptionsTest < ActionDispatch::IntegrationTest
 
     get new_event_rsvp_option_path(events(:campout))
     assert_select "input[name=?]", "rsvp_option[cost_dollars]"
-    assert_match "Per person. Leave blank if free.", response.body
+    assert_match "Per person (per adult, if a youth cost is set). Leave blank if free.", response.body
   end
 
   test "admin adds an option with a cost, and without one" do
@@ -239,5 +239,75 @@ class RsvpOptionsTest < ActionDispatch::IntegrationTest
     get event_path(events(:weekend_trip))
     assert_select "li", text: /Day trip only\s*Saturday only/
     assert_no_match "Day trip only - ", response.body
+  end
+
+  # --- youth cost ---
+
+  test "the option form has an optional youth cost field" do
+    sign_in_as "adminfamily"
+
+    get new_event_rsvp_option_path(events(:campout))
+    assert_select "input[name=?]", "rsvp_option[youth_cost_dollars]"
+    assert_match "Charged for anyone who isn't an adult", response.body
+    assert_match "Leave blank to charge everyone the cost above.", response.body
+  end
+
+  test "admin adds an option with both prices, and with only a youth price" do
+    sign_in_as "adminfamily"
+
+    post event_rsvp_options_path(events(:campout)), params: option_params(cost_dollars: "40", youth_cost_dollars: "$20.50")
+    option = events(:campout).rsvp_options.find_by!(name: "Overnight")
+    assert_equal [ 4000, 2050 ], [ option.cost_cents, option.youth_cost_cents ]
+
+    post event_rsvp_options_path(events(:campout)), params: option_params(name: "Scouts only", cost_dollars: "", youth_cost_dollars: "15")
+    scouts = events(:campout).rsvp_options.find_by!(name: "Scouts only")
+    assert_nil scouts.cost_cents
+    assert_equal 1500, scouts.youth_cost_cents
+  end
+
+  test "an invalid youth cost re-renders the form with what was typed" do
+    sign_in_as "adminfamily"
+
+    assert_no_difference "RsvpOption.count" do
+      post event_rsvp_options_path(events(:campout)), params: option_params(cost_dollars: "40", youth_cost_dollars: "cheap")
+    end
+    assert_response :unprocessable_entity
+    assert_select "#error_explanation", /Youth cost must be a dollar amount such as 25 or 25\.50/
+    assert_select "input[name=?][value=?]", "rsvp_option[youth_cost_dollars]", "cheap"
+    assert_select "input[name=?][value=?]", "rsvp_option[cost_dollars]", "40"
+  end
+
+  test "admin edits and clears the youth cost" do
+    sign_in_as "adminfamily"
+    event = events(:weekend_trip)
+
+    get edit_event_rsvp_option_path(event, rsvp_options(:full_weekend))
+    assert_select "input[name=?][value=?]", "rsvp_option[youth_cost_dollars]", "30.00"
+
+    patch event_rsvp_option_path(event, rsvp_options(:full_weekend)), params: option_params(name: "Full weekend", cost_dollars: "60", youth_cost_dollars: "0")
+    assert_equal 0, rsvp_options(:full_weekend).reload.youth_cost_cents, "zero is kept: free for youth"
+
+    patch event_rsvp_option_path(event, rsvp_options(:full_weekend)), params: option_params(name: "Full weekend", cost_dollars: "60", youth_cost_dollars: "")
+    assert_nil rsvp_options(:full_weekend).reload.youth_cost_cents
+  end
+
+  test "families can't set a youth cost" do
+    sign_in_as "examplefamily"
+
+    patch event_rsvp_option_path(events(:weekend_trip), rsvp_options(:full_weekend)), params: option_params(youth_cost_dollars: "1")
+    assert_denied
+    assert_equal 3000, rsvp_options(:full_weekend).reload.youth_cost_cents
+  end
+
+  test "the list describes each way of pricing an option" do
+    events(:weekend_trip).rsvp_options.create!(name: "Scouts only", youth_cost_dollars: "12")
+    events(:weekend_trip).rsvp_options.create!(name: "Family pass", cost_dollars: "20", youth_cost_dollars: "0")
+    sign_in_as "examplefamily"
+
+    get event_path(events(:weekend_trip))
+    assert_select "li", text: /Day trip only\s*- \$25\.00 per person/
+    assert_select "li", text: /Full weekend\s*- \$60\.00 per adult, \$30\.00 per youth/
+    assert_select "li", text: /Scouts only\s*- free for adults, \$12\.00 per youth/
+    assert_select "li", text: /Family pass\s*- \$20\.00 per adult, free for youth/
   end
 end

@@ -43,6 +43,7 @@ en:
     attributes:
       rsvp_option:
         cost_dollars: "Cost"
+        youth_cost_dollars: "Youth cost"
   ledger:
     codes:
       deposit: "Deposit"

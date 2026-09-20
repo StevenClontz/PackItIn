@@ -8,4 +8,5 @@ full_weekend:
   event: weekend_trip
   name: Full weekend
   cost_cents: 6000
+  youth_cost_cents: 3000
   description: Both days, with the overnight camp.

@@ -15,13 +15,14 @@ class EventPayment
     @family = family
   end
 
-  # The costed options the family's attending people chose.
+  # The options the family's attending people chose that cost them something, at each person's own price.
   def line_items
     people.filter_map do |person|
       rsvp = rsvps[person.id]
-      next unless rsvp&.attending? && rsvp.rsvp_option&.costed?
+      next unless rsvp&.attending? && rsvp.rsvp_option
 
-      Item.new(person, rsvp.rsvp_option, rsvp.rsvp_option.cost)
+      cost = rsvp.rsvp_option.cost_for(person)
+      Item.new(person, rsvp.rsvp_option, cost) if cost.positive?
     end
   end
 

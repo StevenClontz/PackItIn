@@ -224,4 +224,57 @@ class EventPaymentTest < ActiveSupport::TestCase
     assert_equal Money.new(85_00), payment_for.outstanding
     assert_equal Money.new(-25_00), families(:two).balance
   end
+
+  # --- youth pricing ---
+
+  test "an adult and a non-adult pay their own price for the same option" do
+    answer people(:smith_dad), "attending", rsvp_options(:full_weekend)   # adult: $60
+    answer people(:smith_lion), "attending", rsvp_options(:full_weekend)  # lion: $30 youth price
+
+    payment = payment_for
+    assert_equal [ Money.new(30_00), Money.new(60_00) ], payment.line_items.map(&:cost).sort
+    assert_equal Money.new(90_00), payment.total
+  end
+
+  test "paying charges the mixed total" do
+    answer people(:smith_dad), "attending", rsvp_options(:full_weekend)
+    answer people(:smith_lion), "attending", rsvp_options(:full_weekend)
+
+    assert_equal :paid, payment_for.pay(expected_cents: 90_00)
+    assert_equal Money.new(-90_00), families(:one).balance
+    assert_equal Money.new(90_00), trip.balance
+  end
+
+  test "an option with one price charges an adult and a non-adult the same" do
+    answer people(:smith_dad), "attending", rsvp_options(:day_trip)
+    answer people(:smith_lion), "attending", rsvp_options(:day_trip)
+    assert_equal [ Money.new(25_00), Money.new(25_00) ], payment_for.line_items.map(&:cost)
+  end
+
+  test "an option with only a youth price charges just the non-adults" do
+    youth_only = RsvpOption.create!(event: trip, name: "Scouts only", youth_cost_dollars: "12")
+    answer people(:smith_dad), "attending", youth_only
+    answer people(:smith_lion), "attending", youth_only
+
+    assert_equal [ "Lily Smith" ], payment_for.line_items.map { |item| item.person.full_name }
+    assert_equal Money.new(12_00), payment_for.total
+  end
+
+  test "an option that is free for youth charges just the adults" do
+    free_for_youth = RsvpOption.create!(event: trip, name: "Family pass", cost_dollars: "20", youth_cost_dollars: "0")
+    answer people(:smith_dad), "attending", free_for_youth
+    answer people(:smith_lion), "attending", free_for_youth
+
+    assert_equal [ "Sam Smith" ], payment_for.line_items.map { |item| item.person.full_name }
+    assert_equal Money.new(20_00), payment_for.total
+  end
+
+  test "a family whose option is free for everyone has nothing to pay" do
+    free = RsvpOption.create!(event: trip, name: "Just visiting", cost_dollars: "0", youth_cost_dollars: "0")
+    answer people(:smith_dad), "attending", free
+    answer people(:smith_lion), "attending", free
+
+    assert_empty payment_for.line_items
+    assert_not payment_for.relevant?
+  end
 end

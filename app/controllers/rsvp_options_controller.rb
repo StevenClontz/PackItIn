@@ -55,6 +55,6 @@ class RsvpOptionsController < ApplicationController
   end
 
   def rsvp_option_params
-    params.expect(rsvp_option: %i[name description cost_dollars])
+    params.expect(rsvp_option: %i[name description cost_dollars youth_cost_dollars])
   end
 end

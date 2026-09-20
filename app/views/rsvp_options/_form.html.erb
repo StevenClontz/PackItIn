@@ -10,8 +10,14 @@
 
   <div class="mb-4">
     <%= f.label :cost_dollars, "Cost (dollars)", class: "mb-1 block font-medium" %>
-    <p class="mb-1 text-sm text-gray-500">Optional. Per person. Leave blank if free.</p>
+    <p class="mb-1 text-sm text-gray-500">Optional. Per person (per adult, if a youth cost is set). Leave blank if free.</p>
     <%= f.text_field :cost_dollars, inputmode: "decimal", placeholder: "25.00", autocomplete: "off", class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :youth_cost_dollars, "Youth cost (dollars)", class: "mb-1 block font-medium" %>
+    <p class="mb-1 text-sm text-gray-500">Optional. Charged for anyone who isn't an adult (lion, tiger, wolf, bear, webelos, AOL, youth). Leave blank to charge everyone the cost above.</p>
+    <%= f.text_field :youth_cost_dollars, inputmode: "decimal", placeholder: "15.00", autocomplete: "off", class: input_class %>
   </div>
 
   <div class="mb-4">

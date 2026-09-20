@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_050034) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_051617) do
   create_table "double_entry_account_balances", force: :cascade do |t|
     t.string "account", null: false
     t.bigint "balance", null: false
@@ -101,6 +101,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_050034) do
     t.integer "event_id", null: false
     t.string "name", null: false
     t.datetime "updated_at", null: false
+    t.bigint "youth_cost_cents"
     t.index ["event_id", "name"], name: "index_rsvp_options_on_event_id_and_name", unique: true
     t.index ["event_id"], name: "index_rsvp_options_on_event_id"
   end

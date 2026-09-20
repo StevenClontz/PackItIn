@@ -287,11 +287,11 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     sign_in_as "examplefamily"
 
     get event_path(events(:weekend_trip))
-    [ people(:smith_dad), people(:smith_lion) ].each do |person|
+    { people(:smith_dad) => "$60.00", people(:smith_lion) => "$30.00" }.each do |person, weekend_price|
       assert_select "select[name=?]", "rsvps[#{person.id}][rsvp_option_id]" do
         assert_select "option", text: "Choose an option"
         assert_select "option", text: "Day trip only ($25.00)"
-        assert_select "option", text: "Full weekend ($60.00)"
+        assert_select "option", text: "Full weekend (#{weekend_price})"
       end
     end
 

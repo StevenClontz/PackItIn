@@ -18,7 +18,7 @@
             <span>
               <span class="font-medium"><%= option.name %></span>
               <% if option.costed? %>
-                <span class="text-sm text-gray-700">- <%= money(option.cost) %> per person</span>
+                <span class="text-sm text-gray-700">- <%= option.cost_summary %></span>
               <% end %>
               <% if option.description.present? %>
                 <span class="block text-sm text-gray-500"><%= option.description %></span>
@@ -87,7 +87,7 @@
               <% option_id = "rsvps_#{person.id}_rsvp_option_id" %>
               <span class="flex w-full flex-wrap items-center gap-2 text-sm">
                 <%= label_tag option_id, "Option for #{person.first_name}", class: "text-gray-700" %>
-                <%= select_tag "rsvps[#{person.id}][rsvp_option_id]", options_for_select(@options.map { |option| [ option.label, option.id ] }, rsvp&.rsvp_option_id), include_blank: "Choose an option", id: option_id, class: "rounded-md border border-gray-300 px-2 py-1" %>
+                <%= select_tag "rsvps[#{person.id}][rsvp_option_id]", options_for_select(@options.map { |option| [ option.label_for(person), option.id ] }, rsvp&.rsvp_option_id), include_blank: "Choose an option", id: option_id, class: "rounded-md border border-gray-300 px-2 py-1" %>
                 <span class="text-gray-500">Needed if attending or maybe.</span>
               </span>
             <% end %>

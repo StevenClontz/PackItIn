@@ -43,7 +43,7 @@ class SeedsTest < ActiveSupport::TestCase
     assert_equal @rsvp_options, RsvpOption.joins(:event).order("events.title", :name).pluck("events.title", :name)
     ben_on_the_trip = Rsvp.joins(:event).find_by!(person: Person.find_by!(first_name: "Ben"), events: { title: "Weekend Trip" })
     assert_equal "Day trip only", ben_on_the_trip.rsvp_option.name
-    assert_equal [ 2500, 6000 ], RsvpOption.joins(:event).where(events: { title: "Weekend Trip" }).order(:cost_cents).pluck(:cost_cents)
+    assert_equal [ [ 2500, nil ], [ 6000, 3000 ] ], RsvpOption.joins(:event).where(events: { title: "Weekend Trip" }).order(:cost_cents).pluck(:cost_cents, :youth_cost_cents)
     assert_equal @rsvps, Rsvp.joins(:event, :person).order("events.title", "people.first_name").pluck("events.title", "people.first_name", :status)
     assert Event.find_by!(title: "Fall Campout").rsvp_deadline_at
     assert Event.find_by!(title: "Pack Meeting").starts_at.future?
