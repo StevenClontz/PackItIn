@@ -1,9 +1,12 @@
 Rails.application.routes.draw do
-  # Devise lives under /account so that /families is free for the resourceful CRUD below
-  # (Devise's sign-up would otherwise claim POST /families).
-  devise_for :families, path: "account", controllers: { registrations: "families/registrations", sessions: "families/sessions" }
+  # Devise lives under /account so that /families is free for the resourceful CRUD below.
+  # Only admins create families, so the registration routes (sign-up, cancel, delete account) are skipped;
+  # just editing your own account is re-declared below.
+  devise_for :families, path: "account", skip: :registrations, controllers: { sessions: "families/sessions" }
   devise_scope :family do
     post "account/sign_in/address", to: "families/sessions#create_with_address", as: :address_family_session
+    get "account/edit", to: "devise/registrations#edit", as: :edit_family_registration
+    match "account", to: "devise/registrations#update", via: %i[patch put], as: :family_registration
   end
   resources :families do
     resources :people, shallow: true

@@ -27,8 +27,8 @@ class FamiliesTest < ActionDispatch::IntegrationTest
 
     get families_path
     assert_response :success
-    assert_select "a", "joneses"
-    assert_select "a", "adminfamily"
+    assert_select "a", "The Joneses"
+    assert_select "a", "Pack Administrators"
 
     get family_path(families(:two))
     assert_response :success
@@ -289,7 +289,6 @@ class FamiliesTest < ActionDispatch::IntegrationTest
 
   test "devise pages live under /account" do
     assert_equal "/account/sign_in", new_family_session_path
-    assert_equal "/account/sign_up", new_family_registration_path
     assert_equal "/account/edit", edit_family_registration_path
   end
 end

@@ -7,29 +7,29 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "a", "Log in"
   end
 
-  test "sign up with username and password" do
-    assert_difference "Family.count", 1 do
-      post family_registration_path, params: { family: { username: "brandnew", password: "password123", password_confirmation: "password123", **profile_params } }
-    end
-    assert_redirected_to root_path
-    follow_redirect!
-    assert_match "brandnew", response.body
+  # --- only admins create families: there is no sign-up ---
+
+  test "home page has no sign up link" do
+    get root_path
+    assert_select "a", text: /sign up/i, count: 0
   end
 
-  test "sign up requires the name and address" do
+  test "sign up routes do not exist" do
     assert_no_difference "Family.count" do
-      post family_registration_path, params: { family: { username: "brandnew", password: "password123", password_confirmation: "password123" } }
+      get "/account/sign_up"
+      assert_response :not_found
+
+      post "/account", params: { family: { username: "brandnew", password: "password123", password_confirmation: "password123", **profile_params } }
+      assert_response :not_found
+
+      get "/account/cancel"
+      assert_response :not_found
     end
-    assert_response :unprocessable_entity
-    assert_select "#error_explanation", /Name can't be blank/
-    assert_select "#error_explanation", /Zip can't be blank/
   end
 
-  test "sign up with invalid data re-renders form" do
-    assert_no_difference "Family.count" do
-      post family_registration_path, params: { family: { username: "", password: "x", password_confirmation: "y" } }
-    end
-    assert_response :unprocessable_entity
+  test "sign in page has no sign up link" do
+    get new_family_session_path
+    assert_select "a", text: /sign up/i, count: 0
   end
 
   test "sign in and sign out" do
@@ -160,18 +160,6 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "signed-in family cannot destroy its own account" do
-    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
-
-    assert_no_difference "Family.count" do
-      delete family_registration_path
-    end
-    assert_redirected_to root_path
-    follow_redirect!
-    assert_match "not authorized", response.body
-    assert_match "examplefamily", response.body, "should still be signed in"
-  end
-
   test "edit account page has no cancel account button" do
     post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
     get edit_family_registration_path
@@ -181,10 +169,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "input[name=_method][value=delete]", count: 0
   end
 
-  test "sign up and edit account forms include the name and address fields" do
-    get new_family_registration_path
-    %w[name street_address city state zip].each { |field| assert_select "[name=?]", "family[#{field}]" }
-
+  test "edit account form includes the name and address fields" do
     post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
     get edit_family_registration_path
     assert_select "input[name=?][value=?]", "family[street_address]", "100 Main St"
@@ -200,32 +185,30 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_equal [ "The Examples", "9 Oak Ln", "Dallas", "tx", "75201" ], families(:one).values_at(:name, :street_address, :city, :state, :zip)
   end
 
-  test "sign up cannot make a family an admin" do
-    post family_registration_path, params: { family: { username: "sneaky", password: "password123", password_confirmation: "password123", admin: "1", **profile_params } }
-    assert_not Family.find_by!(username: "sneaky").admin?
-  end
-
   test "account update cannot make a family an admin" do
     post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
     put family_registration_path, params: { family: { username: "examplefamily", admin: "1", current_password: "password123" } }
     assert_not families(:one).reload.admin?
   end
 
-  test "admin family cannot destroy its own account either" do
-    post family_session_path, params: { family: { username: "adminfamily", password: "password123" } }
-
+  test "there is no route to delete your own account, for anyone" do
     assert_no_difference "Family.count" do
-      delete family_registration_path
+      delete "/account"
+      assert_response :not_found
+
+      [ "examplefamily", "adminfamily" ].each do |username|
+        post family_session_path, params: { family: { username: username, password: "password123" } }
+        delete "/account"
+        assert_response :not_found, username
+      end
     end
-    assert_redirected_to root_path
-    follow_redirect!
-    assert_match "not authorized", response.body
   end
 
-  test "guest cannot destroy a family either" do
-    assert_no_difference "Family.count" do
-      delete family_registration_path
-    end
+  test "guests are sent to sign in from the edit account page" do
+    get edit_family_registration_path
+    assert_redirected_to new_family_session_path
+
+    put family_registration_path, params: { family: { name: "Hijacked" } }
     assert_redirected_to new_family_session_path
   end
 end

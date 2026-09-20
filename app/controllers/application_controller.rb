@@ -19,8 +19,6 @@ class ApplicationController < ActionController::Base
   protected
 
   def configure_permitted_parameters
-    profile_keys = %i[username name street_address city state zip]
-    devise_parameter_sanitizer.permit(:sign_up, keys: profile_keys)
-    devise_parameter_sanitizer.permit(:account_update, keys: profile_keys)
+    devise_parameter_sanitizer.permit(:account_update, keys: %i[username name street_address city state zip])
   end
 end
