@@ -64,6 +64,36 @@ class FamilyTest < ActiveSupport::TestCase
     assert_equal "Texas", families(:one).state_label
   end
 
+  test "normalize_address keeps only lowercase letters and digits" do
+    assert_equal "100mainst", Family.normalize_address("  100 Main St.  ")
+    assert_equal "", Family.normalize_address("-- !!")
+    assert_equal "", Family.normalize_address(nil)
+  end
+
+  test "street address matching ignores case, spacing and punctuation" do
+    family = families(:one) # 100 Main St
+    [ "100 Main St", "100 main st.", "100-MAIN   ST", "1 0 0 m a i n s t" ].each do |input|
+      assert family.street_address_matches?(input), input
+    end
+  end
+
+  test "street address matching rejects different or blank input" do
+    family = families(:one)
+    [ "100 Main Street", "101 Main St", "Main St", "", nil, "  ..  " ].each do |input|
+      assert_not family.street_address_matches?(input), input.inspect
+    end
+  end
+
+  test "a punctuation-only street address never matches" do
+    family = build_family(street_address: "---")
+    assert_not family.street_address_matches?("")
+    assert_not family.street_address_matches?("--")
+  end
+
+  test "non_admin excludes admin families" do
+    assert_equal [ "examplefamily", "joneses" ], Family.non_admin.order(:username).pluck(:username)
+  end
+
   test "requires a password on create" do
     assert_not build_family(password: nil, password_confirmation: nil).valid?
   end

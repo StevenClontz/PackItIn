@@ -1,7 +1,10 @@
 Rails.application.routes.draw do
   # Devise lives under /account so that /families is free for the resourceful CRUD below
   # (Devise's sign-up would otherwise claim POST /families).
-  devise_for :families, path: "account", controllers: { registrations: "families/registrations" }
+  devise_for :families, path: "account", controllers: { registrations: "families/registrations", sessions: "families/sessions" }
+  devise_scope :family do
+    post "account/sign_in/address", to: "families/sessions#create_with_address", as: :address_family_session
+  end
   resources :families do
     resources :people, shallow: true
   end

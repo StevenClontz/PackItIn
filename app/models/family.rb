@@ -22,6 +22,18 @@ class Family < ApplicationRecord
   validates :zip, format: { with: /\A\d{5}(-\d{4})?\z/, message: "must be a 5-digit ZIP or ZIP+4" }, allow_blank: true
   validates :password, presence: true, confirmation: true, length: { in: Devise.password_length }, if: :password_required?
 
+  scope :non_admin, -> { where(admin: false) }
+
+  # Addresses are compared as bare sequences of letters and digits, ignoring case, spacing and punctuation.
+  def self.normalize_address(value)
+    value.to_s.downcase.gsub(/[^[:alnum:]]/, "")
+  end
+
+  def street_address_matches?(input)
+    expected = self.class.normalize_address(street_address)
+    expected.present? && ActiveSupport::SecurityUtils.secure_compare(expected, self.class.normalize_address(input))
+  end
+
   # [[label, value], ...] for the state <select>.
   def self.state_options
     states.keys.map { |state| [ I18n.t("families.states.#{state}"), state ] }

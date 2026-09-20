@@ -2,10 +2,32 @@
 <div class="mx-auto w-full max-w-md">
   <h2 class="mb-6 text-2xl font-bold">Log in</h2>
 
+  <% families = Family.non_admin.order(:name).pluck(:name, :id) %>
+  <% if families.any? %>
+    <%= form_with(scope: :address_sign_in, url: address_family_session_path) do |f| %>
+      <div class="mb-4">
+        <%= f.label :family_id, "Family", class: "mb-1 block font-medium" %>
+        <%= f.select :family_id, options_for_select(families, @selected_family_id), { prompt: "Select your family" }, autofocus: true, class: input_class %>
+      </div>
+
+      <div class="mb-4">
+        <%= f.label :street_address, class: "mb-1 block font-medium" do %>
+          Confirm your street address
+        <% end %>
+        <p class="mb-1 text-sm text-gray-500">Do not include city, state, etc.</p>
+        <%= f.text_field :street_address, autocomplete: "street-address", class: input_class %>
+      </div>
+
+      <%= f.submit "Log in with address", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+    <% end %>
+
+    <p class="my-6 text-center text-sm text-gray-500">or log in with a username and password</p>
+  <% end %>
+
   <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
     <div class="mb-4">
       <%= f.label :username, class: "mb-1 block font-medium" %>
-      <%= f.text_field :username, autofocus: true, autocomplete: "username", class: input_class %>
+      <%= f.text_field :username, autofocus: families.empty?, autocomplete: "username", class: input_class %>
     </div>
 
     <div class="mb-4">
