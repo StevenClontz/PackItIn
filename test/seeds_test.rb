@@ -36,7 +36,7 @@ class SeedsTest < ActiveSupport::TestCase
 
   test "seeds are idempotent and leave other families alone" do
     run_dev_seeds
-    other = Family.create!(username: "someoneelse", password: "password123")
+    other = Family.create!(username: "someoneelse", password: "password123", **profile_params)
     other.people.create!(first_name: "Kit", last_name: "Else", position: :youth)
 
     assert_no_difference [ "Family.count", "Person.count" ] do

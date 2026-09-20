@@ -10,6 +10,8 @@
       <%= f.text_field :username, autofocus: true, autocomplete: "username", class: input_class %>
     </div>
 
+    <%= render "families/address_fields", f: f %>
+
     <div class="mb-4">
       <%= f.label :password, class: "mb-1 block font-medium" %>
       <%= f.password_field :password, autocomplete: "new-password", class: input_class %>

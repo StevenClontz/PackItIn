@@ -47,7 +47,7 @@ class FamiliesController < ApplicationController
 
   # Only admins may set `admin`, and never on themselves, so the last admin can't be demoted.
   def family_params
-    permitted = %i[username password password_confirmation]
+    permitted = %i[username password password_confirmation name street_address city state zip]
     permitted << :admin if current_family.admin? && @family != current_family
     params.expect(family: permitted)
   end

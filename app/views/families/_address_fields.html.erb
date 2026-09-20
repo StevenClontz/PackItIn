@@ -1,0 +1,26 @@
+<% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+
+<div class="mb-4">
+  <%= f.label :name, class: "mb-1 block font-medium" %>
+  <%= f.text_field :name, autocomplete: "organization", class: input_class %>
+</div>
+
+<div class="mb-4">
+  <%= f.label :street_address, class: "mb-1 block font-medium" %>
+  <%= f.text_field :street_address, autocomplete: "street-address", class: input_class %>
+</div>
+
+<div class="mb-4">
+  <%= f.label :city, class: "mb-1 block font-medium" %>
+  <%= f.text_field :city, autocomplete: "address-level2", class: input_class %>
+</div>
+
+<div class="mb-4">
+  <%= f.label :state, class: "mb-1 block font-medium" %>
+  <%= f.select :state, Family.state_options, { prompt: "Select a state" }, autocomplete: "address-level1", class: input_class %>
+</div>
+
+<div class="mb-4">
+  <%= f.label :zip, class: "mb-1 block font-medium" %>
+  <%= f.text_field :zip, autocomplete: "postal-code", class: input_class %>
+</div>

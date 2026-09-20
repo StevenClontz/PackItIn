@@ -65,7 +65,7 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     assert_denied
 
     assert_no_difference "Family.count" do
-      post families_path, params: { family: { username: "nope", password: "password123", password_confirmation: "password123" } }
+      post families_path, params: { family: { username: "nope", password: "password123", password_confirmation: "password123", **profile_params } }
     end
     assert_denied
   end
@@ -77,11 +77,12 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_difference "Family.count", 1 do
-      post families_path, params: { family: { username: "newbies", password: "password123", password_confirmation: "password123", admin: "1" } }
+      post families_path, params: { family: { username: "newbies", password: "password123", password_confirmation: "password123", admin: "1", **profile_params(name: "The Newbies", state: "wa") } }
     end
     created = Family.find_by!(username: "newbies")
     assert_redirected_to family_path(created)
     assert created.admin?
+    assert_equal [ "The Newbies", "wa" ], created.values_at(:name, :state)
     assert created.valid_password?("password123")
   end
 
@@ -106,6 +107,61 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     patch family_path(families(:two)), params: { family: { username: "hijacked" } }
     assert_denied
     assert_equal "joneses", families(:two).reload.username
+  end
+
+  test "family show page displays the name and address" do
+    sign_in_as "examplefamily"
+
+    get family_path(families(:one))
+    assert_response :success
+    assert_match "The Example Family", response.body
+    assert_match "100 Main St", response.body
+    assert_match "Austin, Texas 78701", response.body.squish
+  end
+
+  test "family edit form includes the name and address fields" do
+    sign_in_as "examplefamily"
+
+    get edit_family_path(families(:one))
+    assert_select "input[name=?][value=?]", "family[name]", "The Example Family"
+    assert_select "input[name=?][value=?]", "family[zip]", "78701"
+    assert_select "select[name=?] option[selected][value=tx]", "family[state]"
+    assert_select "select[name=?] option", "family[state]", count: 51
+  end
+
+  test "family can update its own name and address" do
+    sign_in_as "examplefamily"
+
+    patch family_path(families(:one)), params: { family: profile_params(name: "The Examples", zip: "60601-1234", state: "il") }
+    assert_redirected_to family_path(families(:one))
+    families(:one).reload
+    assert_equal [ "The Examples", "1 Test Rd", "Springfield", "il", "60601-1234" ], families(:one).values_at(:name, :street_address, :city, :state, :zip)
+  end
+
+  test "invalid address on update re-renders the form and changes nothing" do
+    sign_in_as "examplefamily"
+
+    patch family_path(families(:one)), params: { family: { name: "", zip: "nope" } }
+    assert_response :unprocessable_entity
+    assert_select "#error_explanation"
+    assert_equal "The Example Family", families(:one).reload.name
+    assert_equal "78701", families(:one).zip
+  end
+
+  test "non-admin cannot change another family's address" do
+    sign_in_as "examplefamily"
+
+    patch family_path(families(:two)), params: { family: { city: "Hijacked" } }
+    assert_denied
+    assert_equal "Denver", families(:two).reload.city
+  end
+
+  test "admin can change any family's address" do
+    sign_in_as "adminfamily"
+
+    patch family_path(families(:two)), params: { family: { city: "Boulder" } }
+    assert_redirected_to family_path(families(:two))
+    assert_equal "Boulder", families(:two).reload.city
   end
 
   test "admin edits another family without a current password" do

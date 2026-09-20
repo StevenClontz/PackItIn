@@ -4,13 +4,28 @@
 # Fixture passwords are all "password123".
 one:
   username: examplefamily
+  name: The Example Family
+  street_address: 100 Main St
+  city: Austin
+  state: tx
+  zip: "78701"
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 two:
   username: joneses
+  name: The Joneses
+  street_address: 22 Elm Ave
+  city: Denver
+  state: co
+  zip: "80202"
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 admin:
   username: adminfamily
+  name: Pack Administrators
+  street_address: 1 Pack Way
+  city: Portland
+  state: or
+  zip: "97201"
   admin: true
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>

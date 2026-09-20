@@ -9,11 +9,20 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
 
   test "sign up with username and password" do
     assert_difference "Family.count", 1 do
-      post family_registration_path, params: { family: { username: "brandnew", password: "password123", password_confirmation: "password123" } }
+      post family_registration_path, params: { family: { username: "brandnew", password: "password123", password_confirmation: "password123", **profile_params } }
     end
     assert_redirected_to root_path
     follow_redirect!
     assert_match "brandnew", response.body
+  end
+
+  test "sign up requires the name and address" do
+    assert_no_difference "Family.count" do
+      post family_registration_path, params: { family: { username: "brandnew", password: "password123", password_confirmation: "password123" } }
+    end
+    assert_response :unprocessable_entity
+    assert_select "#error_explanation", /Name can't be blank/
+    assert_select "#error_explanation", /Zip can't be blank/
   end
 
   test "sign up with invalid data re-renders form" do
@@ -66,8 +75,27 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "input[name=_method][value=delete]", count: 0
   end
 
+  test "sign up and edit account forms include the name and address fields" do
+    get new_family_registration_path
+    %w[name street_address city state zip].each { |field| assert_select "[name=?]", "family[#{field}]" }
+
+    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
+    get edit_family_registration_path
+    assert_select "input[name=?][value=?]", "family[street_address]", "100 Main St"
+    assert_select "select[name=?] option[selected][value=tx]", "family[state]"
+  end
+
+  test "family can update its own name and address from the account page" do
+    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
+    put family_registration_path, params: { family: { name: "The Examples", street_address: "9 Oak Ln", city: "Dallas", state: "tx", zip: "75201", current_password: "password123" } }
+
+    assert_redirected_to root_path
+    families(:one).reload
+    assert_equal [ "The Examples", "9 Oak Ln", "Dallas", "tx", "75201" ], families(:one).values_at(:name, :street_address, :city, :state, :zip)
+  end
+
   test "sign up cannot make a family an admin" do
-    post family_registration_path, params: { family: { username: "sneaky", password: "password123", password_confirmation: "password123", admin: "1" } }
+    post family_registration_path, params: { family: { username: "sneaky", password: "password123", password_confirmation: "password123", admin: "1", **profile_params } }
     assert_not Family.find_by!(username: "sneaky").admin?
   end
 

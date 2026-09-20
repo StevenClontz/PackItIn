@@ -10,14 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_19_033030) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_015107) do
   create_table "families", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
+    t.string "city", null: false
     t.datetime "created_at", null: false
     t.string "encrypted_password", default: "", null: false
+    t.string "name", null: false
     t.datetime "remember_created_at"
+    t.integer "state", null: false
+    t.string "street_address", null: false
     t.datetime "updated_at", null: false
     t.string "username", null: false
+    t.string "zip", null: false
     t.index ["username"], name: "index_families_on_username", unique: true
   end
 

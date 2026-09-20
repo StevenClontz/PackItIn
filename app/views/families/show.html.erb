@@ -4,6 +4,13 @@
   <dl class="mb-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
     <dt class="font-medium">Username</dt>
     <dd><%= @family.username %></dd>
+    <dt class="font-medium">Name</dt>
+    <dd><%= @family.name %></dd>
+    <dt class="font-medium">Address</dt>
+    <dd>
+      <%= @family.street_address %><br>
+      <%= @family.city %>, <%= @family.state_label %> <%= @family.zip %>
+    </dd>
     <dt class="font-medium">Administrator</dt>
     <dd><%= @family.admin? ? "Yes" : "No" %></dd>
     <dt class="font-medium">Created</dt>

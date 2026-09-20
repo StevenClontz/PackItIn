@@ -11,5 +11,10 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+
+    # The profile attributes every Family requires, for building or posting valid families.
+    def profile_params(**overrides)
+      { name: "The New Family", street_address: "1 Test Rd", city: "Springfield", state: "il", zip: "62701" }.merge(overrides)
+    end
   end
 end
