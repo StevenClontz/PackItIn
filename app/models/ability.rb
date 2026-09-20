@@ -16,6 +16,10 @@ class Ability
       can :read, Family
       can :update, Family, id: family.id
 
+      # A family's own money account is private to it; pack funds are readable by every family.
+      can :view_account, Family, id: family.id
+      can :read, Fund
+
       # People are only visible to their own family, and only admins can change them.
       can :read, Person, family_id: family.id
 

@@ -1,0 +1,14 @@
+<div class="mx-auto w-full max-w-2xl">
+  <h2 class="mb-1 text-2xl font-bold"><%= @family.name %> account</h2>
+  <p class="mb-6 text-sm text-gray-500">Family: <%= link_to @family.username, family_path(@family), class: "text-blue-600 hover:underline" %></p>
+
+  <p class="mb-6 text-lg">Balance: <strong><%= money(@family.balance) %></strong></p>
+
+  <h3 class="mb-2 text-lg font-semibold">Statement</h3>
+  <%= render "ledger/statement", lines: @lines %>
+
+  <% if can? :create, LedgerTransaction %>
+    <p class="mt-6 text-sm"><%= link_to "New transaction", new_ledger_transaction_path, class: "text-blue-600 hover:underline" %></p>
+  <% end %>
+  <p class="mt-2 text-sm"><%= link_to "Back to family", family_path(@family), class: "text-blue-600 hover:underline" %></p>
+</div>

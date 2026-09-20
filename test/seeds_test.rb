@@ -15,6 +15,10 @@ class SeedsTest < ActiveSupport::TestCase
     @people = Person.order(:first_name).pluck(:first_name, :last_name, :position)
     @event_titles = Event.order(:title).pluck(:title)
     @rsvps = Rsvp.joins(:event, :person).order("events.title", "people.first_name").pluck("events.title", "people.first_name", :status)
+    @fund_names = Fund.order(:name).pluck(:name)
+    DoubleEntry::Line.delete_all
+    DoubleEntry::AccountBalance.delete_all
+    Fund.delete_all
     Rsvp.delete_all
     Event.delete_all
     Person.delete_all
@@ -39,6 +43,17 @@ class SeedsTest < ActiveSupport::TestCase
     assert Event.find_by!(title: "Pack Meeting").starts_at.future?
   end
 
+  test "seeds recreate the fixture funds and record sample money once" do
+    run_dev_seeds
+
+    assert_equal @fund_names, Fund.order(:name).pluck(:name)
+    assert_equal 10, DoubleEntry::Line.count, "5 transactions, 2 lines each"
+    assert_equal Money.new(40_00), Family.find_by!(username: "examplefamily").balance
+    assert_equal Money.new(-15_00), Family.find_by!(username: "joneses").balance
+    assert_equal Money.new(520_00), Fund.find_by!(name: "General").balance
+    assert_equal Money.new(545_00), Ledger.total_held
+  end
+
   test "sample families can sign in with password123" do
     run_dev_seeds
 
@@ -52,7 +67,7 @@ class SeedsTest < ActiveSupport::TestCase
     other = Family.create!(username: "someoneelse", password: "password123", **profile_params)
     other.people.create!(first_name: "Kit", last_name: "Else", position: :youth)
 
-    assert_no_difference [ "Family.count", "Person.count", "Event.count", "Rsvp.count" ] do
+    assert_no_difference [ "Family.count", "Person.count", "Event.count", "Rsvp.count", "Fund.count", "DoubleEntry::Line.count" ] do
       run_dev_seeds
     end
     assert Family.exists?(other.id)
@@ -77,5 +92,7 @@ class SeedsTest < ActiveSupport::TestCase
     assert_equal 0, Person.count
     assert_equal 0, Event.count
     assert_equal 0, Rsvp.count
+    assert_equal 0, Fund.count
+    assert_equal 0, DoubleEntry::Line.count
   end
 end

@@ -265,6 +265,19 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     assert_response :see_other
   end
 
+  test "admin can't delete a family that has account activity" do
+    transact from: :outside, to: families(:two), dollars: 25
+    sign_in_as "adminfamily"
+
+    assert_no_difference [ "Family.count", "Person.count" ] do
+      delete family_path(families(:two))
+    end
+    assert_redirected_to family_path(families(:two))
+    follow_redirect!
+    assert_match "has account activity and can&#39;t be deleted", response.body
+    assert_equal Money.new(25_00), families(:two).reload.balance
+  end
+
   test "admin cannot delete themselves" do
     sign_in_as "adminfamily"
 

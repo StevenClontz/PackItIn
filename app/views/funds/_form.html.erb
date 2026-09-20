@@ -1,0 +1,17 @@
+<% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+
+<%= form_with(model: fund) do |f| %>
+  <%= render "devise/shared/error_messages", resource: fund %>
+
+  <div class="mb-4">
+    <%= f.label :name, class: "mb-1 block font-medium" %>
+    <%= f.text_field :name, autofocus: true, class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :description, class: "mb-1 block font-medium" %>
+    <%= f.text_area :description, rows: 3, class: input_class %>
+  </div>
+
+  <%= f.submit class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+<% end %>

@@ -39,6 +39,11 @@ en:
       webelos: "Webelos"
       aol: "AOL"
       youth: "Youth"
+  ledger:
+    codes:
+      deposit: "Deposit"
+      withdrawal: "Withdrawal"
+      transfer: "Transfer"
   rsvps:
     statuses:
       attending: "Attending"

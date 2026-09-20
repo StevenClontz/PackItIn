@@ -1,0 +1,25 @@
+<div class="mx-auto w-full max-w-2xl">
+  <h2 class="mb-1 text-2xl font-bold"><%= @fund.name %></h2>
+  <% if @fund.description.present? %>
+    <p class="mb-4 text-gray-700"><%= @fund.description %></p>
+  <% end %>
+
+  <p class="mb-6 text-lg">Balance: <strong><%= money(@fund.balance) %></strong></p>
+
+  <h3 class="mb-2 text-lg font-semibold">Activity</h3>
+  <%= render "ledger/statement", lines: @lines %>
+
+  <div class="mt-6 flex items-center gap-4">
+    <% if can? :create, LedgerTransaction %>
+      <%= link_to "New transaction", new_ledger_transaction_path, class: "text-blue-600 hover:underline" %>
+    <% end %>
+    <% if can? :update, @fund %>
+      <%= link_to "Edit", edit_fund_path(@fund), class: "text-blue-600 hover:underline" %>
+    <% end %>
+    <% if can? :destroy, @fund %>
+      <%= button_to "Delete", fund_path(@fund), method: :delete, data: { turbo_confirm: "Delete #{@fund.name}? This cannot be undone." }, class: "text-red-600 hover:underline cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <p class="mt-6 text-sm"><%= link_to "Back to funds", funds_path, class: "text-blue-600 hover:underline" %></p>
+</div>

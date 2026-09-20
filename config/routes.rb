@@ -10,7 +10,10 @@ Rails.application.routes.draw do
   end
   resources :families do
     resources :people, shallow: true
+    resource :account, only: :show
   end
+  resources :funds
+  resources :ledger_transactions, only: %i[new create]
   resources :events do
     resource :rsvp, only: :update
   end

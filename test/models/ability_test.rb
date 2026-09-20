@@ -154,4 +154,42 @@ class AbilityTest < ActiveSupport::TestCase
     assert ability.can?(:update, rsvps(:jones_bear_pack_meeting))
     assert ability.can?(:create, Rsvp.new(event: events(:past_hike), person: people(:jones_bear)))
   end
+
+  test "guests have no abilities on funds, accounts or ledger transactions" do
+    ability = Ability.new(nil)
+    assert ability.cannot?(:read, funds(:general))
+    assert ability.cannot?(:view_account, families(:one))
+    assert ability.cannot?(:create, LedgerTransaction)
+  end
+
+  test "non-admin family can view only its own money account" do
+    ability = Ability.new(families(:one))
+    assert ability.can?(:view_account, families(:one))
+    assert ability.cannot?(:view_account, families(:two))
+    assert ability.cannot?(:view_account, families(:admin))
+  end
+
+  test "non-admin family can read every fund but not change one" do
+    ability = Ability.new(families(:one))
+    assert ability.can?(:read, funds(:general))
+    assert ability.can?(:read, Fund)
+    %i[create new update destroy].each do |action|
+      assert ability.cannot?(action, funds(:general)), action
+      assert ability.cannot?(action, Fund.new), "new: #{action}"
+    end
+  end
+
+  test "non-admin family cannot record ledger transactions" do
+    ability = Ability.new(families(:one))
+    assert ability.cannot?(:create, LedgerTransaction)
+    assert ability.cannot?(:new, LedgerTransaction)
+  end
+
+  test "admin family can manage funds, ledger transactions and every family's account" do
+    ability = Ability.new(families(:admin))
+    assert ability.can?(:manage, Fund)
+    assert ability.can?(:create, LedgerTransaction)
+    assert ability.can?(:view_account, families(:one))
+    assert ability.can?(:view_account, families(:admin))
+  end
 end

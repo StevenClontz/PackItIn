@@ -3,6 +3,8 @@ class Family < ApplicationRecord
   # (:recoverable, :confirmable); validations are declared below.
   devise :database_authenticatable, :registerable, :rememberable
 
+  include HasLedgerAccount
+
   has_many :people, dependent: :destroy
 
   # Prefixed because bare postal codes collide with ActiveRecord methods (`or`, `id`).

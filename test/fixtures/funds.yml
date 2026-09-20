@@ -1,0 +1,7 @@
+general:
+  name: General
+  description: The pack's general operating fund.
+
+campout:
+  name: Campout Fund
+  description: Saved up for the fall campout.

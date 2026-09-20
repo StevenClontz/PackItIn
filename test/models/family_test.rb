@@ -116,4 +116,36 @@ class FamilyTest < ActiveSupport::TestCase
     assert family.valid_password?("password123")
     assert_not family.valid_password?("wrong")
   end
+
+  test "a family has its own ledger account, starting at zero" do
+    assert_equal Money.new(0), families(:one).balance
+    assert_not families(:one).ledger_activity?
+    assert_equal Money.new(0), build_family.balance, "an unsaved family has no account yet"
+  end
+
+  test "a family's balance and lines follow the ledger, separately from other families" do
+    transact from: :outside, to: families(:one), dollars: 40
+    transact from: families(:one), to: families(:two), dollars: 15
+
+    assert_equal Money.new(25_00), families(:one).balance
+    assert_equal Money.new(15_00), families(:two).balance
+    assert_equal [ Money.new(-15_00), Money.new(40_00) ], families(:one).ledger_lines.map(&:amount), "newest first"
+    assert_equal [ Money.new(15_00) ], families(:two).ledger_lines.map(&:amount)
+  end
+
+  test "a family with account activity can't be destroyed, and keeps its people" do
+    transact from: :outside, to: families(:one), dollars: 10
+
+    assert_no_difference [ "Family.count", "Person.count" ] do
+      assert_not families(:one).destroy
+    end
+    assert_includes families(:one).errors.full_messages, "The Example Family has account activity and can't be deleted"
+  end
+
+  test "activity on the other side of a transfer also protects the account" do
+    transact from: families(:one), to: families(:two), dollars: 1
+
+    assert_not families(:two).destroy
+    assert_not families(:one).destroy
+  end
 end

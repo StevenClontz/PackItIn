@@ -1,0 +1,39 @@
+<% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+<% options = LedgerTransaction.account_options %>
+<div class="mx-auto w-full max-w-md">
+  <h2 class="mb-6 text-2xl font-bold">New transaction</h2>
+
+  <%= form_with(model: @ledger_transaction, url: ledger_transactions_path) do |f| %>
+    <%= render "devise/shared/error_messages", resource: @ledger_transaction %>
+
+    <p class="mb-4 text-sm text-gray-500">
+      Money in from outside the pack is a credit (deposit); money out to outside is a debit (withdrawal);
+      between two accounts it is a transfer.
+    </p>
+
+    <div class="mb-4">
+      <%= f.label :from, "From", class: "mb-1 block font-medium" %>
+      <%= f.select :from, options, { prompt: "Select an account" }, autofocus: true, class: input_class %>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :to, "To", class: "mb-1 block font-medium" %>
+      <%= f.select :to, options, { prompt: "Select an account" }, class: input_class %>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :amount, "Amount (dollars)", class: "mb-1 block font-medium" %>
+      <%= f.text_field :amount, inputmode: "decimal", placeholder: "25.00", autocomplete: "off", class: input_class %>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :memo, class: "mb-1 block font-medium" %>
+      <p class="mb-1 text-sm text-gray-500">Optional. Shown on statements.</p>
+      <%= f.text_field :memo, maxlength: 200, class: input_class %>
+    </div>
+
+    <%= f.submit "Record transaction", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+  <% end %>
+
+  <p class="mt-6 text-sm"><%= link_to "Back to funds", funds_path, class: "text-blue-600 hover:underline" %></p>
+</div>

@@ -10,7 +10,46 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_032028) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_035155) do
+  create_table "double_entry_account_balances", force: :cascade do |t|
+    t.string "account", null: false
+    t.bigint "balance", null: false
+    t.datetime "created_at", null: false
+    t.string "scope"
+    t.datetime "updated_at", null: false
+    t.index ["account"], name: "index_account_balances_on_account"
+    t.index ["scope", "account"], name: "index_account_balances_on_scope_and_account", unique: true
+  end
+
+  create_table "double_entry_line_checks", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "errors_found", null: false
+    t.integer "last_line_id", null: false
+    t.text "log"
+    t.datetime "updated_at", null: false
+    t.index ["created_at", "last_line_id"], name: "line_checks_created_at_last_line_id_idx"
+  end
+
+  create_table "double_entry_lines", force: :cascade do |t|
+    t.string "account", null: false
+    t.bigint "amount", null: false
+    t.bigint "balance", null: false
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.integer "detail_id"
+    t.string "detail_type"
+    t.json "metadata"
+    t.string "partner_account", null: false
+    t.integer "partner_id"
+    t.string "partner_scope"
+    t.string "scope"
+    t.datetime "updated_at", null: false
+    t.index ["account", "code", "created_at"], name: "lines_account_code_created_at_idx"
+    t.index ["account", "created_at"], name: "lines_account_created_at_idx"
+    t.index ["scope", "account", "created_at"], name: "lines_scope_account_created_at_idx"
+    t.index ["scope", "account", "id"], name: "lines_scope_account_id_idx"
+  end
+
   create_table "events", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -35,6 +74,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_032028) do
     t.string "username", null: false
     t.string "zip", null: false
     t.index ["username"], name: "index_families_on_username", unique: true
+  end
+
+  create_table "funds", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_funds_on_name", unique: true
   end
 
   create_table "people", force: :cascade do |t|

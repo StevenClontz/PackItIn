@@ -39,8 +39,11 @@ class FamiliesController < ApplicationController
   end
 
   def destroy
-    @family.destroy!
-    redirect_to families_path, notice: "Family deleted.", status: :see_other
+    if @family.destroy
+      redirect_to families_path, notice: "Family deleted.", status: :see_other
+    else
+      redirect_to @family, alert: @family.errors.full_messages.to_sentence, status: :see_other
+    end
   end
 
   private

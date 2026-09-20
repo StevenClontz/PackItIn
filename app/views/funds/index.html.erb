@@ -1,0 +1,43 @@
+<div class="mx-auto w-full max-w-2xl">
+  <div class="mb-6 flex items-center justify-between">
+    <h2 class="text-2xl font-bold">Funds</h2>
+    <span class="flex items-center gap-4">
+      <% if can? :create, LedgerTransaction %>
+        <%= link_to "New transaction", new_ledger_transaction_path, class: "text-blue-600 hover:underline" %>
+      <% end %>
+      <% if can? :create, Fund %>
+        <%= link_to "New fund", new_fund_path, class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500" %>
+      <% end %>
+    </span>
+  </div>
+
+  <% if @funds.empty? %>
+    <p class="text-gray-700">No funds yet.</p>
+  <% else %>
+    <ul class="divide-y divide-gray-200 rounded-md border border-gray-200">
+      <% @funds.each do |fund| %>
+        <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+          <span>
+            <%= link_to fund.name, fund_path(fund), class: "font-medium text-blue-600 hover:underline" %>
+            <% if fund.description.present? %>
+              <span class="block text-sm text-gray-500"><%= fund.description %></span>
+            <% end %>
+          </span>
+          <span class="flex items-center gap-4 text-sm">
+            <strong><%= money(fund.balance) %></strong>
+            <% if can? :update, fund %>
+              <%= link_to "Edit", edit_fund_path(fund), class: "text-blue-600 hover:underline" %>
+            <% end %>
+            <% if can? :destroy, fund %>
+              <%= button_to "Delete", fund_path(fund), method: :delete, data: { turbo_confirm: "Delete #{fund.name}? This cannot be undone." }, class: "text-red-600 hover:underline cursor-pointer" %>
+            <% end %>
+          </span>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <p class="mt-4 text-sm text-gray-700">Total held by the pack (families and funds): <strong><%= money(@total_held) %></strong></p>
+
+  <p class="mt-6 text-sm"><%= link_to "Back", root_path, class: "text-blue-600 hover:underline" %></p>
+</div>

@@ -11,6 +11,10 @@
       <%= @family.street_address %><br>
       <%= @family.city %>, <%= @family.state_label %> <%= @family.zip %>
     </dd>
+    <% if can? :view_account, @family %>
+      <dt class="font-medium">Balance</dt>
+      <dd><%= link_to money(@family.balance), family_account_path(@family), class: "hover:underline" %></dd>
+    <% end %>
     <dt class="font-medium">Administrator</dt>
     <dd><%= @family.admin? ? "Yes" : "No" %></dd>
     <dt class="font-medium">Created</dt>

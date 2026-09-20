@@ -44,4 +44,24 @@ if Rails.env.development?
   fixture_rows.call("rsvps").each_value do |attrs|
     Rsvp.find_or_initialize_by(event: events.fetch(attrs.fetch("event")), person: people.fetch(attrs.fetch("person"))).update!(status: attrs.fetch("status"))
   end
+
+  # Pack funds are fixtures too, matched on their name.
+  funds = fixture_rows.call("funds").transform_values do |attrs|
+    Fund.find_or_initialize_by(name: attrs.fetch("name")).tap { |fund| fund.update!(attrs) }
+  end
+
+  # Ledger lines can't be fixtures (each carries a running balance), so sample money is recorded through
+  # LedgerTransaction instead - and only into an empty ledger, so re-seeding never double-counts it.
+  if DoubleEntry::Line.none?
+    ref = ->(account) { account == :outside ? "outside" : "#{account.class.name.underscore}:#{account.id}" }
+    [
+      [ :outside, families.fetch("one"), "60.00", "Popcorn sale proceeds" ],
+      [ :outside, families.fetch("two"), "25.00", "Annual dues" ],
+      [ :outside, funds.fetch("general"), "500.00", "Fundraiser" ],
+      [ families.fetch("one"), funds.fetch("general"), "20.00", "Pack t-shirt" ],
+      [ families.fetch("two"), :outside, "40.00", "Uniform purchase" ]
+    ].each do |from, to, amount, memo|
+      LedgerTransaction.new(from: ref.call(from), to: ref.call(to), amount: amount, memo: memo, admin: families.fetch("admin")).save || raise("couldn't seed #{memo}")
+    end
+  end
 end

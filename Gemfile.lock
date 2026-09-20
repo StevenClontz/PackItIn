@@ -115,6 +115,11 @@ GEM
       responders
       warden (~> 1.2.3)
     dotenv (3.2.0)
+    double_entry (2.0.2)
+      activerecord (>= 6.1.0)
+      activesupport (>= 6.1.0)
+      money (>= 6.0.0)
+      railties (>= 6.1.0)
     drb (2.2.3)
     ed25519 (1.4.0)
     erb (6.0.7)
@@ -182,6 +187,9 @@ GEM
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
+    money (7.1.1)
+      bigdecimal
+      i18n (~> 1.9)
     msgpack (1.8.5)
     net-imap (0.6.7)
       date
@@ -413,6 +421,7 @@ DEPENDENCIES
   capybara
   debug
   devise (~> 5.0)
+  double_entry
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
