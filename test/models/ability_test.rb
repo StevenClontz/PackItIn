@@ -192,4 +192,18 @@ class AbilityTest < ActiveSupport::TestCase
     assert ability.can?(:view_account, families(:one))
     assert ability.can?(:view_account, families(:admin))
   end
+
+  test "non-admin family can read RSVP options but not change them" do
+    ability = Ability.new(families(:one))
+    assert ability.can?(:read, rsvp_options(:day_trip))
+    %i[create new update destroy].each do |action|
+      assert ability.cannot?(action, rsvp_options(:day_trip)), action
+      assert ability.cannot?(action, RsvpOption.new(event: events(:weekend_trip))), "new: #{action}"
+    end
+  end
+
+  test "guests can't see RSVP options and admins manage them" do
+    assert Ability.new(nil).cannot?(:read, rsvp_options(:day_trip))
+    assert Ability.new(families(:admin)).can?(:manage, RsvpOption)
+  end
 end

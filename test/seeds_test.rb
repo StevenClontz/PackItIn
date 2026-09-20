@@ -19,7 +19,9 @@ class SeedsTest < ActiveSupport::TestCase
     DoubleEntry::Line.delete_all
     DoubleEntry::AccountBalance.delete_all
     Fund.delete_all
+    @rsvp_options = RsvpOption.joins(:event).order("events.title", :name).pluck("events.title", :name)
     Rsvp.delete_all
+    RsvpOption.delete_all
     Event.delete_all
     Person.delete_all
     Family.delete_all
@@ -38,6 +40,9 @@ class SeedsTest < ActiveSupport::TestCase
     run_dev_seeds
 
     assert_equal @event_titles, Event.order(:title).pluck(:title)
+    assert_equal @rsvp_options, RsvpOption.joins(:event).order("events.title", :name).pluck("events.title", :name)
+    ben_on_the_trip = Rsvp.joins(:event).find_by!(person: Person.find_by!(first_name: "Ben"), events: { title: "Weekend Trip" })
+    assert_equal "Day trip only", ben_on_the_trip.rsvp_option.name
     assert_equal @rsvps, Rsvp.joins(:event, :person).order("events.title", "people.first_name").pluck("events.title", "people.first_name", :status)
     assert Event.find_by!(title: "Fall Campout").rsvp_deadline_at
     assert Event.find_by!(title: "Pack Meeting").starts_at.future?

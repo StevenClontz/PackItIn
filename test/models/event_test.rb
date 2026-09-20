@@ -77,7 +77,7 @@ class EventTest < ActiveSupport::TestCase
     assert_not_includes Event.upcoming, events(:past_hike)
     assert_equal [ events(:past_hike) ], Event.past.to_a
 
-    assert_equal [ events(:pack_meeting), events(:campout) ], Event.upcoming.to_a, "soonest first"
+    assert_equal [ events(:pack_meeting), events(:campout), events(:weekend_trip) ], Event.upcoming.to_a, "soonest first"
   end
 
   test "an event in progress is still upcoming" do

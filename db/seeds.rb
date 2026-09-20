@@ -40,9 +40,16 @@ if Rails.env.development?
     Event.find_or_initialize_by(title: attrs.fetch("title")).tap { |event| event.update!(attrs) }
   end
 
-  # `event: pack_meeting` / `person: smith_dad` in rsvps.yml are fixture labels too.
+  # Ways to attend an event, matched on event + name.
+  rsvp_options = fixture_rows.call("rsvp_options").transform_values do |attrs|
+    event = events.fetch(attrs.fetch("event"))
+    RsvpOption.find_or_initialize_by(event: event, name: attrs.fetch("name")).tap { |option| option.update!(attrs.except("event")) }
+  end
+
+  # `event: pack_meeting` / `person: smith_dad` / `rsvp_option: day_trip` in rsvps.yml are fixture labels too.
   fixture_rows.call("rsvps").each_value do |attrs|
-    Rsvp.find_or_initialize_by(event: events.fetch(attrs.fetch("event")), person: people.fetch(attrs.fetch("person"))).update!(status: attrs.fetch("status"))
+    rsvp = Rsvp.find_or_initialize_by(event: events.fetch(attrs.fetch("event")), person: people.fetch(attrs.fetch("person")))
+    rsvp.update!(status: attrs.fetch("status"), rsvp_option: rsvp_options[attrs["rsvp_option"]])
   end
 
   # Pack funds are fixtures too, matched on their name.

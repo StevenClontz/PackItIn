@@ -1,5 +1,6 @@
 class Event < ApplicationRecord
   has_many :rsvps, dependent: :destroy
+  has_many :rsvp_options, -> { order(:id) }, dependent: :destroy
 
   validates :title, :starts_at, :ends_at, presence: true
   validate :ends_after_start

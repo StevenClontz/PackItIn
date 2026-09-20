@@ -8,12 +8,13 @@ class EventsController < ApplicationController
   end
 
   def show
+    @options = @event.rsvp_options.to_a
     @people = current_family.people.order(:last_name, :first_name)
-    @rsvps = @event.rsvps.where(person: @people).index_by(&:person_id)
+    @rsvps = @event.rsvps.where(person: @people).includes(:rsvp_option).index_by(&:person_id)
 
     if current_family.admin?
       @everyone = Person.includes(:family).order(:last_name, :first_name)
-      @responses = @event.rsvps.index_by(&:person_id)
+      @responses = @event.rsvps.includes(:rsvp_option).index_by(&:person_id)
     end
   end
 

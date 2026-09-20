@@ -6,6 +6,39 @@
     <div class="mb-6"><%= simple_format(h(@event.description)) %></div>
   <% end %>
 
+  <% if @options.any? || can?(:create, RsvpOption) %>
+    <div class="mb-6">
+    <h3 class="mb-2 text-lg font-semibold">Ways to attend</h3>
+    <% if @options.empty? %>
+      <p class="mb-2 text-sm text-gray-500">No options yet: everyone just RSVPs attending, maybe or not attending.</p>
+    <% else %>
+      <ul class="mb-2 divide-y divide-gray-200 rounded-md border border-gray-200">
+        <% @options.each do |option| %>
+          <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+            <span>
+              <span class="font-medium"><%= option.name %></span>
+              <% if option.description.present? %>
+                <span class="block text-sm text-gray-500"><%= option.description %></span>
+              <% end %>
+            </span>
+            <span class="flex items-center gap-4 text-sm">
+              <% if can? :update, option %>
+                <%= link_to "Edit", edit_event_rsvp_option_path(@event, option), class: "text-blue-600 hover:underline" %>
+              <% end %>
+              <% if can? :destroy, option %>
+                <%= button_to "Delete", event_rsvp_option_path(@event, option), method: :delete, data: { turbo_confirm: "Delete #{option.name}? Anyone who chose it will need to choose again." }, class: "text-red-600 hover:underline cursor-pointer" %>
+              <% end %>
+            </span>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+    <% if can? :create, RsvpOption %>
+      <p class="text-sm"><%= link_to "Add option", new_event_rsvp_option_path(@event), class: "text-blue-600 hover:underline" %></p>
+    <% end %>
+    </div>
+  <% end %>
+
   <h3 class="mb-1 text-lg font-semibold">Your RSVPs</h3>
   <p class="mb-3 text-sm text-gray-500">
     <% if @event.rsvp_open? %>
@@ -23,7 +56,7 @@
       <% @people.each do |person| %>
         <li class="flex items-center justify-between px-4 py-3">
           <span class="font-medium"><%= person.full_name %></span>
-          <span><%= @rsvps[person.id]&.status_label || "No response" %></span>
+          <span><%= @rsvps[person.id]&.summary || "No response" %></span>
         </li>
       <% end %>
     </ul>
@@ -34,6 +67,7 @@
     <%= form_with(url: event_rsvp_path(@event), method: :patch, class: "mb-6") do %>
       <div class="mb-4 divide-y divide-gray-200 rounded-md border border-gray-200">
         <% @people.each do |person| %>
+          <% rsvp = @rsvps[person.id] %>
           <fieldset class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
             <legend class="sr-only"><%= person.full_name %></legend>
             <span class="font-medium"><%= person.full_name %></span>
@@ -41,11 +75,19 @@
               <% Rsvp.status_options.each do |label, status| %>
                 <% id = "rsvps_#{person.id}_#{status}" %>
                 <span class="flex items-center gap-1">
-                  <%= radio_button_tag "rsvps[#{person.id}]", status, @rsvps[person.id]&.status == status, id: id %>
+                  <%= radio_button_tag "rsvps[#{person.id}][status]", status, rsvp&.status == status, id: id %>
                   <%= label_tag id, label %>
                 </span>
               <% end %>
             </span>
+            <% if @options.any? %>
+              <% option_id = "rsvps_#{person.id}_rsvp_option_id" %>
+              <span class="flex w-full flex-wrap items-center gap-2 text-sm">
+                <%= label_tag option_id, "Option for #{person.first_name}", class: "text-gray-700" %>
+                <%= select_tag "rsvps[#{person.id}][rsvp_option_id]", options_for_select(@options.map { |option| [ option.name, option.id ] }, rsvp&.rsvp_option_id), include_blank: "Choose an option", id: option_id, class: "rounded-md border border-gray-300 px-2 py-1" %>
+                <span class="text-gray-500">Needed if attending or maybe.</span>
+              </span>
+            <% end %>
           </fieldset>
         <% end %>
       </div>
@@ -61,10 +103,20 @@
       <p class="mt-3 font-medium">
         <%= status == "none" ? "No response" : t("rsvps.statuses.#{status}") %> (<%= people.size %>)
       </p>
+      <% if @options.any? && %w[attending maybe].include?(status) && people.any? %>
+        <% counts = people.map { |person| @responses[person.id].rsvp_option&.name || "No option chosen" }.tally %>
+        <p class="text-sm text-gray-500"><%= counts.map { |name, count| "#{name}: #{count}" }.join(", ") %></p>
+      <% end %>
       <% if people.any? %>
         <ul class="list-disc pl-5 text-sm text-gray-700">
           <% people.each do |person| %>
-            <li><%= person.full_name %> <span class="text-gray-500">(<%= person.family.name %>)</span></li>
+            <% response = @responses[person.id] %>
+            <li>
+              <%= person.full_name %> <span class="text-gray-500">(<%= person.family.name %>)</span>
+              <% if @options.any? && response && !response.not_attending? %>
+                - <%= response.rsvp_option&.name || "no option chosen" %>
+              <% end %>
+            </li>
           <% end %>
         </ul>
       <% end %>

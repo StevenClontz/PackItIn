@@ -1,0 +1,18 @@
+<% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+
+<%= form_with(model: [ event, rsvp_option ]) do |f| %>
+  <%= render "devise/shared/error_messages", resource: rsvp_option %>
+
+  <div class="mb-4">
+    <%= f.label :name, class: "mb-1 block font-medium" %>
+    <%= f.text_field :name, autofocus: true, placeholder: "Full weekend", class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :description, class: "mb-1 block font-medium" %>
+    <p class="mb-1 text-sm text-gray-500">Optional. Shown to families choosing between options.</p>
+    <%= f.text_area :description, rows: 3, class: input_class %>
+  </div>
+
+  <%= f.submit class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+<% end %>

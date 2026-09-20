@@ -12,3 +12,9 @@ jones_bear_pack_meeting:
   event: pack_meeting
   person: jones_bear
   status: not_attending
+
+jones_bear_weekend_trip:
+  event: weekend_trip
+  person: jones_bear
+  rsvp_option: day_trip
+  status: attending

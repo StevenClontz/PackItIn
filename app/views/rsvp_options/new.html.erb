@@ -1,0 +1,8 @@
+<div class="mx-auto w-full max-w-md">
+  <h2 class="mb-1 text-2xl font-bold">Add option</h2>
+  <p class="mb-6 text-sm text-gray-500">A way to attend <%= @event.title %>.</p>
+
+  <%= render "form", event: @event, rsvp_option: @rsvp_option %>
+
+  <p class="mt-6 text-sm"><%= link_to "Back to event", event_path(@event), class: "text-blue-600 hover:underline" %></p>
+</div>

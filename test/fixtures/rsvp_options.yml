@@ -1,0 +1,9 @@
+day_trip:
+  event: weekend_trip
+  name: Day trip only
+  description: Saturday only, home by dinner.
+
+full_weekend:
+  event: weekend_trip
+  name: Full weekend
+  description: Both days, with the overnight camp.

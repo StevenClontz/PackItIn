@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_035155) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_043710) do
   create_table "double_entry_account_balances", force: :cascade do |t|
     t.string "account", null: false
     t.bigint "balance", null: false
@@ -94,18 +94,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_035155) do
     t.index ["family_id"], name: "index_people_on_family_id"
   end
 
+  create_table "rsvp_options", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "event_id", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "name"], name: "index_rsvp_options_on_event_id_and_name", unique: true
+    t.index ["event_id"], name: "index_rsvp_options_on_event_id"
+  end
+
   create_table "rsvps", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "event_id", null: false
     t.integer "person_id", null: false
+    t.integer "rsvp_option_id"
     t.integer "status", null: false
     t.datetime "updated_at", null: false
     t.index ["event_id", "person_id"], name: "index_rsvps_on_event_id_and_person_id", unique: true
     t.index ["event_id"], name: "index_rsvps_on_event_id"
     t.index ["person_id"], name: "index_rsvps_on_person_id"
+    t.index ["rsvp_option_id"], name: "index_rsvps_on_rsvp_option_id"
   end
 
   add_foreign_key "people", "families"
+  add_foreign_key "rsvp_options", "events"
   add_foreign_key "rsvps", "events"
   add_foreign_key "rsvps", "people"
+  add_foreign_key "rsvps", "rsvp_options", on_delete: :nullify
 end

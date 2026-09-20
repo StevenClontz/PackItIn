@@ -11,8 +11,10 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     assert_match "not authorized", response.body
   end
 
+  # responses: { person => "attending" } or { person => { status: "attending", rsvp_option_id: option.id } }
   def rsvp_to(event, responses)
-    patch event_rsvp_path(event), params: { rsvps: responses.transform_keys { |person| person.id.to_s } }
+    rsvps = responses.to_h { |person, answer| [ person.id.to_s, answer.is_a?(Hash) ? answer : { status: answer } ] }
+    patch event_rsvp_path(event), params: { rsvps: rsvps }
   end
 
   def status_of(event, person)
@@ -43,10 +45,10 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "form[action=?]", event_rsvp_path(events(:pack_meeting))
     [ people(:smith_dad), people(:smith_lion) ].each do |person|
-      assert_select "input[type=radio][name=?]", "rsvps[#{person.id}]", count: 3
+      assert_select "input[type=radio][name=?]", "rsvps[#{person.id}][status]", count: 3
     end
-    assert_select "input[type=radio][name=?][value=attending][checked]", "rsvps[#{people(:smith_dad).id}]"
-    assert_select "input[type=radio][name=?][value=maybe][checked]", "rsvps[#{people(:smith_lion).id}]"
+    assert_select "input[type=radio][name=?][value=attending][checked]", "rsvps[#{people(:smith_dad).id}][status]"
+    assert_select "input[type=radio][name=?][value=maybe][checked]", "rsvps[#{people(:smith_lion).id}][status]"
     assert_select "input[type=radio][checked]", count: 2
 
     assert_select "label", text: "Attending", minimum: 2
@@ -60,7 +62,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
 
     get event_path(events(:pack_meeting))
     assert_no_match "Ben Jones", response.body
-    assert_select "input[name=?]", "rsvps[#{people(:jones_bear).id}]", count: 0
+    assert_select "input[name^=?]", "rsvps[#{people(:jones_bear).id}]", count: 0
     assert_no_match "All responses", response.body
   end
 
@@ -87,7 +89,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
 
     assert_equal "attending", status_of(events(:campout), people(:smith_dad))
     assert_equal "not_attending", status_of(events(:campout), people(:smith_lion))
-    assert_select "input[type=radio][name=?][value=not_attending][checked]", "rsvps[#{people(:smith_lion).id}]"
+    assert_select "input[type=radio][name=?][value=not_attending][checked]", "rsvps[#{people(:smith_lion).id}][status]"
   end
 
   test "family changes an existing RSVP without creating a duplicate" do
@@ -140,15 +142,20 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to event_path(events(:campout))
     follow_redirect!
-    assert_match "nothing was saved", response.body
+    assert_match "Nothing was saved.", response.body
     assert_nil status_of(events(:campout), people(:smith_dad))
   end
 
   test "an unknown person is a 404 and an empty submission is rejected gently" do
     sign_in_as "examplefamily"
 
-    patch event_rsvp_path(events(:campout)), params: { rsvps: { "0" => "attending" } }
+    patch event_rsvp_path(events(:campout)), params: { rsvps: { "0" => { status: "attending" } } }
     assert_response :not_found
+
+    patch event_rsvp_path(events(:campout)), params: { rsvps: { people(:smith_dad).id.to_s => "attending" } }
+    assert_redirected_to event_path(events(:campout))
+    follow_redirect!
+    assert_match "That response isn&#39;t valid", response.body
 
     [ {}, { rsvps: "oops" }, { rsvps: {} } ].each do |params|
       patch event_rsvp_path(events(:campout)), params: params
@@ -268,5 +275,173 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     get event_path(events(:pack_meeting))
     assert_match "Your family has no people yet", response.body
     assert_select "input[type=radio]", count: 0
+  end
+
+  # --- options ---
+
+  def option_answer(status, option)
+    { status: status, rsvp_option_id: option&.id }
+  end
+
+  test "the form has an option select per person only on events that have options" do
+    sign_in_as "examplefamily"
+
+    get event_path(events(:weekend_trip))
+    [ people(:smith_dad), people(:smith_lion) ].each do |person|
+      assert_select "select[name=?]", "rsvps[#{person.id}][rsvp_option_id]" do
+        assert_select "option", text: "Choose an option"
+        assert_select "option", text: "Day trip only"
+        assert_select "option", text: "Full weekend"
+      end
+    end
+
+    get event_path(events(:pack_meeting))
+    assert_select "select", count: 0
+  end
+
+  test "the form pre-selects the current answer and option" do
+    Rsvp.create!(event: events(:weekend_trip), person: people(:smith_dad), status: "maybe", rsvp_option: rsvp_options(:full_weekend))
+    sign_in_as "examplefamily"
+
+    get event_path(events(:weekend_trip))
+    assert_select "input[type=radio][name=?][value=maybe][checked]", "rsvps[#{people(:smith_dad).id}][status]"
+    assert_select "select[name=?] option[selected][value=?]", "rsvps[#{people(:smith_dad).id}][rsvp_option_id]", rsvp_options(:full_weekend).id.to_s
+  end
+
+  test "family RSVPs with an option, and can change both later" do
+    sign_in_as "examplefamily"
+    event = events(:weekend_trip)
+
+    rsvp_to event, people(:smith_dad) => option_answer("attending", rsvp_options(:full_weekend)),
+                   people(:smith_lion) => option_answer("maybe", rsvp_options(:day_trip))
+    assert_redirected_to event_path(event)
+    assert_equal rsvp_options(:full_weekend), Rsvp.find_by!(event: event, person: people(:smith_dad)).rsvp_option
+    assert_equal rsvp_options(:day_trip), Rsvp.find_by!(event: event, person: people(:smith_lion)).rsvp_option
+
+    assert_no_difference "Rsvp.count" do
+      rsvp_to event, people(:smith_dad) => option_answer("attending", rsvp_options(:day_trip))
+    end
+    assert_equal rsvp_options(:day_trip), Rsvp.find_by!(event: event, person: people(:smith_dad)).rsvp_option
+  end
+
+  test "attending or maybe without an option saves nothing and names the person" do
+    sign_in_as "examplefamily"
+    event = events(:weekend_trip)
+
+    assert_no_difference "Rsvp.count" do
+      rsvp_to event, people(:smith_lion) => option_answer("attending", rsvp_options(:full_weekend)),
+                     people(:smith_dad) => option_answer("maybe", nil)
+    end
+    assert_redirected_to event_path(event)
+    follow_redirect!
+    assert_match "Sam Smith: Rsvp option must be chosen. Nothing was saved.", response.body
+    assert_nil status_of(event, people(:smith_lion)), "the valid answer isn't saved on its own"
+  end
+
+  test "an option select left blank for someone who hasn't answered is ignored" do
+    sign_in_as "examplefamily"
+    event = events(:weekend_trip)
+
+    assert_difference "Rsvp.count", 1 do
+      rsvp_to event, people(:smith_dad) => option_answer("attending", rsvp_options(:day_trip)),
+                     people(:smith_lion) => { rsvp_option_id: "" }
+    end
+    assert_nil status_of(event, people(:smith_lion))
+  end
+
+  test "not attending needs no option and drops one that was sent" do
+    sign_in_as "examplefamily"
+    event = events(:weekend_trip)
+
+    rsvp_to event, people(:smith_dad) => option_answer("not_attending", nil),
+                   people(:smith_lion) => option_answer("not_attending", rsvp_options(:full_weekend))
+    assert_redirected_to event_path(event)
+    assert_nil Rsvp.find_by!(event: event, person: people(:smith_dad)).rsvp_option
+    assert_nil Rsvp.find_by!(event: event, person: people(:smith_lion)).rsvp_option
+  end
+
+  test "switching an answer to not attending clears the option" do
+    sign_in_as "examplefamily"
+    event = events(:weekend_trip)
+
+    rsvp_to event, people(:smith_dad) => option_answer("attending", rsvp_options(:full_weekend))
+    rsvp_to event, people(:smith_dad) => option_answer("not_attending", nil)
+    assert_nil Rsvp.find_by!(event: event, person: people(:smith_dad)).rsvp_option
+  end
+
+  test "another event's option is rejected" do
+    other = RsvpOption.create!(event: events(:campout), name: "Overnight")
+    sign_in_as "examplefamily"
+
+    assert_no_difference "Rsvp.count" do
+      rsvp_to events(:weekend_trip), people(:smith_dad) => option_answer("attending", other)
+    end
+    follow_redirect!
+    assert_match "isn&#39;t an option for this event", response.body
+  end
+
+  test "an option can't be sent for an event that has none" do
+    sign_in_as "examplefamily"
+
+    assert_no_difference "Rsvp.count" do
+      rsvp_to events(:campout), people(:smith_dad) => option_answer("attending", rsvp_options(:day_trip))
+    end
+    follow_redirect!
+    assert_match "isn&#39;t an option for this event", response.body
+  end
+
+  test "after the deadline families see their option, or that one is still needed" do
+    Rsvp.create!(event: events(:weekend_trip), person: people(:smith_dad), status: "attending", rsvp_option: rsvp_options(:full_weekend))
+    sign_in_as "examplefamily"
+
+    travel_to events(:weekend_trip).ends_at + 1.minute do
+      get event_path(events(:weekend_trip))
+      assert_select "form[action=?]", event_rsvp_path(events(:weekend_trip)), count: 0
+      assert_select "li", text: /Sam Smith\s*Attending - Full weekend/
+      assert_select "li", text: /Lily Smith\s*No response/
+    end
+  end
+
+  test "a response whose option was deleted reads as needing a choice" do
+    rsvp = Rsvp.create!(event: events(:weekend_trip), person: people(:smith_dad), status: "attending", rsvp_option: rsvp_options(:full_weekend))
+    rsvp_options(:full_weekend).destroy!
+    assert_nil rsvp.reload.rsvp_option
+    sign_in_as "examplefamily"
+
+    travel_to events(:weekend_trip).ends_at + 1.minute do
+      get event_path(events(:weekend_trip))
+      assert_select "li", text: /Sam Smith\s*Attending - choose an option/
+    end
+  end
+
+  test "admin roll-up shows each person's option and a count per option" do
+    Rsvp.create!(event: events(:weekend_trip), person: people(:smith_dad), status: "attending", rsvp_option: rsvp_options(:full_weekend))
+    Rsvp.create!(event: events(:weekend_trip), person: people(:smith_lion), status: "maybe", rsvp_option: rsvp_options(:day_trip))
+    sign_in_as "adminfamily"
+
+    get event_path(events(:weekend_trip))
+    assert_select "p", text: /Attending \(2\)/ # Ben (fixture, day trip) and Sam (full weekend)
+    assert_select "p", text: /Day trip only: 1, Full weekend: 1/
+    assert_select "li", text: /Sam Smith\s*\(The Example Family\)\s*- Full weekend/
+    assert_select "li", text: /Ben Jones\s*\(The Joneses\)\s*- Day trip only/
+    assert_select "li", text: /Lily Smith\s*\(The Example Family\)\s*- Day trip only/
+    assert_select "p", text: /Maybe \(1\)/
+  end
+
+  test "roll-up flags attending responses that have no option chosen" do
+    rsvps(:jones_bear_weekend_trip).update_columns(rsvp_option_id: nil)
+    sign_in_as "adminfamily"
+
+    get event_path(events(:weekend_trip))
+    assert_select "p", text: /No option chosen: 1/
+    assert_select "li", text: /Ben Jones\s*\(The Joneses\)\s*- no option chosen/
+  end
+
+  test "events without options keep the plain roll-up" do
+    sign_in_as "adminfamily"
+
+    get event_path(events(:pack_meeting))
+    assert_no_match "No option chosen", response.body
+    assert_select "li", text: /Sam Smith\s*\(The Example Family\)\s*\z/
   end
 end
