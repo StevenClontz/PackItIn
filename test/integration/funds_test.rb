@@ -25,60 +25,17 @@ class FundsTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # --- any family can read ---
+  # --- non-admins can't read funds at all ---
 
-  test "a family sees every fund with its balance and the pack total" do
+  test "a non-admin family can't see the funds index or a fund's page" do
     transact from: :outside, to: funds(:general), dollars: "250.00"
-    transact from: :outside, to: funds(:campout), dollars: "40.50"
     sign_in_as "examplefamily"
 
     get funds_path
-    assert_response :success
-    assert_select "a[href=?]", fund_path(funds(:general)), text: "General"
-    assert_select "a[href=?]", fund_path(funds(:campout)), text: "Campout Fund"
-    assert_match "$250.00", response.body
-    assert_match "$40.50", response.body
-    assert_match "Total held by the pack", response.body
-    assert_match "$290.50", response.body
-  end
-
-  test "a family sees a fund's activity, including which families were involved" do
-    transact from: :outside, to: funds(:general), dollars: 100, memo: "Fundraiser"
-    transact from: families(:two), to: funds(:general), dollars: 20, memo: "Pack t-shirt"
-    sign_in_as "examplefamily"
+    assert_denied
 
     get fund_path(funds(:general))
-    assert_response :success
-    assert_select "h2", "General"
-    assert_match "Balance:", response.body
-    assert_match "$120.00", response.body
-    assert_match "Deposit", response.body
-    assert_match "Fundraiser", response.body
-    assert_match "Transfer from The Joneses", response.body.squish
-    assert_match "Pack t-shirt", response.body
-  end
-
-  test "a family sees an empty fund's page" do
-    sign_in_as "examplefamily"
-    get fund_path(funds(:general))
-    assert_response :success
-    assert_match "No activity yet", response.body
-    assert_match "$0.00", response.body
-  end
-
-  test "non-admin families see no admin controls on funds" do
-    sign_in_as "examplefamily"
-
-    get funds_path
-    assert_select "a", text: "New fund", count: 0
-    assert_select "a", text: "New transaction", count: 0
-    assert_select "a", text: "Edit", count: 0
-    assert_select "button", text: "Delete", count: 0
-
-    get fund_path(funds(:general))
-    assert_select "a", text: "New transaction", count: 0
-    assert_select "a", text: "Edit", count: 0
-    assert_select "button", text: "Delete", count: 0
+    assert_denied
   end
 
   test "non-admin families can't create, edit or delete funds" do
@@ -187,30 +144,16 @@ class FundsTest < ActionDispatch::IntegrationTest
     assert_match "General has account activity and can&#39;t be deleted", response.body
   end
 
-  # --- the three lists: funds, Scout Accounts, Event Accounts ---
+  # --- the three lists: funds, Scout Accounts, Event Accounts (admin-only) ---
 
   test "the index has Funds, Scout Accounts and Event Accounts lists" do
-    sign_in_as "examplefamily"
+    sign_in_as "adminfamily"
 
     get funds_path
     assert_select "h2", "Funds"
     assert_select "h3", "Scout Accounts"
     assert_select "h3", "Event Accounts"
     assert_select "a[href=?]", fund_path(funds(:general)), text: "General"
-  end
-
-  test "a family sees only its own Scout Account, with its balance" do
-    transact from: :outside, to: families(:one), dollars: 40
-    transact from: :outside, to: families(:two), dollars: 999
-    sign_in_as "examplefamily"
-
-    get funds_path
-    assert_select "a[href=?]", family_account_path(families(:one)), text: "The Example Family"
-    assert_select "li", text: /The Example Family\s*\$40\.00/
-    assert_select "a[href=?]", family_account_path(families(:two)), count: 0
-    assert_select "a[href=?]", family_account_path(families(:admin)), count: 0
-    assert_no_match "The Joneses", response.body
-    assert_no_match "$999.00", response.body
   end
 
   test "an admin sees every family's Scout Account" do
@@ -224,9 +167,9 @@ class FundsTest < ActionDispatch::IntegrationTest
     assert_select "li", text: /The Joneses\s*\$25\.00/
   end
 
-  test "every family sees every event's account, with its date and balance" do
+  test "an admin sees every event's account, with its date and balance" do
     transact from: :outside, to: events(:campout), dollars: 60
-    sign_in_as "examplefamily"
+    sign_in_as "adminfamily"
 
     get funds_path
     Event.find_each do |event|
@@ -237,7 +180,7 @@ class FundsTest < ActionDispatch::IntegrationTest
   end
 
   test "events are listed newest first" do
-    sign_in_as "examplefamily"
+    sign_in_as "adminfamily"
 
     get funds_path
     titles = css_select("a[href*='/account']").map(&:text) & Event.pluck(:title)
@@ -248,7 +191,7 @@ class FundsTest < ActionDispatch::IntegrationTest
     transact from: :outside, to: families(:one), dollars: 10
     transact from: :outside, to: funds(:general), dollars: 20
     transact from: :outside, to: events(:campout), dollars: 30
-    sign_in_as "examplefamily"
+    sign_in_as "adminfamily"
 
     get funds_path
     assert_match "Total held by the pack (Scout Accounts, funds and events)", response.body
@@ -258,7 +201,7 @@ class FundsTest < ActionDispatch::IntegrationTest
   test "the lists show a message when empty" do
     Event.destroy_all
     Fund.destroy_all
-    sign_in_as "examplefamily"
+    sign_in_as "adminfamily"
 
     get funds_path
     assert_match "No funds yet.", response.body

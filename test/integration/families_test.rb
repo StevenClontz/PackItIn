@@ -22,17 +22,27 @@ class FamiliesTest < ActionDispatch::IntegrationTest
 
   # --- viewing ---
 
-  test "any signed-in family can view the index and show pages" do
+  test "non-admin index shows only their own family, and can't view another family's show page" do
     sign_in_as "examplefamily"
 
     get families_path
     assert_response :success
-    assert_select "a", "The Joneses"
-    assert_select "a", "Pack Administrators"
+    assert_select "a", "The Example Family"
+    assert_select "a", text: "The Joneses", count: 0
+    assert_select "a", text: "Pack Administrators", count: 0
 
     get family_path(families(:two))
+    assert_denied
+  end
+
+  test "admin index shows every family" do
+    sign_in_as "adminfamily"
+
+    get families_path
     assert_response :success
-    assert_match "joneses", response.body
+    assert_select "a", "The Example Family"
+    assert_select "a", "The Joneses"
+    assert_select "a", "Pack Administrators"
   end
 
   test "non-admin index shows only the controls they may use" do
@@ -42,7 +52,6 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "New family", count: 0
     assert_select "button", text: "Delete", count: 0
     assert_select "a[href=?]", edit_family_path(families(:one)), count: 1
-    assert_select "a[href=?]", edit_family_path(families(:two)), count: 0
   end
 
   test "admin index shows New, Edit everywhere and Delete for others but not themselves" do

@@ -7,10 +7,10 @@ class AbilityTest < ActiveSupport::TestCase
     assert ability.cannot?(:read, families(:one))
   end
 
-  test "signed-in family can read any family" do
+  test "signed-in family can read only its own family" do
     ability = Ability.new(families(:one))
     assert ability.can?(:read, families(:one))
-    assert ability.can?(:read, families(:two))
+    assert ability.cannot?(:read, families(:two))
   end
 
   test "signed-in family can update only itself" do
@@ -169,10 +169,10 @@ class AbilityTest < ActiveSupport::TestCase
     assert ability.cannot?(:view_account, families(:admin))
   end
 
-  test "non-admin family can read every fund but not change one" do
+  test "non-admin family cannot read or change any fund" do
     ability = Ability.new(families(:one))
-    assert ability.can?(:read, funds(:general))
-    assert ability.can?(:read, Fund)
+    assert ability.cannot?(:read, funds(:general))
+    assert ability.cannot?(:read, Fund)
     %i[create new update destroy].each do |action|
       assert ability.cannot?(action, funds(:general)), action
       assert ability.cannot?(action, Fund.new), "new: #{action}"
@@ -185,12 +185,13 @@ class AbilityTest < ActiveSupport::TestCase
     assert ability.cannot?(:new, LedgerTransaction)
   end
 
-  test "admin family can manage funds, ledger transactions and every family's account" do
+  test "admin family can manage funds, ledger transactions and every account" do
     ability = Ability.new(families(:admin))
     assert ability.can?(:manage, Fund)
     assert ability.can?(:create, LedgerTransaction)
     assert ability.can?(:view_account, families(:one))
     assert ability.can?(:view_account, families(:admin))
+    assert ability.can?(:view_account, events(:weekend_trip))
   end
 
   test "non-admin family can read RSVP options but not change them" do
@@ -213,7 +214,9 @@ class AbilityTest < ActiveSupport::TestCase
     assert Ability.new(nil).cannot?(:pay, events(:weekend_trip))
   end
 
-  test "any signed-in family can read an event, and so its account" do
-    assert Ability.new(families(:one)).can?(:read, events(:weekend_trip))
+  test "any signed-in family can read an event, but not its account" do
+    ability = Ability.new(families(:one))
+    assert ability.can?(:read, events(:weekend_trip))
+    assert ability.cannot?(:view_account, events(:weekend_trip))
   end
 end

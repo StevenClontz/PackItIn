@@ -94,16 +94,14 @@ class PeopleTest < ActionDispatch::IntegrationTest
     assert_equal "Sam", people(:smith_dad).reload.first_name
   end
 
-  test "family page links to people only for the own family" do
+  test "family page links to people for the own family, and another family's page is denied" do
     sign_in_as "examplefamily"
 
     get family_path(families(:one))
     assert_select "a[href=?]", family_people_path(families(:one)), text: "People (2)"
 
     get family_path(families(:two))
-    assert_response :success
-    assert_select "a[href=?]", family_people_path(families(:two)), count: 0
-    assert_no_match "People (", response.body
+    assert_denied
   end
 
   # --- admin: everything, for any family ---

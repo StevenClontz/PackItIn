@@ -5,9 +5,9 @@ class FundsController < ApplicationController
   def index
     @funds = @funds.order(:name)
     @total_held = Ledger.total_held
-    # Scout Accounts are private to their family (and admins); Event Accounts are readable by every family.
+    # Scout Accounts and Event Accounts are admin-only, pending a future transparency dashboard.
     @families = Family.accessible_by(current_ability, :view_account).order(:name)
-    @events = Event.accessible_by(current_ability).order(starts_at: :desc)
+    @events = Event.accessible_by(current_ability, :view_account).order(starts_at: :desc)
   end
 
   def show

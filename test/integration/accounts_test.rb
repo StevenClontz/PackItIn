@@ -73,15 +73,12 @@ class AccountsTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "New transaction", count: 0
   end
 
-  test "the family page shows the Scout Account only to that family and to admins" do
+  test "the family page shows the Scout Account to the family itself and to admins" do
     transact from: :outside, to: families(:two), dollars: 80
     sign_in_as "examplefamily"
 
-    get family_path(families(:two))
-    assert_response :success
-    assert_select "dt", text: "Scout Account", count: 0
-    assert_select "a[href=?]", family_account_path(families(:two)), count: 0
-    assert_no_match "$80.00", response.body
+    get family_path(families(:two)) # non-admins can't view another family's page at all
+    assert_denied
 
     get family_path(families(:one))
     assert_select "dt", "Scout Account"
@@ -94,11 +91,17 @@ class AccountsTest < ActionDispatch::IntegrationTest
     assert_match "$80.00", response.body
   end
 
-  test "the home page links to funds and to the family's own Scout Account" do
+  test "the home page links to the family's own Scout Account, but not to funds for a non-admin" do
     sign_in_as "examplefamily"
     get root_path
-    assert_select "a[href=?]", funds_path, text: "Funds"
+    assert_select "a[href=?]", funds_path, count: 0
     assert_select "a[href=?]", family_account_path(families(:one)), text: "Our Scout Account"
+  end
+
+  test "the home page links to funds for an admin" do
+    sign_in_as "adminfamily"
+    get root_path
+    assert_select "a[href=?]", funds_path, text: "Funds"
   end
 
   test "statements show only the latest 200 lines" do
@@ -119,10 +122,18 @@ class AccountsTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_family_session_path
   end
 
-  test "every family sees an event's account balance and activity, with family names" do
+  test "a non-admin family can't see an event's account" do
+    transact from: :outside, to: events(:campout), dollars: 100, memo: "Sponsor gift"
+    sign_in_as "examplefamily"
+
+    get event_account_path(events(:campout))
+    assert_denied
+  end
+
+  test "an admin sees an event's account balance and activity, with family names" do
     transact from: :outside, to: events(:campout), dollars: 100, memo: "Sponsor gift"
     transact from: families(:two), to: events(:campout), dollars: 20, memo: "Firewood"
-    sign_in_as "examplefamily"
+    sign_in_as "adminfamily"
 
     get event_account_path(events(:campout))
     assert_response :success
@@ -136,18 +147,13 @@ class AccountsTest < ActionDispatch::IntegrationTest
   end
 
   test "an event account with no activity shows a zero balance" do
-    sign_in_as "examplefamily"
+    sign_in_as "adminfamily"
     get event_account_path(events(:campout))
     assert_select "p", text: /Balance:\s*\$0\.00/
     assert_match "No activity yet", response.body
   end
 
-  test "only admins get a New transaction link on an event account" do
-    sign_in_as "examplefamily"
-    get event_account_path(events(:campout))
-    assert_select "a", text: "New transaction", count: 0
-
-    delete destroy_family_session_path
+  test "an admin gets a New transaction link on an event account" do
     sign_in_as "adminfamily"
     get event_account_path(events(:campout))
     assert_select "a[href=?]", new_ledger_transaction_path, text: "New transaction"

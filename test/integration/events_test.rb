@@ -199,9 +199,20 @@ class EventsTest < ActionDispatch::IntegrationTest
 
   # --- event account ---
 
-  test "the event page links to the event's account instead of listing its transactions" do
+  test "the event page has no Event Account link for a non-admin" do
     transact from: :outside, to: events(:campout), dollars: 100, memo: "Sponsor gift"
     sign_in_as "examplefamily"
+
+    get event_path(events(:campout))
+    assert_response :success
+    assert_select "a[href=?]", event_account_path(events(:campout)), count: 0
+    assert_no_match "Sponsor gift", response.body
+    assert_no_match "Statement", response.body
+  end
+
+  test "the event page links to the event's account instead of listing its transactions, for an admin" do
+    transact from: :outside, to: events(:campout), dollars: 100, memo: "Sponsor gift"
+    sign_in_as "adminfamily"
 
     get event_path(events(:campout))
     assert_response :success

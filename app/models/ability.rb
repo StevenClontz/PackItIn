@@ -13,12 +13,12 @@ class Ability
     else
       # Not :manage: with an `id` condition CanCan would build `Family.new(id: family.id)`
       # for :new, which would then pass the check.
-      can :read, Family
+      can :read, Family, id: family.id
       can :update, Family, id: family.id
 
-      # A family's own Scout Account is private to it; pack funds are readable by every family.
+      # A family's own Scout Account is private to it. Fund and Event Account ledgers are
+      # admin-only for now, pending a future pack-wide transparency dashboard.
       can :view_account, Family, id: family.id
-      can :read, Fund
 
       # People are only visible to their own family, and only admins can change them.
       can :read, Person, family_id: family.id

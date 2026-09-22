@@ -139,8 +139,11 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     assert_select "span.text-red-600", text: "-$60.00", minimum: 1
 
     get event_path(trip)
-    assert_select "a[href=?]", event_account_path(trip), text: "View Event Account"
+    assert_select "a[href=?]", event_account_path(trip), count: 0 # event accounts are admin-only
     assert_select "td", text: /Payment from/, count: 0 # the event page doesn't list transactions
+
+    delete destroy_family_session_path
+    sign_in_as "adminfamily"
 
     get event_account_path(trip)
     assert_select "h2", "Weekend Trip Event Account"
@@ -148,12 +151,12 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     assert_select "td", text: /Payment from The Example Family/
   end
 
-  test "every family can see the event's account, with the families that paid" do
+  test "an admin can see the event's account, with the families that paid" do
     sam_attends
     sign_in_as "examplefamily"
     pay 6000
     delete destroy_family_session_path
-    sign_in_as "joneses"
+    sign_in_as "adminfamily"
 
     get event_account_path(trip)
     assert_select "p", text: /Balance:\s*\$60\.00/
