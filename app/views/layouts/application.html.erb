@@ -24,7 +24,9 @@
   </head>
 
   <body>
-    <main class="container mx-auto mt-16 px-5">
+    <%= render "layouts/nav" %>
+
+    <main class="container mx-auto mt-8 px-5">
       <% if notice %>
         <p class="mx-auto mb-4 max-w-md rounded-md bg-green-50 px-4 py-2 text-green-800"><%= notice %></p>
       <% end %>

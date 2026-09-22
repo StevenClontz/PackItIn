@@ -93,7 +93,7 @@ class EventsTest < ActionDispatch::IntegrationTest
   test "home page links to events for signed-in families" do
     sign_in_as "examplefamily"
     get root_path
-    assert_select "a[href=?]", events_path, text: "Events"
+    assert_select "a[href=?]", events_path, text: "Pack Events"
   end
 
   # --- admin ---

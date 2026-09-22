@@ -227,14 +227,14 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     get edit_family_path(families(:one))
     assert_response :success
     assert_select "button, input[type=submit]", text: /delete|cancel/i, count: 0
-    assert_select "input[name=_method][value=delete]", count: 0
+    assert_select "main input[name=_method][value=delete]", count: 0 # excludes the nav's unrelated "Log out" control
   end
 
-  test "home page has Manage our family, not Edit account" do
+  test "home page has My Family, not Edit account" do
     sign_in_as "examplefamily"
 
     get root_path
-    assert_select "a[href=?]", family_path(families(:one)), text: "Manage our family"
+    assert_select "a[href=?]", family_path(families(:one)), text: "My Family"
     assert_select "a", text: "Edit account", count: 0
 
     get family_path(families(:one))

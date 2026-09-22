@@ -95,7 +95,7 @@ class AccountsTest < ActionDispatch::IntegrationTest
     sign_in_as "examplefamily"
     get root_path
     assert_select "a[href=?]", funds_path, count: 0
-    assert_select "a[href=?]", family_account_path(families(:one)), text: "Our Scout Account"
+    assert_select "a[href=?]", family_account_path(families(:one)), text: "My Scout Account"
   end
 
   test "the home page links to funds for an admin" do
