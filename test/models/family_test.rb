@@ -94,6 +94,11 @@ class FamilyTest < ActiveSupport::TestCase
     assert_equal [ "examplefamily", "joneses" ], Family.non_admin.order(:username).pluck(:username)
   end
 
+  test "address_login_eligible excludes admin and password-only families" do
+    families(:one).update!(password_only: true)
+    assert_equal [ "joneses" ], Family.address_login_eligible.order(:username).pluck(:username)
+  end
+
   test "requires a password on create" do
     assert_not build_family(password: nil, password_confirmation: nil).valid?
   end

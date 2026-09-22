@@ -2,7 +2,7 @@
 <div class="mx-auto w-full max-w-md">
   <h2 class="mb-6 text-2xl font-bold">Log in</h2>
 
-  <% families = Family.non_admin.order(:name).pluck(:name, :id) %>
+  <% families = Family.address_login_eligible.order(:name).pluck(:name, :id) %>
   <% if families.any? %>
     <%= form_with(scope: :address_sign_in, url: address_family_session_path) do |f| %>
       <div class="mb-4">

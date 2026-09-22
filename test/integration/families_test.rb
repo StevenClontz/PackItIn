@@ -298,6 +298,28 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     assert_select "input[type=checkbox][name=?]", "family[admin]", count: 1
   end
 
+  # --- password-only login opt-in ---
+
+  test "a family can require password-only login for themselves" do
+    sign_in_as "examplefamily"
+
+    get edit_family_path(families(:one))
+    assert_select "input[type=checkbox][name=?]", "family[password_only]"
+
+    patch family_path(families(:one)), params: { family: { password_only: "1" } }
+    assert families(:one).reload.password_only?
+  end
+
+  test "admin can require password-only login for another family" do
+    sign_in_as "adminfamily"
+
+    patch family_path(families(:two)), params: { family: { password_only: "1" } }
+    assert families(:two).reload.password_only?
+
+    patch family_path(families(:two)), params: { family: { password_only: "0" } }
+    assert_not families(:two).reload.password_only?
+  end
+
   # --- destroy ---
 
   test "admin deletes another family" do

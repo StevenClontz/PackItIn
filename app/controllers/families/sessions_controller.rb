@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-# Adds a second way to sign in: choose a (non-admin) family and enter its street address.
-# A street address is a weak secret, so attempts are rate-limited and admins can never sign in this way.
+# Adds a second way to sign in: choose an eligible family and enter its street address.
+# A street address is a weak secret, so attempts are rate-limited, and admins and families that
+# opted into password-only login can never sign in this way.
 class Families::SessionsController < Devise::SessionsController
   prepend_before_action :require_no_authentication, only: :create_with_address
 
@@ -10,7 +11,7 @@ class Families::SessionsController < Devise::SessionsController
 
   # POST /account/sign_in/address
   def create_with_address
-    family = Family.non_admin.find_by(id: address_sign_in_params[:family_id])
+    family = Family.address_login_eligible.find_by(id: address_sign_in_params[:family_id])
 
     if family&.street_address_matches?(address_sign_in_params[:street_address])
       set_flash_message!(:notice, :signed_in)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_20_051617) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_22_034051) do
   create_table "double_entry_account_balances", force: :cascade do |t|
     t.string "account", null: false
     t.bigint "balance", null: false
@@ -67,6 +67,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_20_051617) do
     t.datetime "created_at", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "name", null: false
+    t.boolean "password_only", default: false, null: false
     t.datetime "remember_created_at"
     t.integer "state", null: false
     t.string "street_address", null: false

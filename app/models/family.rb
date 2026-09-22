@@ -25,6 +25,7 @@ class Family < ApplicationRecord
   validates :password, presence: true, confirmation: true, length: { in: Devise.password_length }, if: :password_required?
 
   scope :non_admin, -> { where(admin: false) }
+  scope :address_login_eligible, -> { where(admin: false, password_only: false) }
 
   # Addresses are compared as bare sequences of letters and digits, ignoring case, spacing and punctuation.
   def self.normalize_address(value)

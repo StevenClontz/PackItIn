@@ -119,6 +119,19 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_address_sign_in_rejected
   end
 
+  test "a family that opted into password-only login is excluded from the sign in page's family list" do
+    families(:one).update!(password_only: true)
+    get new_family_session_path
+    assert_select "select[name=?] option", "address_sign_in[family_id]", text: "The Example Family", count: 0
+    assert_select "select[name=?] option", "address_sign_in[family_id]", text: "The Joneses"
+  end
+
+  test "a family that opted into password-only login cannot sign in with an address, even with a forged id" do
+    families(:one).update!(password_only: true)
+    sign_in_with_address families(:one), families(:one).street_address
+    assert_address_sign_in_rejected
+  end
+
   test "failed address sign in keeps the chosen family selected" do
     sign_in_with_address families(:two), "wrong"
     assert_select "select[name=?] option[selected][value=?]", "address_sign_in[family_id]", families(:two).id.to_s
