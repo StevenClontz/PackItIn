@@ -1,0 +1,44 @@
+<div class="mx-auto w-full max-w-2xl">
+  <h2 class="mb-6 text-2xl font-bold">Pack Info</h2>
+
+  <% @den_groups.each do |group| %>
+    <div id="den_<%= group.den %>">
+      <h3 class="mt-8 text-lg font-semibold"><%= Person.new(den: group.den).den_label %> Den</h3>
+
+      <p class="mt-3 font-medium">Youth (<%= group.youth.size %>)</p>
+      <% if group.youth.empty? %>
+        <p class="text-sm text-gray-500">No youth in this den yet.</p>
+      <% else %>
+        <ul class="list-disc pl-5 text-sm text-gray-700">
+          <% group.youth.each do |person| %>
+            <li><%= person.full_name %> <%= den_badge(person) %> <span class="text-gray-500">(<%= person.family.name %>)</span></li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <p class="mt-3 font-medium">Adults (<%= group.adults.size %>)</p>
+      <% if group.adults.empty? %>
+        <p class="text-sm text-gray-500">No adults linked to this den yet.</p>
+      <% else %>
+        <ul class="list-disc pl-5 text-sm text-gray-700">
+          <% group.adults.each do |person| %>
+            <li><%= person.full_name %> <%= den_badge(person) %> <span class="text-gray-500">(<%= person.family.name %>)</span></li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div id="other_personnel">
+    <h3 class="mt-8 text-lg font-semibold">Other Personnel (<%= @other_personnel.size %>)</h3>
+    <% if @other_personnel.empty? %>
+      <p class="text-sm text-gray-500">Everyone is listed under a den above.</p>
+    <% else %>
+      <ul class="list-disc pl-5 text-sm text-gray-700">
+        <% @other_personnel.each do |person| %>
+          <li><%= person.full_name %> <%= den_badge(person) %> <span class="text-gray-500">(<%= person.family.name %>)</span></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</div>

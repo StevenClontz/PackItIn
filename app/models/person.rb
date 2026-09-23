@@ -17,6 +17,11 @@ class Person < ApplicationRecord
     dens.keys.map { |den| [ I18n.t("people.dens.#{den}"), den ] }
   end
 
+  # The actual Cub Scout dens, excluding the "adult" and "other_youth" catch-alls.
+  def self.regular_dens
+    dens.keys - %w[adult other_youth]
+  end
+
   def self.normalize_phone_number(value)
     value.to_s.gsub(/\D/, "")
   end

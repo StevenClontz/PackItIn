@@ -1,8 +1,9 @@
-<%= link_to "Pack Events", events_path, class: "text-blue-600 hover:underline" %>
+<%= link_to "Events", events_path, class: "text-blue-600 hover:underline" %>
 <% if family_signed_in? %>
   <% if current_family.admin? %>
     <%= link_to "Families", families_path, class: "text-blue-600 hover:underline" %>
   <% end %>
+  <%= link_to "Pack Info", pack_info_path, class: "text-blue-600 hover:underline" %>
   <% if can? :index, Fund %>
     <%= link_to "Funds", funds_path, class: "text-blue-600 hover:underline" %>
   <% end %>

@@ -11,7 +11,7 @@ class NavigationTest < ActionDispatch::IntegrationTest
     get events_path
     assert_response :success
     assert_select "header nav a[href=?]", root_path, text: "Pack It In"
-    assert_select "header a[href=?]", events_path, text: "Pack Events"
+    assert_select "header a[href=?]", events_path, text: "Events"
     assert_select "header a[href=?]", family_path(families(:one)), text: "My Family"
     assert_select "header a[href=?]", family_account_path(families(:one)), text: "My Scout Account"
     assert_select "header a", text: "Families", count: 0
@@ -32,7 +32,7 @@ class NavigationTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "header nav a[href=?]", root_path, text: "Pack It In"
     assert_select "header a[href=?]", new_family_session_path, text: "Log in"
-    assert_select "header a[href=?]", events_path, text: "Pack Events"
+    assert_select "header a[href=?]", events_path, text: "Events"
     assert_select "header a", text: "My Family", count: 0
     assert_select "header a", text: "Families", count: 0
     assert_select "header a", text: "Funds", count: 0

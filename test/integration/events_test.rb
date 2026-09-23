@@ -48,7 +48,7 @@ class EventsTest < ActionDispatch::IntegrationTest
 
   test "home page links to events for guests too" do
     get root_path
-    assert_select "a[href=?]", events_path, text: "Pack Events"
+    assert_select "a[href=?]", events_path, text: "Events"
   end
 
   # --- non-admin: read only ---
@@ -113,7 +113,7 @@ class EventsTest < ActionDispatch::IntegrationTest
   test "home page links to events for signed-in families" do
     sign_in_as "examplefamily"
     get root_path
-    assert_select "a[href=?]", events_path, text: "Pack Events"
+    assert_select "a[href=?]", events_path, text: "Events"
   end
 
   test "home page shows the signed-in family's Scout Account balance and links to it" do
