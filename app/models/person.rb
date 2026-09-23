@@ -2,19 +2,19 @@ class Person < ApplicationRecord
   belongs_to :family
   has_many :rsvps, dependent: :destroy
 
-  enum :position, { adult: 0, lion: 1, tiger: 2, wolf: 3, bear: 4, webelos: 5, aol: 6, youth: 7 }, validate: true
+  enum :den, { adult: 0, lion: 1, tiger: 2, wolf: 3, bear: 4, webelos: 5, aol: 6, other_youth: 7 }, validate: true
 
   before_validation :normalize_contact_info
 
-  validates :first_name, :last_name, :position, presence: true
+  validates :first_name, :last_name, :den, presence: true
   validates :email, uniqueness: { case_sensitive: false },
                      format: { with: URI::MailTo::EMAIL_REGEXP, message: "must be a valid email address" }, allow_blank: true
   validates :phone_number, uniqueness: true,
                             format: { with: /\A\d{10}\z/, message: "must be a 10-digit phone number" }, allow_blank: true
 
-  # [[label, value], ...] for the position <select>.
-  def self.position_options
-    positions.keys.map { |position| [ I18n.t("people.positions.#{position}"), position ] }
+  # [[label, value], ...] for the den <select>.
+  def self.den_options
+    dens.keys.map { |den| [ I18n.t("people.dens.#{den}"), den ] }
   end
 
   def self.normalize_phone_number(value)
@@ -25,8 +25,8 @@ class Person < ApplicationRecord
     "#{first_name} #{last_name}"
   end
 
-  def position_label
-    I18n.t("people.positions.#{position}")
+  def den_label
+    I18n.t("people.dens.#{den}")
   end
 
   def formatted_phone_number

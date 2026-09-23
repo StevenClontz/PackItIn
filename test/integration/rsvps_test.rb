@@ -259,7 +259,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
   end
 
   test "an admin with people of their own still gets the form after the deadline, with a note" do
-    families(:admin).people.create!(first_name: "Ada", last_name: "Admin", position: :adult)
+    families(:admin).people.create!(first_name: "Ada", last_name: "Admin", den: :adult)
     sign_in_as "adminfamily"
 
     travel_to events(:pack_meeting).ends_at + 1.minute do
@@ -445,9 +445,9 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     assert_select "li", text: /Sam Smith\s*Adult\s*\(The Example Family\)\s*\z/
   end
 
-  # --- position badges ---
+  # --- den badges ---
 
-  test "the RSVP form shows each person's position next to their name" do
+  test "the RSVP form shows each person's den next to their name" do
     sign_in_as "examplefamily"
 
     get event_path(events(:pack_meeting))
@@ -457,7 +457,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     assert_select "fieldset", text: /Lily Smith\s*Lion/
   end
 
-  test "after the deadline the read-only list still shows the position badges" do
+  test "after the deadline the read-only list still shows the den badges" do
     sign_in_as "examplefamily"
 
     travel_to events(:pack_meeting).ends_at + 1.minute do
@@ -467,7 +467,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the admin roll-up shows each person's position" do
+  test "the admin roll-up shows each person's den" do
     sign_in_as "adminfamily"
 
     get event_path(events(:pack_meeting))

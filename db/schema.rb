@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_23_224558) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_23_232328) do
   create_table "double_entry_account_balances", force: :cascade do |t|
     t.string "account", null: false
     t.bigint "balance", null: false
@@ -87,12 +87,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_224558) do
 
   create_table "people", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.integer "den", null: false
     t.string "email"
     t.integer "family_id", null: false
     t.string "first_name", null: false
     t.string "last_name", null: false
     t.string "phone_number"
-    t.integer "position", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_people_on_email", unique: true
     t.index ["family_id"], name: "index_people_on_family_id"

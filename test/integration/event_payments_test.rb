@@ -284,9 +284,9 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     assert_equal Money.new(90_00), trip.balance
   end
 
-  # --- position badges ---
+  # --- den badges ---
 
-  test "the Costs line items show each person's position" do
+  test "the Costs line items show each person's den" do
     answer people(:smith_dad), "attending", rsvp_options(:full_weekend)
     answer people(:smith_lion), "attending", rsvp_options(:full_weekend)
     sign_in_as "examplefamily"
@@ -296,7 +296,7 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     assert_select "li span.rounded-full", text: "Lion", count: 1
   end
 
-  test "each person blocking payment is listed with their position" do
+  test "each person blocking payment is listed with their den" do
     answer people(:smith_dad), "attending", rsvp_options(:full_weekend)
     sign_in_as "examplefamily"
 

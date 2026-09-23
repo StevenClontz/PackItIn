@@ -12,7 +12,7 @@ class SeedsTest < ActiveSupport::TestCase
 
   setup do
     @family_usernames = Family.order(:username).pluck(:username)
-    @people = Person.order(:first_name).pluck(:first_name, :last_name, :position)
+    @people = Person.order(:first_name).pluck(:first_name, :last_name, :den)
     @event_titles = Event.order(:title).pluck(:title)
     @rsvps = Rsvp.joins(:event, :person).order("events.title", "people.first_name").pluck("events.title", "people.first_name", :status)
     @fund_names = Fund.order(:name).pluck(:name)
@@ -31,7 +31,7 @@ class SeedsTest < ActiveSupport::TestCase
     run_dev_seeds
 
     assert_equal @family_usernames, Family.order(:username).pluck(:username)
-    assert_equal @people, Person.order(:first_name).pluck(:first_name, :last_name, :position)
+    assert_equal @people, Person.order(:first_name).pluck(:first_name, :last_name, :den)
     assert_equal %w[adminfamily], Family.where(admin: true).pluck(:username)
     assert_equal %w[Lily Sam], Family.find_by!(username: "examplefamily").people.pluck(:first_name).sort
   end
@@ -71,7 +71,7 @@ class SeedsTest < ActiveSupport::TestCase
   test "seeds are idempotent and leave other families alone" do
     run_dev_seeds
     other = Family.create!(username: "someoneelse", password: "password123", **profile_params)
-    other.people.create!(first_name: "Kit", last_name: "Else", position: :youth)
+    other.people.create!(first_name: "Kit", last_name: "Else", den: :other_youth)
 
     assert_no_difference [ "Family.count", "Person.count", "Event.count", "Rsvp.count", "Fund.count", "DoubleEntry::Line.count" ] do
       run_dev_seeds

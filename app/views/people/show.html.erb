@@ -1,7 +1,7 @@
 <div class="mx-auto w-full max-w-md">
   <h2 class="mb-6 flex flex-wrap items-center gap-3 text-2xl font-bold">
     <%= @person.full_name %>
-    <%= position_badge(@person) %>
+    <%= den_badge(@person) %>
   </h2>
 
   <dl class="mb-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
@@ -9,8 +9,8 @@
     <dd><%= @person.first_name %></dd>
     <dt class="font-medium">Last name</dt>
     <dd><%= @person.last_name %></dd>
-    <dt class="font-medium">Position</dt>
-    <dd><%= @person.position_label %></dd>
+    <dt class="font-medium">Den</dt>
+    <dd><%= @person.den_label %></dd>
     <dt class="font-medium">Email</dt>
     <dd><%= @person.email.presence || "—" %></dd>
     <dt class="font-medium">Phone number</dt>

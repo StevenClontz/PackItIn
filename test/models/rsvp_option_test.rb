@@ -122,34 +122,34 @@ class RsvpOptionTest < ActiveSupport::TestCase
     RsvpOption.new(event: events(:campout), name: "Overnight", cost_cents: cost, youth_cost_cents: youth_cost)
   end
 
-  def person_at(position)
-    Person.new(family: families(:one), first_name: "Pat", last_name: "Smith", position: position)
+  def person_at(den)
+    Person.new(family: families(:one), first_name: "Pat", last_name: "Smith", den: den)
   end
 
   ADULT = :adult
-  NON_ADULTS = %i[lion tiger wolf bear webelos aol youth].freeze
+  NON_ADULTS = %i[lion tiger wolf bear webelos aol other_youth].freeze
 
   test "with one price, everyone pays it" do
     option = option_with(cost: 2500)
-    [ ADULT, *NON_ADULTS ].each { |position| assert_equal Money.new(25_00), option.cost_for(person_at(position)), position }
+    [ ADULT, *NON_ADULTS ].each { |den| assert_equal Money.new(25_00), option.cost_for(person_at(den)), den }
   end
 
-  test "with a youth price, adults pay the cost and every other position the youth cost" do
+  test "with a youth price, adults pay the cost and every other den the youth cost" do
     option = option_with(cost: 6000, youth_cost: 3000)
     assert_equal Money.new(60_00), option.cost_for(person_at(ADULT))
-    NON_ADULTS.each { |position| assert_equal Money.new(30_00), option.cost_for(person_at(position)), position }
+    NON_ADULTS.each { |den| assert_equal Money.new(30_00), option.cost_for(person_at(den)), den }
   end
 
   test "a youth price without a cost makes the option free for adults" do
     option = option_with(youth_cost: 3000)
     assert_equal Money.new(0), option.cost_for(person_at(ADULT))
-    NON_ADULTS.each { |position| assert_equal Money.new(30_00), option.cost_for(person_at(position)), position }
+    NON_ADULTS.each { |den| assert_equal Money.new(30_00), option.cost_for(person_at(den)), den }
   end
 
   test "a youth price of zero makes the option free for youth only" do
     option = option_with(cost: 6000, youth_cost: 0)
     assert_equal Money.new(60_00), option.cost_for(person_at(ADULT))
-    NON_ADULTS.each { |position| assert_equal Money.new(0), option.cost_for(person_at(position)), position }
+    NON_ADULTS.each { |den| assert_equal Money.new(0), option.cost_for(person_at(den)), den }
   end
 
   test "a youth price may be higher than the adult cost" do
@@ -160,7 +160,7 @@ class RsvpOptionTest < ActiveSupport::TestCase
 
   test "with no prices nobody pays" do
     option = option_with
-    [ ADULT, *NON_ADULTS ].each { |position| assert_equal Money.new(0), option.cost_for(person_at(position)), position }
+    [ ADULT, *NON_ADULTS ].each { |den| assert_equal Money.new(0), option.cost_for(person_at(den)), den }
   end
 
   test "an option is costed if anyone pays for it" do

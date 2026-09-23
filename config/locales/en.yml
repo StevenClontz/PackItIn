@@ -30,7 +30,7 @@
 en:
   hello: "Hello world"
   people:
-    positions:
+    dens:
       adult: "Adult"
       lion: "Lion"
       tiger: "Tiger"
@@ -38,7 +38,7 @@ en:
       bear: "Bear"
       webelos: "Webelos"
       aol: "AOL"
-      youth: "Youth"
+      other_youth: "Other Youth"
   activerecord:
     attributes:
       rsvp_option:

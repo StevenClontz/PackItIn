@@ -2,7 +2,7 @@ smith_dad:
   family: one
   first_name: Sam
   last_name: Smith
-  position: adult
+  den: adult
   email: sam@example.com
   phone_number: "5125551234"
 
@@ -10,10 +10,10 @@ smith_lion:
   family: one
   first_name: Lily
   last_name: Smith
-  position: lion
+  den: lion
 
 jones_bear:
   family: two
   first_name: Ben
   last_name: Jones
-  position: bear
+  den: bear

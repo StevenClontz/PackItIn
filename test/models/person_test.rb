@@ -2,15 +2,15 @@ require "test_helper"
 
 class PersonTest < ActiveSupport::TestCase
   def build_person(**attrs)
-    Person.new({ family: families(:one), first_name: "Pat", last_name: "Smith", position: :wolf }.merge(attrs))
+    Person.new({ family: families(:one), first_name: "Pat", last_name: "Smith", den: :wolf }.merge(attrs))
   end
 
-  test "valid with a family, names and a position" do
+  test "valid with a family, names and a den" do
     assert build_person.valid?
   end
 
-  test "requires first name, last name and position" do
-    %i[first_name last_name position].each do |attr|
+  test "requires first name, last name and den" do
+    %i[first_name last_name den].each do |attr|
       person = build_person(attr => nil)
       assert_not person.valid?, "#{attr} should be required"
       assert_includes person.errors[attr], "can't be blank"
@@ -21,31 +21,31 @@ class PersonTest < ActiveSupport::TestCase
     assert_not build_person(family: nil).valid?
   end
 
-  test "position enum maps to the documented integers" do
+  test "den enum maps to the documented integers" do
     assert_equal(
-      { "adult" => 0, "lion" => 1, "tiger" => 2, "wolf" => 3, "bear" => 4, "webelos" => 5, "aol" => 6, "youth" => 7 },
-      Person.positions
+      { "adult" => 0, "lion" => 1, "tiger" => 2, "wolf" => 3, "bear" => 4, "webelos" => 5, "aol" => 6, "other_youth" => 7 },
+      Person.dens
     )
   end
 
-  test "position can be set by name or integer" do
-    assert_equal "aol", build_person(position: 6).position
-    assert build_person(position: "youth").youth?
-    assert build_person(position: :adult).adult?
+  test "den can be set by name or integer" do
+    assert_equal "aol", build_person(den: 6).den
+    assert build_person(den: "other_youth").other_youth?
+    assert build_person(den: :adult).adult?
   end
 
-  test "an unknown position is a validation error, not an exception" do
-    person = build_person(position: "dragon")
+  test "an unknown den is a validation error, not an exception" do
+    person = build_person(den: "dragon")
     assert_nothing_raised { person.valid? }
     assert_not person.valid?
-    assert person.errors[:position].any?
+    assert person.errors[:den].any?
   end
 
   test "labels" do
-    assert_equal "AOL", build_person(position: :aol).position_label
+    assert_equal "AOL", build_person(den: :aol).den_label
     assert_equal "Sam Smith", people(:smith_dad).full_name
-    assert_equal %w[Adult Lion Tiger Wolf Bear Webelos AOL Youth], Person.position_options.map(&:first)
-    assert_equal Person.positions.keys, Person.position_options.map(&:last)
+    assert_equal [ "Adult", "Lion", "Tiger", "Wolf", "Bear", "Webelos", "AOL", "Other Youth" ], Person.den_options.map(&:first)
+    assert_equal Person.dens.keys, Person.den_options.map(&:last)
   end
 
   test "family has many people and deleting the family deletes them" do

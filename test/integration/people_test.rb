@@ -12,7 +12,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
   end
 
   def valid_person_params
-    { person: { first_name: "Newt", last_name: "Smith", position: "tiger" } }
+    { person: { first_name: "Newt", last_name: "Smith", den: "tiger" } }
   end
 
   # --- guests ---
@@ -125,7 +125,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
 
     get new_family_person_path(families(:two))
     assert_response :success
-    assert_select "select[name=?] option", "person[position]", count: 9 # prompt + 8 positions
+    assert_select "select[name=?] option", "person[den]", count: 9 # prompt + 8 dens
     assert_select "option", "AOL"
 
     assert_difference -> { families(:two).people.count }, 1 do
@@ -144,7 +144,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "option[selected][value=bear]"
 
-    patch person_path(people(:jones_bear)), params: { person: { first_name: "Benny", position: "webelos" } }
+    patch person_path(people(:jones_bear)), params: { person: { first_name: "Benny", den: "webelos" } }
     assert_redirected_to family_people_path(families(:two))
     people(:jones_bear).reload
     assert_equal "Benny", people(:jones_bear).first_name
@@ -168,13 +168,13 @@ class PeopleTest < ActionDispatch::IntegrationTest
     sign_in_as "adminfamily"
 
     assert_no_difference "Person.count" do
-      post family_people_path(families(:one)), params: { person: { first_name: "", last_name: "Smith", position: "" } }
+      post family_people_path(families(:one)), params: { person: { first_name: "", last_name: "Smith", den: "" } }
     end
     assert_response :unprocessable_entity
     assert_select "#error_explanation"
 
     assert_no_difference "Person.count" do
-      post family_people_path(families(:one)), params: { person: { first_name: "A", last_name: "B", position: "dragon" } }
+      post family_people_path(families(:one)), params: { person: { first_name: "A", last_name: "B", den: "dragon" } }
     end
     assert_response :unprocessable_entity
 
@@ -191,19 +191,19 @@ class PeopleTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # --- position badges ---
+  # --- den badges ---
 
-  test "the person page heading shows their position" do
+  test "the person page heading shows their den" do
     sign_in_as "examplefamily"
 
     get person_path(people(:smith_lion))
     assert_select "h2", text: /Lily Smith\s*Lion/ do
       assert_select "span.rounded-full", text: "Lion"
     end
-    assert_select "dt", "Position"
+    assert_select "dt", "Den"
   end
 
-  test "the people list shows one position badge per person" do
+  test "the people list shows one den badge per person" do
     sign_in_as "examplefamily"
 
     get family_people_path(families(:one))

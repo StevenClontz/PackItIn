@@ -5,7 +5,7 @@
     <ul class="mb-3 divide-y divide-gray-100 text-sm">
       <% payment.line_items.each do |item| %>
         <li class="flex justify-between py-1">
-          <span><%= item.person.full_name %> <%= position_badge(item.person) %> <span class="text-gray-500">- <%= item.option.name %></span></span>
+          <span><%= item.person.full_name %> <%= den_badge(item.person) %> <span class="text-gray-500">- <%= item.option.name %></span></span>
           <span><%= money(item.cost) %></span>
         </li>
       <% end %>
@@ -27,7 +27,7 @@
     </p>
     <ul class="mt-1 list-disc pl-5 text-sm text-gray-700">
       <% payment.blockers.each do |blocker| %>
-        <li><%= blocker.person.full_name %> <%= position_badge(blocker.person) %> (<%= blocker.status %>)</li>
+        <li><%= blocker.person.full_name %> <%= den_badge(blocker.person) %> (<%= blocker.status %>)</li>
       <% end %>
     </ul>
   <% elsif payment.overpaid? %>

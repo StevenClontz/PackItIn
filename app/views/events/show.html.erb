@@ -61,7 +61,7 @@
           <li class="flex items-center justify-between px-4 py-3">
             <span class="flex items-center gap-2">
               <span class="font-medium"><%= person.full_name %></span>
-              <%= position_badge(person) %>
+              <%= den_badge(person) %>
             </span>
             <span><%= @rsvps[person.id]&.summary || "No response" %></span>
           </li>
@@ -79,7 +79,7 @@
               <legend class="sr-only"><%= person.full_name %></legend>
               <span class="flex items-center gap-2">
                 <span class="font-medium"><%= person.full_name %></span>
-                <%= position_badge(person) %>
+                <%= den_badge(person) %>
               </span>
               <span class="flex items-center gap-4">
                 <% Rsvp.status_options.each do |label, status| %>
@@ -126,7 +126,7 @@
             <% people.each do |person| %>
               <% response = @responses[person.id] %>
               <li>
-                <%= person.full_name %> <%= position_badge(person) %> <span class="text-gray-500">(<%= person.family.name %>)</span>
+                <%= person.full_name %> <%= den_badge(person) %> <span class="text-gray-500">(<%= person.family.name %>)</span>
                 <% if @options.any? && response && !response.not_attending? %>
                   - <%= response.rsvp_option&.name || "no option chosen" %>
                 <% end %>
