@@ -6,6 +6,13 @@
     <% end %>
   </p>
 
+  <% if family_signed_in? %>
+    <p class="mt-4 text-gray-700">
+      Scout Account balance: <strong><%= money(current_family.balance) %></strong>
+      (<%= link_to "view", family_account_path(current_family), class: "text-blue-600 hover:underline" %>)
+    </p>
+  <% end %>
+
   <% if @upcoming_events.any? %>
     <h2 class="mb-2 mt-8 text-left text-lg font-semibold">Upcoming Events</h2>
     <ul class="divide-y divide-gray-200 rounded-md border border-gray-200 text-left">

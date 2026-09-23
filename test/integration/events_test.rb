@@ -116,6 +116,22 @@ class EventsTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", events_path, text: "Pack Events"
   end
 
+  test "home page shows the signed-in family's Scout Account balance and links to it" do
+    transact from: :outside, to: families(:one), dollars: 42
+    sign_in_as "examplefamily"
+
+    get root_path
+    assert_response :success
+    assert_match "$42.00", response.body
+    assert_select "a[href=?]", family_account_path(families(:one)), text: "view"
+  end
+
+  test "home page has no Scout Account balance for guests" do
+    get root_path
+    assert_response :success
+    assert_no_match "Scout Account balance", response.body
+  end
+
   test "home page lists the three closest upcoming events, but not past ones" do
     get root_path
     assert_response :success
