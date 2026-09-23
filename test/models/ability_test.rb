@@ -86,10 +86,13 @@ class AbilityTest < ActiveSupport::TestCase
     assert ability.can?(:create, Person.new(family: families(:two)))
   end
 
-  test "guests have no abilities on events or rsvps" do
+  test "guests can read events but have no other abilities on events or rsvps" do
     ability = Ability.new(nil)
-    assert ability.cannot?(:read, events(:pack_meeting))
-    assert ability.cannot?(:read, Event)
+    assert ability.can?(:read, events(:pack_meeting))
+    assert ability.can?(:read, Event)
+    %i[create new update destroy].each do |action|
+      assert ability.cannot?(action, events(:pack_meeting)), action
+    end
     assert ability.cannot?(:update, rsvps(:smith_dad_pack_meeting))
   end
 
@@ -203,8 +206,9 @@ class AbilityTest < ActiveSupport::TestCase
     end
   end
 
-  test "guests can't see RSVP options and admins manage them" do
-    assert Ability.new(nil).cannot?(:read, rsvp_options(:day_trip))
+  test "guests can read RSVP options but not change them, and admins manage them" do
+    assert Ability.new(nil).can?(:read, rsvp_options(:day_trip))
+    assert Ability.new(nil).cannot?(:create, RsvpOption.new(event: events(:weekend_trip)))
     assert Ability.new(families(:admin)).can?(:manage, RsvpOption)
   end
 

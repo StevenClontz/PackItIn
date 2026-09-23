@@ -1,3 +1,4 @@
+<%= link_to "Pack Events", events_path, class: "text-blue-600 hover:underline" %>
 <% if family_signed_in? %>
   <% if current_family.admin? %>
     <%= link_to "Families", families_path, class: "text-blue-600 hover:underline" %>
@@ -5,7 +6,6 @@
   <% if can? :index, Fund %>
     <%= link_to "Funds", funds_path, class: "text-blue-600 hover:underline" %>
   <% end %>
-  <%= link_to "Pack Events", events_path, class: "text-blue-600 hover:underline" %>
   <%= link_to "My Family", family_path(current_family), class: "text-blue-600 hover:underline" %>
   <%= link_to "My Scout Account", family_account_path(current_family), class: "text-blue-600 hover:underline" %>
   <%= button_to "Log out", destroy_family_session_path, method: :delete, class: "text-blue-600 hover:underline cursor-pointer" %>

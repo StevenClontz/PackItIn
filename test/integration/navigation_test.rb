@@ -27,12 +27,15 @@ class NavigationTest < ActionDispatch::IntegrationTest
     assert_select "header a[href=?]", funds_path, text: "Funds"
   end
 
-  test "the nav shows only the brand and a login link for a guest" do
+  test "the nav shows only the brand, events and a login link for a guest" do
     get new_family_session_path
     assert_response :success
     assert_select "header nav a[href=?]", root_path, text: "Pack It In"
     assert_select "header a[href=?]", new_family_session_path, text: "Log in"
-    assert_select "header a", text: "Pack Events", count: 0
+    assert_select "header a[href=?]", events_path, text: "Pack Events"
+    assert_select "header a", text: "My Family", count: 0
+    assert_select "header a", text: "Families", count: 0
+    assert_select "header a", text: "Funds", count: 0
   end
 
   test "the nav includes a hamburger toggle and a mobile menu panel" do

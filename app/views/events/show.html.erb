@@ -42,98 +42,104 @@
     </div>
   <% end %>
 
-  <h3 class="mb-1 text-lg font-semibold">Your RSVPs</h3>
-  <p class="mb-3 text-sm text-gray-500">
-    <% if @event.rsvp_open? %>
-      RSVP by <%= format_event_time(@event.rsvp_closes_at) %>.
-    <% else %>
-      RSVPs closed <%= format_event_time(@event.rsvp_closes_at) %>.
-    <% end %>
-  </p>
-
-  <% if @people.empty? %>
-    <p class="mb-6 text-gray-700">Your family has no people yet. Ask a pack administrator to add them.</p>
-  <% elsif !@event.rsvp_open? && !current_family.admin? %>
-    <p class="mb-2 text-gray-700">Ask a pack administrator if you need to change a response.</p>
-    <ul class="mb-6 divide-y divide-gray-200 rounded-md border border-gray-200">
-      <% @people.each do |person| %>
-        <li class="flex items-center justify-between px-4 py-3">
-          <span class="flex items-center gap-2">
-            <span class="font-medium"><%= person.full_name %></span>
-            <%= position_badge(person) %>
-          </span>
-          <span><%= @rsvps[person.id]&.summary || "No response" %></span>
-        </li>
+  <% if family_signed_in? %>
+    <h3 class="mb-1 text-lg font-semibold">Your RSVPs</h3>
+    <p class="mb-3 text-sm text-gray-500">
+      <% if @event.rsvp_open? %>
+        RSVP by <%= format_event_time(@event.rsvp_closes_at) %>.
+      <% else %>
+        RSVPs closed <%= format_event_time(@event.rsvp_closes_at) %>.
       <% end %>
-    </ul>
-  <% else %>
-    <% unless @event.rsvp_open? %>
-      <p class="mb-2 text-sm text-gray-700">RSVPs are closed to families; you can still change them as an admin.</p>
-    <% end %>
-    <%= form_with(url: event_rsvp_path(@event), method: :patch, class: "mb-6") do %>
-      <div class="mb-4 divide-y divide-gray-200 rounded-md border border-gray-200">
+    </p>
+
+    <% if @people.empty? %>
+      <p class="mb-6 text-gray-700">Your family has no people yet. Ask a pack administrator to add them.</p>
+    <% elsif !@event.rsvp_open? && !current_family.admin? %>
+      <p class="mb-2 text-gray-700">Ask a pack administrator if you need to change a response.</p>
+      <ul class="mb-6 divide-y divide-gray-200 rounded-md border border-gray-200">
         <% @people.each do |person| %>
-          <% rsvp = @rsvps[person.id] %>
-          <fieldset class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-            <legend class="sr-only"><%= person.full_name %></legend>
+          <li class="flex items-center justify-between px-4 py-3">
             <span class="flex items-center gap-2">
               <span class="font-medium"><%= person.full_name %></span>
               <%= position_badge(person) %>
             </span>
-            <span class="flex items-center gap-4">
-              <% Rsvp.status_options.each do |label, status| %>
-                <% id = "rsvps_#{person.id}_#{status}" %>
-                <span class="flex items-center gap-1">
-                  <%= radio_button_tag "rsvps[#{person.id}][status]", status, rsvp&.status == status, id: id %>
-                  <%= label_tag id, label %>
+            <span><%= @rsvps[person.id]&.summary || "No response" %></span>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <% unless @event.rsvp_open? %>
+        <p class="mb-2 text-sm text-gray-700">RSVPs are closed to families; you can still change them as an admin.</p>
+      <% end %>
+      <%= form_with(url: event_rsvp_path(@event), method: :patch, class: "mb-6") do %>
+        <div class="mb-4 divide-y divide-gray-200 rounded-md border border-gray-200">
+          <% @people.each do |person| %>
+            <% rsvp = @rsvps[person.id] %>
+            <fieldset class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+              <legend class="sr-only"><%= person.full_name %></legend>
+              <span class="flex items-center gap-2">
+                <span class="font-medium"><%= person.full_name %></span>
+                <%= position_badge(person) %>
+              </span>
+              <span class="flex items-center gap-4">
+                <% Rsvp.status_options.each do |label, status| %>
+                  <% id = "rsvps_#{person.id}_#{status}" %>
+                  <span class="flex items-center gap-1">
+                    <%= radio_button_tag "rsvps[#{person.id}][status]", status, rsvp&.status == status, id: id %>
+                    <%= label_tag id, label %>
+                  </span>
+                <% end %>
+              </span>
+              <% if @options.any? %>
+                <% option_id = "rsvps_#{person.id}_rsvp_option_id" %>
+                <span class="flex w-full flex-wrap items-center gap-2 text-sm">
+                  <%= label_tag option_id, "Option for #{person.first_name}", class: "text-gray-700" %>
+                  <%= select_tag "rsvps[#{person.id}][rsvp_option_id]", options_for_select(@options.map { |option| [ option.label_for(person), option.id ] }, rsvp&.rsvp_option_id), include_blank: "Choose an option", id: option_id, class: "rounded-md border border-gray-300 px-2 py-1" %>
+                  <span class="text-gray-500">Needed if attending or maybe.</span>
                 </span>
               <% end %>
-            </span>
-            <% if @options.any? %>
-              <% option_id = "rsvps_#{person.id}_rsvp_option_id" %>
-              <span class="flex w-full flex-wrap items-center gap-2 text-sm">
-                <%= label_tag option_id, "Option for #{person.first_name}", class: "text-gray-700" %>
-                <%= select_tag "rsvps[#{person.id}][rsvp_option_id]", options_for_select(@options.map { |option| [ option.label_for(person), option.id ] }, rsvp&.rsvp_option_id), include_blank: "Choose an option", id: option_id, class: "rounded-md border border-gray-300 px-2 py-1" %>
-                <span class="text-gray-500">Needed if attending or maybe.</span>
-              </span>
-            <% end %>
-          </fieldset>
-        <% end %>
-      </div>
-      <%= submit_tag "Save RSVPs", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
-    <% end %>
-  <% end %>
-
-  <% if @people.any? && @payment.relevant? %>
-    <%= render "events/costs", payment: @payment, event: @event %>
-  <% end %>
-
-  <% if current_family.admin? %>
-    <h3 class="mb-2 text-lg font-semibold">All responses</h3>
-    <% grouped = @everyone.group_by { |person| @responses[person.id]&.status || "none" } %>
-    <% (Rsvp.statuses.keys + [ "none" ]).each do |status| %>
-      <% people = grouped.fetch(status, []) %>
-      <p class="mt-3 font-medium">
-        <%= status == "none" ? "No response" : t("rsvps.statuses.#{status}") %> (<%= people.size %>)
-      </p>
-      <% if @options.any? && %w[attending maybe].include?(status) && people.any? %>
-        <% counts = people.map { |person| @responses[person.id].rsvp_option&.name || "No option chosen" }.tally %>
-        <p class="text-sm text-gray-500"><%= counts.map { |name, count| "#{name}: #{count}" }.join(", ") %></p>
-      <% end %>
-      <% if people.any? %>
-        <ul class="list-disc pl-5 text-sm text-gray-700">
-          <% people.each do |person| %>
-            <% response = @responses[person.id] %>
-            <li>
-              <%= person.full_name %> <%= position_badge(person) %> <span class="text-gray-500">(<%= person.family.name %>)</span>
-              <% if @options.any? && response && !response.not_attending? %>
-                - <%= response.rsvp_option&.name || "no option chosen" %>
-              <% end %>
-            </li>
+            </fieldset>
           <% end %>
-        </ul>
+        </div>
+        <%= submit_tag "Save RSVPs", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
       <% end %>
     <% end %>
+
+    <% if @people.any? && @payment.relevant? %>
+      <%= render "events/costs", payment: @payment, event: @event %>
+    <% end %>
+
+    <% if current_family.admin? %>
+      <h3 class="mb-2 text-lg font-semibold">All responses</h3>
+      <% grouped = @everyone.group_by { |person| @responses[person.id]&.status || "none" } %>
+      <% (Rsvp.statuses.keys + [ "none" ]).each do |status| %>
+        <% people = grouped.fetch(status, []) %>
+        <p class="mt-3 font-medium">
+          <%= status == "none" ? "No response" : t("rsvps.statuses.#{status}") %> (<%= people.size %>)
+        </p>
+        <% if @options.any? && %w[attending maybe].include?(status) && people.any? %>
+          <% counts = people.map { |person| @responses[person.id].rsvp_option&.name || "No option chosen" }.tally %>
+          <p class="text-sm text-gray-500"><%= counts.map { |name, count| "#{name}: #{count}" }.join(", ") %></p>
+        <% end %>
+        <% if people.any? %>
+          <ul class="list-disc pl-5 text-sm text-gray-700">
+            <% people.each do |person| %>
+              <% response = @responses[person.id] %>
+              <li>
+                <%= person.full_name %> <%= position_badge(person) %> <span class="text-gray-500">(<%= person.family.name %>)</span>
+                <% if @options.any? && response && !response.not_attending? %>
+                  - <%= response.rsvp_option&.name || "no option chosen" %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <p class="mb-6 text-gray-700">
+      <%= link_to "Log in", new_family_session_path, class: "text-blue-600 hover:underline" %> to RSVP for this event.
+    </p>
   <% end %>
 
   <% if can? :view_account, @event %>

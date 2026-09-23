@@ -4,7 +4,11 @@ class Ability
   include CanCan::Ability
 
   def initialize(family)
-    # Guests (no signed-in family) have no abilities.
+    # Events and their RSVP options are public information, visible even to guests.
+    can :read, Event
+    can :read, RsvpOption
+
+    # Guests (no signed-in family) have no further abilities.
     return unless family.present?
 
     if family.admin?
@@ -23,11 +27,9 @@ class Ability
       # People are only visible to their own family, and only admins can change them.
       can :read, Person, family_id: family.id
 
-      # Events are read-only for families, who RSVP their own people until the event's RSVP deadline
-      # passes (a block: the deadline falls back to ends_at, which a hash condition can't express).
-      can :read, Event
+      # Families RSVP their own people until the event's RSVP deadline passes (a block: the
+      # deadline falls back to ends_at, which a hash condition can't express).
       can :pay, Event # its own RSVPs' costs, from its own Scout Account (EventPaymentsController)
-      can :read, RsvpOption
       can :read, Rsvp, person: { family_id: family.id }
       can %i[create update], Rsvp do |rsvp|
         rsvp.person&.family_id == family.id && rsvp.event&.rsvp_open?

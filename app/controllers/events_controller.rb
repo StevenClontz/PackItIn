@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  before_action :authenticate_family!
+  before_action :authenticate_family!, except: %i[index show]
   load_and_authorize_resource
 
   def index
@@ -9,13 +9,16 @@ class EventsController < ApplicationController
 
   def show
     @options = @event.rsvp_options.to_a
-    @people = current_family.people.order(:last_name, :first_name)
-    @rsvps = @event.rsvps.where(person: @people).includes(:rsvp_option).index_by(&:person_id)
-    @payment = EventPayment.new(event: @event, family: current_family)
 
-    if current_family.admin?
-      @everyone = Person.includes(:family).order(:last_name, :first_name)
-      @responses = @event.rsvps.includes(:rsvp_option).index_by(&:person_id)
+    if family_signed_in?
+      @people = current_family.people.order(:last_name, :first_name)
+      @rsvps = @event.rsvps.where(person: @people).includes(:rsvp_option).index_by(&:person_id)
+      @payment = EventPayment.new(event: @event, family: current_family)
+
+      if current_family.admin?
+        @everyone = Person.includes(:family).order(:last_name, :first_name)
+        @responses = @event.rsvps.includes(:rsvp_option).index_by(&:person_id)
+      end
     end
   end
 

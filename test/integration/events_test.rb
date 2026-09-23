@@ -17,8 +17,14 @@ class EventsTest < ActionDispatch::IntegrationTest
 
   # --- guests ---
 
-  test "guests are sent to sign in" do
-    [ events_path, event_path(events(:pack_meeting)), new_event_path, edit_event_path(events(:pack_meeting)) ].each do |path|
+  test "guests can view events but must sign in to manage them" do
+    get events_path
+    assert_response :success
+
+    get event_path(events(:pack_meeting))
+    assert_response :success
+
+    [ new_event_path, edit_event_path(events(:pack_meeting)) ].each do |path|
       get path
       assert_redirected_to new_family_session_path, "GET #{path}"
     end
@@ -29,6 +35,20 @@ class EventsTest < ActionDispatch::IntegrationTest
       delete event_path(events(:pack_meeting))
     end
     assert_equal "Pack Meeting", events(:pack_meeting).reload.title
+  end
+
+  test "guests see event details but no RSVP form or admin controls" do
+    get event_path(events(:pack_meeting))
+    assert_response :success
+    assert_select "h2", "Pack Meeting"
+    assert_select "form", count: 0
+    assert_select "h3", text: "All responses", count: 0
+    assert_match "Log in", response.body
+  end
+
+  test "home page links to events for guests too" do
+    get root_path
+    assert_select "a[href=?]", events_path, text: "Pack Events"
   end
 
   # --- non-admin: read only ---
@@ -94,6 +114,22 @@ class EventsTest < ActionDispatch::IntegrationTest
     sign_in_as "examplefamily"
     get root_path
     assert_select "a[href=?]", events_path, text: "Pack Events"
+  end
+
+  test "home page lists the three closest upcoming events, but not past ones" do
+    get root_path
+    assert_response :success
+
+    assert_select "a[href=?]", event_path(events(:pack_meeting)), text: "Pack Meeting"
+    assert_select "a[href=?]", event_path(events(:campout)), text: "Fall Campout"
+    assert_select "a[href=?]", event_path(events(:weekend_trip)), text: "Weekend Trip"
+    assert_no_match "Trail Hike", response.body
+
+    body = response.body
+    assert_operator body.index("Pack Meeting"), :<, body.index("Fall Campout")
+    assert_operator body.index("Fall Campout"), :<, body.index("Weekend Trip")
+
+    assert_select "a[href=?]", events_path, text: "View all events"
   end
 
   # --- admin ---
