@@ -19,5 +19,15 @@
     <%= f.select :position, Person.position_options, { prompt: "Select a position" }, class: input_class %>
   </div>
 
+  <div class="mb-4">
+    <%= f.label :email, class: "mb-1 block font-medium" %>
+    <%= f.email_field :email, autocomplete: "email", class: input_class %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :phone_number, "Phone number", class: "mb-1 block font-medium" %>
+    <%= f.telephone_field :phone_number, autocomplete: "tel", class: input_class %>
+  </div>
+
   <%= f.submit class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
 <% end %>

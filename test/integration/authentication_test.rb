@@ -33,7 +33,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test "sign in and sign out" do
-    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
+    post family_session_path, params: { family: { login: "examplefamily", password: "password123" } }
     assert_redirected_to root_path
     follow_redirect!
     assert_match "examplefamily", response.body
@@ -57,14 +57,14 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_family_session_path, "should not be signed in"
   end
 
-  test "sign in page lists non-admin families only and still has the username form" do
+  test "sign in page lists non-admin families only and still has the login form" do
     get new_family_session_path
     assert_response :success
     assert_select "select[name=?] option", "address_sign_in[family_id]", text: "The Example Family"
     assert_select "select[name=?] option", "address_sign_in[family_id]", text: "The Joneses"
     assert_select "select[name=?] option", "address_sign_in[family_id]", text: "Pack Administrators", count: 0
     assert_select "input[name=?]", "address_sign_in[street_address]"
-    assert_select "input[name=?]", "family[username]"
+    assert_select "input[name=?]", "family[login]"
     assert_select "input[name=?]", "family[password]"
   end
 
@@ -138,7 +138,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test "signed-in families are redirected away from address sign in" do
-    post family_session_path, params: { family: { username: "examplefamily", password: "password123" } }
+    post family_session_path, params: { family: { login: "examplefamily", password: "password123" } }
     sign_in_with_address families(:two), "22 Elm Ave"
     assert_redirected_to root_path
 
@@ -164,12 +164,46 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test "username sign in is case insensitive" do
-    post family_session_path, params: { family: { username: "ExampleFamily", password: "password123" } }
+    post family_session_path, params: { family: { login: "ExampleFamily", password: "password123" } }
     assert_redirected_to root_path
   end
 
   test "wrong password is rejected" do
-    post family_session_path, params: { family: { username: "examplefamily", password: "nope" } }
+    post family_session_path, params: { family: { login: "examplefamily", password: "nope" } }
+    assert_response :unprocessable_entity
+  end
+
+  # --- sign in with a person's email or phone number ---
+
+  test "sign in with a person's email" do
+    post family_session_path, params: { family: { login: "Sam@Example.com", password: "password123" } }
+    assert_redirected_to root_path
+    follow_redirect!
+    assert_match "examplefamily", response.body
+  end
+
+  test "sign in with a person's phone number, with or without punctuation" do
+    [ "5125551234", "(512) 555-1234", "512-555-1234" ].each do |phone|
+      post family_session_path, params: { family: { login: phone, password: "password123" } }
+      assert_redirected_to root_path
+      delete destroy_family_session_path
+    end
+  end
+
+  test "sign in with a person's email resolves to that person's family, not another one" do
+    post family_session_path, params: { family: { login: "sam@example.com", password: "password123" } }
+    follow_redirect!
+    assert_match "examplefamily", response.body
+    assert_no_match "joneses", response.body
+  end
+
+  test "an identifier that matches no username, email, or phone number is rejected" do
+    post family_session_path, params: { family: { login: "nobody@example.com", password: "password123" } }
+    assert_response :unprocessable_entity
+  end
+
+  test "a blank identifier is rejected" do
+    post family_session_path, params: { family: { login: "", password: "password123" } }
     assert_response :unprocessable_entity
   end
 
@@ -177,7 +211,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   test "there are no Devise routes to edit or delete an account" do
     assert_no_difference "Family.count" do
       [ nil, "examplefamily", "adminfamily" ].each do |username|
-        post family_session_path, params: { family: { username: username, password: "password123" } } if username
+        post family_session_path, params: { family: { login: username, password: "password123" } } if username
 
         get "/account/edit"
         assert_response :not_found, "GET /account/edit as #{username.inspect}"

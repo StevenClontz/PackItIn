@@ -7,6 +7,10 @@ class Family < ApplicationRecord
 
   has_many :people, dependent: :destroy
 
+  # Not a DB column: the sign-in form's identifier field, which accepts a username or a person's
+  # email/phone number (see .find_for_database_authentication and config.authentication_keys).
+  attr_accessor :login
+
   # Prefixed because bare postal codes collide with ActiveRecord methods (`or`, `id`).
   enum :state, {
     al: 0, ak: 1, az: 2, ar: 3, ca: 4, co: 5, ct: 6, de: 7, dc: 8, fl: 9, ga: 10, hi: 11, id: 12,
@@ -35,6 +39,19 @@ class Family < ApplicationRecord
   def street_address_matches?(input)
     expected = self.class.normalize_address(street_address)
     expected.present? && ActiveSupport::SecurityUtils.secure_compare(expected, self.class.normalize_address(input))
+  end
+
+  # Devise calls this to look up the resource being signed in. It's overridden (rather than just
+  # listing :email/:phone_number in config.authentication_keys) because those fields live on
+  # Person, not Family: a match resolves to that person's family. Still requires the real
+  # password, so unlike address login this isn't restricted to address_login_eligible families.
+  def self.find_for_database_authentication(warden_conditions)
+    login = warden_conditions[:login].to_s.strip
+    return nil if login.blank?
+
+    find_by("lower(username) = ?", login.downcase) ||
+      Person.find_by("lower(email) = ?", login.downcase)&.family ||
+      Person.find_by(phone_number: Person.normalize_phone_number(login))&.family
   end
 
   # [[label, value], ...] for the state <select>.

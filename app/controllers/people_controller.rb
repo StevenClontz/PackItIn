@@ -64,6 +64,6 @@ class PeopleController < ApplicationController
 
   # The family is fixed by the URL and can't be reassigned.
   def person_params
-    params.expect(person: %i[first_name last_name position])
+    params.expect(person: %i[first_name last_name position email phone_number])
   end
 end

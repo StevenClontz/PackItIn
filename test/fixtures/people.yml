@@ -3,6 +3,8 @@ smith_dad:
   first_name: Sam
   last_name: Smith
   position: adult
+  email: sam@example.com
+  phone_number: "5125551234"
 
 smith_lion:
   family: one

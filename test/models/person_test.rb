@@ -67,4 +67,39 @@ class PersonTest < ActiveSupport::TestCase
       families(:one).destroy
     end
   end
+
+  test "email and phone number are optional" do
+    assert build_person(email: nil, phone_number: nil).valid?
+    assert build_person(email: "", phone_number: "").valid?
+  end
+
+  test "email must look like an email address" do
+    person = build_person(email: "not-an-email")
+    assert_not person.valid?
+    assert_includes person.errors[:email], "must be a valid email address"
+  end
+
+  test "email must be unique, ignoring case" do
+    person = build_person(email: people(:smith_dad).email.upcase)
+    assert_not person.valid?
+    assert_includes person.errors[:email], "has already been taken"
+  end
+
+  test "phone number must be 10 digits" do
+    person = build_person(phone_number: "555-1234")
+    assert_not person.valid?
+    assert_includes person.errors[:phone_number], "must be a 10-digit phone number"
+  end
+
+  test "phone number strips punctuation before validating and saving" do
+    person = build_person(phone_number: "(512) 555-9999")
+    assert person.valid?
+    assert_equal "5125559999", person.phone_number
+  end
+
+  test "phone number must be unique" do
+    person = build_person(phone_number: people(:smith_dad).phone_number)
+    assert_not person.valid?
+    assert_includes person.errors[:phone_number], "has already been taken"
+  end
 end

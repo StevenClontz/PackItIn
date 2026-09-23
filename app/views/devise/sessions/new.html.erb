@@ -21,13 +21,13 @@
       <%= f.submit "Log in with address", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
     <% end %>
 
-    <p class="my-6 text-center text-sm text-gray-500">or log in with a username and password</p>
+    <p class="my-6 text-center text-sm text-gray-500">or log in with a password</p>
   <% end %>
 
   <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
     <div class="mb-4">
-      <%= f.label :username, class: "mb-1 block font-medium" %>
-      <%= f.text_field :username, autofocus: families.empty?, autocomplete: "username", class: input_class %>
+      <%= f.label :login, "Username, phone, or email", class: "mb-1 block font-medium" %>
+      <%= f.text_field :login, autofocus: families.empty?, class: input_class %>
     </div>
 
     <div class="mb-4">

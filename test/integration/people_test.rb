@@ -2,7 +2,7 @@ require "test_helper"
 
 class PeopleTest < ActionDispatch::IntegrationTest
   def sign_in_as(username, password: "password123")
-    post family_session_path, params: { family: { username: username, password: password } }
+    post family_session_path, params: { family: { login: username, password: password } }
   end
 
   def assert_denied
