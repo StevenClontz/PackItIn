@@ -17,3 +17,100 @@ jones_bear:
   first_name: Ben
   last_name: Jones
   den: bear
+
+# The following people exist only to give every regular den at least 3 scouts.
+garcia_tiger:
+  family: three
+  first_name: Mia
+  last_name: Garcia
+  den: tiger
+
+garcia_wolf:
+  family: three
+  first_name: Leo
+  last_name: Garcia
+  den: wolf
+
+nguyen_webelos:
+  family: four
+  first_name: Anna
+  last_name: Nguyen
+  den: webelos
+
+nguyen_aol:
+  family: four
+  first_name: Kai
+  last_name: Nguyen
+  den: aol
+
+patel_lion:
+  family: five
+  first_name: Priya
+  last_name: Patel
+  den: lion
+
+patel_bear:
+  family: five
+  first_name: Arjun
+  last_name: Patel
+  den: bear
+
+chen_tiger:
+  family: six
+  first_name: Mei
+  last_name: Chen
+  den: tiger
+
+chen_wolf:
+  family: six
+  first_name: Alex
+  last_name: Chen
+  den: wolf
+
+rivera_webelos:
+  family: seven
+  first_name: Sofia
+  last_name: Rivera
+  den: webelos
+
+rivera_aol:
+  family: seven
+  first_name: Diego
+  last_name: Rivera
+  den: aol
+
+kim_lion:
+  family: eight
+  first_name: Noah
+  last_name: Kim
+  den: lion
+
+kim_bear:
+  family: eight
+  first_name: Ella
+  last_name: Kim
+  den: bear
+
+okafor_tiger:
+  family: nine
+  first_name: Zara
+  last_name: Okafor
+  den: tiger
+
+okafor_wolf:
+  family: nine
+  first_name: Femi
+  last_name: Okafor
+  den: wolf
+
+anderson_webelos:
+  family: ten
+  first_name: Nia
+  last_name: Anderson
+  den: webelos
+
+anderson_aol:
+  family: ten
+  first_name: Chidi
+  last_name: Anderson
+  den: aol

@@ -91,7 +91,8 @@ class FamilyTest < ActiveSupport::TestCase
   end
 
   test "non_admin excludes admin families" do
-    assert_equal [ "examplefamily", "joneses" ], Family.non_admin.order(:username).pluck(:username)
+    assert_equal [ "andersons", "chens", "examplefamily", "garcias", "joneses", "kims", "nguyens", "okafors", "patels", "riveras" ],
+                 Family.non_admin.order(:username).pluck(:username)
   end
 
   test "address_login_eligible excludes admin and password-only families" do

@@ -29,6 +29,7 @@ class PackInfoTest < ActionDispatch::IntegrationTest
   end
 
   test "a den with no youth shows an empty state for both youth and adults" do
+    Person.tiger.destroy_all
     sign_in_as "examplefamily"
     get pack_info_path
 

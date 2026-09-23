@@ -249,12 +249,12 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     assert_select "p", text: /Attending \(1\)/
     assert_select "p", text: /Maybe \(1\)/
     assert_select "p", text: /Not attending \(1\)/
-    assert_select "p", text: /No response \(0\)/
+    assert_select "p", text: /No response \(#{Person.count - 3}\)/
     assert_select "li", text: /Sam Smith\s*Adult\s*\(The Example Family\)/
     assert_select "li", text: /Ben Jones\s*Bear\s*\(The Joneses\)/
 
     get event_path(events(:campout))
-    assert_select "p", text: /No response \(3\)/
+    assert_select "p", text: /No response \(#{Person.count}\)/
     assert_select "p", text: /Attending \(0\)/
   end
 
@@ -471,8 +471,8 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     sign_in_as "adminfamily"
 
     get event_path(events(:pack_meeting))
-    assert_select "li span.rounded-full", text: "Adult", count: 1
-    assert_select "li span.rounded-full", text: "Lion", count: 1
-    assert_select "li span.rounded-full", text: "Bear", count: 1
+    assert_select "li span.rounded-full", text: "Adult", count: Person.adult.count
+    assert_select "li span.rounded-full", text: "Lion", count: Person.lion.count
+    assert_select "li span.rounded-full", text: "Bear", count: Person.bear.count
   end
 end

@@ -29,3 +29,85 @@ admin:
   zip: "97201"
   admin: true
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
+
+# The following families exist only to give every regular den at least 3 scouts (see people.yml).
+# They're password_only so they don't show up in Family.address_login_eligible-based tests/specs.
+three:
+  username: garcias
+  name: The Garcias
+  street_address: 12 Oak St
+  city: Raleigh
+  state: nc
+  zip: "27601"
+  password_only: true
+  encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
+
+four:
+  username: nguyens
+  name: The Nguyens
+  street_address: 45 Pine Ave
+  city: San Jose
+  state: ca
+  zip: "95112"
+  password_only: true
+  encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
+
+five:
+  username: patels
+  name: The Patels
+  street_address: 78 Maple Dr
+  city: Edison
+  state: nj
+  zip: "08817"
+  password_only: true
+  encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
+
+six:
+  username: chens
+  name: The Chens
+  street_address: 23 Birch Ln
+  city: Seattle
+  state: wa
+  zip: "98101"
+  password_only: true
+  encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
+
+seven:
+  username: riveras
+  name: The Riveras
+  street_address: 89 Cedar Ct
+  city: Phoenix
+  state: az
+  zip: "85001"
+  password_only: true
+  encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
+
+eight:
+  username: kims
+  name: The Kims
+  street_address: 56 Elm St
+  city: Los Angeles
+  state: ca
+  zip: "90001"
+  password_only: true
+  encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
+
+nine:
+  username: okafors
+  name: The Okafors
+  street_address: 34 Walnut Ave
+  city: Atlanta
+  state: ga
+  zip: "30301"
+  password_only: true
+  encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
+
+ten:
+  username: andersons
+  name: The Andersons
+  street_address: 67 Spruce Rd
+  city: Minneapolis
+  state: mn
+  zip: "55401"
+  password_only: true
+  encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
