@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     post "account/sign_in/address", to: "families/sessions#create_with_address", as: :address_family_session
   end
   resources :families do
-    resources :people, shallow: true
+    resources :people, shallow: true, except: :index
     resource :account, only: :show
   end
   resources :funds

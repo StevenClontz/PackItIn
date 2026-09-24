@@ -7,6 +7,7 @@ class FamiliesController < ApplicationController
   end
 
   def show
+    @people = @family.people.order(:last_name, :first_name)
   end
 
   def new

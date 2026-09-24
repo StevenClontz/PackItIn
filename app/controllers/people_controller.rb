@@ -1,15 +1,7 @@
 class PeopleController < ApplicationController
   before_action :authenticate_family!
-  before_action :set_family, only: %i[index new create]
+  before_action :set_family, only: %i[new create]
   before_action :set_person, only: %i[show edit update destroy]
-
-  # Loaded by hand rather than with `load_and_authorize_resource through: :family`: that would
-  # silently filter another family's index to an empty page instead of denying access.
-
-  def index
-    authorize! :read, Person.new(family: @family)
-    @people = @family.people.order(:last_name, :first_name)
-  end
 
   def show
     authorize! :read, @person
@@ -25,7 +17,7 @@ class PeopleController < ApplicationController
     authorize! :create, @person
 
     if @person.save
-      redirect_to family_people_path(@family), notice: "#{@person.full_name} was added."
+      redirect_to family_path(@family), notice: "#{@person.full_name} was added."
     else
       render :new, status: :unprocessable_content
     end
@@ -39,7 +31,7 @@ class PeopleController < ApplicationController
     authorize! :update, @person
 
     if @person.update(person_params)
-      redirect_to family_people_path(@family), notice: "#{@person.full_name} was updated."
+      redirect_to family_path(@family), notice: "#{@person.full_name} was updated."
     else
       render :edit, status: :unprocessable_content
     end
@@ -48,7 +40,7 @@ class PeopleController < ApplicationController
   def destroy
     authorize! :destroy, @person
     @person.destroy!
-    redirect_to family_people_path(@family), notice: "#{@person.full_name} was deleted.", status: :see_other
+    redirect_to family_path(@family), notice: "#{@person.full_name} was deleted.", status: :see_other
   end
 
   private

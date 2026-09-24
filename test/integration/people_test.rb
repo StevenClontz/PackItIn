@@ -19,7 +19,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
 
   test "guests are sent to sign in" do
     [
-      family_people_path(families(:one)), new_family_person_path(families(:one)),
+      family_path(families(:one)), new_family_person_path(families(:one)),
       person_path(people(:smith_dad)), edit_person_path(people(:smith_dad))
     ].each do |path|
       get path
@@ -39,14 +39,14 @@ class PeopleTest < ActionDispatch::IntegrationTest
   test "non-admin sees their own family's people, with no controls" do
     sign_in_as "examplefamily"
 
-    get family_people_path(families(:one))
+    get family_path(families(:one))
     assert_response :success
     assert_select "a", "Sam Smith"
     assert_select "a", "Lily Smith"
     assert_select "span", "Lion"
     assert_select "a", text: "Add person", count: 0
-    assert_select "a", text: "Edit", count: 0
-    assert_select "button", text: "Delete", count: 0
+    assert_select "ul a", text: "Edit", count: 0
+    assert_select "ul button", text: "Delete", count: 0
     assert_select "a", text: "Ben Jones", count: 0
 
     get person_path(people(:smith_lion))
@@ -59,7 +59,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
   test "non-admin cannot see another family's people" do
     sign_in_as "examplefamily"
 
-    get family_people_path(families(:two))
+    get family_path(families(:two))
     assert_denied
 
     get person_path(people(:jones_bear))
@@ -94,25 +94,12 @@ class PeopleTest < ActionDispatch::IntegrationTest
     assert_equal "Sam", people(:smith_dad).reload.first_name
   end
 
-  test "family page links to people for the own family, and another family's page is denied" do
-    sign_in_as "examplefamily"
-
-    get family_path(families(:one))
-    assert_select "a[href=?]", family_people_path(families(:one)), text: "People (2)"
-
-    get family_path(families(:two))
-    assert_denied
-  end
-
   # --- admin: everything, for any family ---
 
   test "admin sees and links to any family's people with all controls" do
     sign_in_as "adminfamily"
 
     get family_path(families(:two))
-    assert_select "a[href=?]", family_people_path(families(:two)), text: "People (2)"
-
-    get family_people_path(families(:two))
     assert_response :success
     assert_select "a", "Ben Jones"
     assert_select "a", text: "Add person", count: 1
@@ -131,7 +118,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
     assert_difference -> { families(:two).people.count }, 1 do
       post family_people_path(families(:two)), params: valid_person_params
     end
-    assert_redirected_to family_people_path(families(:two))
+    assert_redirected_to family_path(families(:two))
     person = families(:two).people.find_by!(first_name: "Newt")
     assert_equal "Smith", person.last_name
     assert person.tiger?
@@ -145,7 +132,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
     assert_select "option[selected][value=bear]"
 
     patch person_path(people(:jones_bear)), params: { person: { first_name: "Benny", den: "webelos" } }
-    assert_redirected_to family_people_path(families(:two))
+    assert_redirected_to family_path(families(:two))
     people(:jones_bear).reload
     assert_equal "Benny", people(:jones_bear).first_name
     assert people(:jones_bear).webelos?
@@ -153,7 +140,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
     assert_difference "Person.count", -1 do
       delete person_path(people(:jones_bear))
     end
-    assert_redirected_to family_people_path(families(:two))
+    assert_redirected_to family_path(families(:two))
     assert_response :see_other
   end
 
@@ -206,7 +193,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
   test "the people list shows one den badge per person" do
     sign_in_as "examplefamily"
 
-    get family_people_path(families(:one))
+    get family_path(families(:one))
     assert_select "li", 2
     assert_select "li span.rounded-full", 2
     assert_select "li", text: /Sam Smith\s*Adult \(Lion\)/
