@@ -47,7 +47,7 @@ class RsvpOptionTest < ActiveSupport::TestCase
   end
 
   test "deleting an event deletes its options and responses" do
-    assert_difference({ "RsvpOption.count" => -2, "Rsvp.count" => -1 }) do
+    assert_difference({ "RsvpOption.count" => -2, "Rsvp.count" => -2 }) do
       events(:weekend_trip).destroy!
     end
   end

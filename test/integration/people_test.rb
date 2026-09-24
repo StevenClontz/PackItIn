@@ -110,7 +110,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
     sign_in_as "adminfamily"
 
     get family_path(families(:two))
-    assert_select "a[href=?]", family_people_path(families(:two)), text: "People (1)"
+    assert_select "a[href=?]", family_people_path(families(:two)), text: "People (2)"
 
     get family_people_path(families(:two))
     assert_response :success

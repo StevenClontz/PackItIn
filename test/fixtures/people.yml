@@ -18,6 +18,12 @@ jones_bear:
   last_name: Jones
   den: bear
 
+jones_dad:
+  family: two
+  first_name: Tom
+  last_name: Jones
+  den: adult
+
 # The following people exist only to give every regular den at least 3 scouts.
 garcia_tiger:
   family: three
@@ -31,6 +37,12 @@ garcia_wolf:
   last_name: Garcia
   den: wolf
 
+garcia_mom:
+  family: three
+  first_name: Carlos
+  last_name: Garcia
+  den: adult
+
 nguyen_webelos:
   family: four
   first_name: Anna
@@ -42,6 +54,12 @@ nguyen_aol:
   first_name: Kai
   last_name: Nguyen
   den: aol
+
+nguyen_mom:
+  family: four
+  first_name: Linh
+  last_name: Nguyen
+  den: adult
 
 patel_lion:
   family: five
@@ -55,6 +73,12 @@ patel_bear:
   last_name: Patel
   den: bear
 
+patel_dad:
+  family: five
+  first_name: Raj
+  last_name: Patel
+  den: adult
+
 chen_tiger:
   family: six
   first_name: Mei
@@ -66,6 +90,12 @@ chen_wolf:
   first_name: Alex
   last_name: Chen
   den: wolf
+
+chen_dad:
+  family: six
+  first_name: Wei
+  last_name: Chen
+  den: adult
 
 rivera_webelos:
   family: seven
@@ -79,6 +109,12 @@ rivera_aol:
   last_name: Rivera
   den: aol
 
+rivera_mom:
+  family: seven
+  first_name: Elena
+  last_name: Rivera
+  den: adult
+
 kim_lion:
   family: eight
   first_name: Noah
@@ -90,6 +126,12 @@ kim_bear:
   first_name: Ella
   last_name: Kim
   den: bear
+
+kim_dad:
+  family: eight
+  first_name: David
+  last_name: Kim
+  den: adult
 
 okafor_tiger:
   family: nine
@@ -103,6 +145,12 @@ okafor_wolf:
   last_name: Okafor
   den: wolf
 
+okafor_mom:
+  family: nine
+  first_name: Chioma
+  last_name: Okafor
+  den: adult
+
 anderson_webelos:
   family: ten
   first_name: Nia
@@ -114,3 +162,9 @@ anderson_aol:
   first_name: Chidi
   last_name: Anderson
   den: aol
+
+anderson_dad:
+  family: ten
+  first_name: Mark
+  last_name: Anderson
+  den: adult

@@ -18,3 +18,8 @@ jones_bear_weekend_trip:
   person: jones_bear
   rsvp_option: day_trip
   status: attending
+
+jones_dad_weekend_trip:
+  event: weekend_trip
+  person: jones_dad
+  status: not_attending
