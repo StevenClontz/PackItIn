@@ -209,7 +209,7 @@ class PeopleTest < ActionDispatch::IntegrationTest
     get family_people_path(families(:one))
     assert_select "li", 2
     assert_select "li span.rounded-full", 2
-    assert_select "li", text: /Sam Smith\s*Adult/
+    assert_select "li", text: /Sam Smith\s*Adult \(Lion\)/
     assert_select "li", text: /Lily Smith\s*Lion/
   end
 end

@@ -42,7 +42,7 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     get event_path(trip)
     assert_response :success
     assert_select "h3", "Costs"
-    assert_select "li", text: /Sam Smith\s*Adult\s*- Full weekend\s*\$60\.00/
+    assert_select "li", text: /Sam Smith\s*Adult \(Lion\)\s*- Full weekend\s*\$60\.00/
     assert_select "dd", text: "$60.00", minimum: 2 # total and still to pay
     assert_select "dd", text: "$0.00", count: 1 # already paid
     assert_select "p", text: /Our Scout Account balance is \$100\.00\./
@@ -275,7 +275,7 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     sign_in_as "examplefamily"
 
     get event_path(trip)
-    assert_select "li", text: /Sam Smith\s*Adult\s*- Full weekend\s*\$60\.00/
+    assert_select "li", text: /Sam Smith\s*Adult \(Lion\)\s*- Full weekend\s*\$60\.00/
     assert_select "li", text: /Lily Smith\s*Lion\s*- Full weekend\s*\$30\.00/
     assert_select "button", "Pay $90.00 from our Scout Account"
 
@@ -292,7 +292,7 @@ class EventPaymentsTest < ActionDispatch::IntegrationTest
     sign_in_as "examplefamily"
 
     get event_path(trip)
-    assert_select "li span.rounded-full", text: "Adult", count: 1
+    assert_select "li span.rounded-full", text: "Adult (Lion)", count: 1
     assert_select "li span.rounded-full", text: "Lion", count: 1
   end
 

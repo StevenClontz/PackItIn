@@ -22,7 +22,7 @@ class PackInfoTest < ActionDispatch::IntegrationTest
 
     assert_select "#den_lion h3", "Lion Den"
     assert_select "#den_lion li", text: /Lily Smith.*Lion.*The Example Family/
-    assert_select "#den_lion li", text: /Sam Smith.*Adult.*The Example Family/
+    assert_select "#den_lion li", text: /Sam Smith.*Adult \(Lion\).*The Example Family/
 
     assert_select "#den_bear h3", "Bear Den"
     assert_select "#den_bear li", text: /Ben Jones.*Bear.*The Joneses/

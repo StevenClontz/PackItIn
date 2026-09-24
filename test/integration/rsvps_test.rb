@@ -192,7 +192,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     travel_to events(:campout).rsvp_deadline_at + 1.minute do
       get event_path(events(:campout))
       assert_select "form[action=?]", event_rsvp_path(events(:campout)), count: 0
-      assert_select "li", text: /Sam Smith\s*Adult\s*No response/
+      assert_select "li", text: /Sam Smith\s*Adult \(Lion\)\s*No response/
     end
   end
 
@@ -250,7 +250,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     assert_select "p", text: /Maybe \(1\)/
     assert_select "p", text: /Not attending \(1\)/
     assert_select "p", text: /No response \(#{Person.count - 3}\)/
-    assert_select "li", text: /Sam Smith\s*Adult\s*\(The Example Family\)/
+    assert_select "li", text: /Sam Smith\s*Adult \(Lion\)\s*\(The Example Family\)/
     assert_select "li", text: /Ben Jones\s*Bear\s*\(The Joneses\)/
 
     get event_path(events(:campout))
@@ -397,7 +397,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     travel_to events(:weekend_trip).ends_at + 1.minute do
       get event_path(events(:weekend_trip))
       assert_select "form[action=?]", event_rsvp_path(events(:weekend_trip)), count: 0
-      assert_select "li", text: /Sam Smith\s*Adult\s*Attending - Full weekend/
+      assert_select "li", text: /Sam Smith\s*Adult \(Lion\)\s*Attending - Full weekend/
       assert_select "li", text: /Lily Smith\s*Lion\s*No response/
     end
   end
@@ -410,7 +410,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
 
     travel_to events(:weekend_trip).ends_at + 1.minute do
       get event_path(events(:weekend_trip))
-      assert_select "li", text: /Sam Smith\s*Adult\s*Attending - choose an option/
+      assert_select "li", text: /Sam Smith\s*Adult \(Lion\)\s*Attending - choose an option/
     end
   end
 
@@ -422,7 +422,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     get event_path(events(:weekend_trip))
     assert_select "p", text: /Attending \(2\)/ # Ben (fixture, day trip) and Sam (full weekend)
     assert_select "p", text: /Day trip only: 1, Full weekend: 1/
-    assert_select "li", text: /Sam Smith\s*Adult\s*\(The Example Family\)\s*- Full weekend/
+    assert_select "li", text: /Sam Smith\s*Adult \(Lion\)\s*\(The Example Family\)\s*- Full weekend/
     assert_select "li", text: /Ben Jones\s*Bear\s*\(The Joneses\)\s*- Day trip only/
     assert_select "li", text: /Lily Smith\s*Lion\s*\(The Example Family\)\s*- Day trip only/
     assert_select "p", text: /Maybe \(1\)/
@@ -442,7 +442,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
 
     get event_path(events(:pack_meeting))
     assert_no_match "No option chosen", response.body
-    assert_select "li", text: /Sam Smith\s*Adult\s*\(The Example Family\)\s*\z/
+    assert_select "li", text: /Sam Smith\s*Adult \(Lion\)\s*\(The Example Family\)\s*\z/
   end
 
   # --- den badges ---
@@ -451,9 +451,9 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     sign_in_as "examplefamily"
 
     get event_path(events(:pack_meeting))
-    assert_select "fieldset span.rounded-full", text: "Adult", count: 1
+    assert_select "fieldset span.rounded-full", text: "Adult (Lion)", count: 1
     assert_select "fieldset span.rounded-full", text: "Lion", count: 1
-    assert_select "fieldset", text: /Sam Smith\s*Adult/
+    assert_select "fieldset", text: /Sam Smith\s*Adult \(Lion\)/
     assert_select "fieldset", text: /Lily Smith\s*Lion/
   end
 
@@ -462,7 +462,7 @@ class RsvpsTest < ActionDispatch::IntegrationTest
 
     travel_to events(:pack_meeting).ends_at + 1.minute do
       get event_path(events(:pack_meeting))
-      assert_select "li span.rounded-full", text: "Adult", count: 1
+      assert_select "li span.rounded-full", text: "Adult (Lion)", count: 1
       assert_select "li span.rounded-full", text: "Lion", count: 1
     end
   end
@@ -471,7 +471,8 @@ class RsvpsTest < ActionDispatch::IntegrationTest
     sign_in_as "adminfamily"
 
     get event_path(events(:pack_meeting))
-    assert_select "li span.rounded-full", text: "Adult", count: Person.adult.count
+    assert_select "li span.rounded-full", text: "Adult", count: Person.adult.select { |p| p.family_dens.empty? }.count
+    assert_select "li span.rounded-full", text: "Adult (Lion)", count: 1
     assert_select "li span.rounded-full", text: "Lion", count: Person.lion.count
     assert_select "li span.rounded-full", text: "Bear", count: Person.bear.count
   end

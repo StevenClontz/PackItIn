@@ -48,6 +48,25 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal Person.dens.keys, Person.den_options.map(&:last)
   end
 
+  test "family_dens lists the regular dens present among an adult's family, in den order" do
+    assert_equal [ "lion" ], people(:smith_dad).family_dens
+
+    families(:one).people.create!(first_name: "Wes", last_name: "Smith", den: :bear)
+    assert_equal [ "lion", "bear" ], people(:smith_dad).reload.family_dens
+  end
+
+  test "family_dens excludes other_youth and is empty with no regular-den family members" do
+    solo_adult = families(:admin).people.create!(first_name: "Ada", last_name: "Admin", den: :adult)
+    assert_equal [], solo_adult.family_dens
+
+    families(:admin).people.create!(first_name: "Kit", last_name: "Admin", den: :other_youth)
+    assert_equal [], solo_adult.reload.family_dens
+  end
+
+  test "family_dens is empty for a non-adult" do
+    assert_equal [], people(:smith_lion).family_dens
+  end
+
   test "family has many people and deleting the family deletes them" do
     assert_equal [ people(:smith_dad), people(:smith_lion) ].sort_by(&:id), families(:one).people.sort_by(&:id)
 

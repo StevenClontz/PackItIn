@@ -34,6 +34,13 @@ class Person < ApplicationRecord
     I18n.t("people.dens.#{den}")
   end
 
+  # The regular dens (excluding "other_youth") present among an adult's own family's people —
+  # shown in parentheses on their den badge, e.g. "Adult (Lion/Bear)".
+  def family_dens
+    return [] unless adult? && family
+    self.class.regular_dens & family.people.pluck(:den)
+  end
+
   def formatted_phone_number
     return nil if phone_number.blank?
     "(#{phone_number[0..2]}) #{phone_number[3..5]}-#{phone_number[6..9]}"
