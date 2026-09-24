@@ -1,4 +1,4 @@
-class PackInfoController < ApplicationController
+class DensController < ApplicationController
   before_action :authenticate_family!
 
   DenGroup = Data.define(:den, :youth, :adults)

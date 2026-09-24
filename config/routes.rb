@@ -17,7 +17,7 @@ Rails.application.routes.draw do
     resource :account, only: :show
     resources :rsvp_options, except: %i[index show]
   end
-  resource :pack_info, only: :show, controller: "pack_info"
+  resource :dens, only: :show
 
   root "home#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
