@@ -8,7 +8,6 @@
     <%= link_to "Funds", funds_path, class: "text-blue-600 hover:underline" %>
   <% end %>
   <%= link_to "My Family", family_path(current_family), class: "text-blue-600 hover:underline" %>
-  <%= link_to "My Scout Account", family_account_path(current_family), class: "text-blue-600 hover:underline" %>
   <%= button_to "Log out", destroy_family_session_path, method: :delete, class: "text-blue-600 hover:underline cursor-pointer" %>
 <% else %>
   <%= link_to "Log in", new_family_session_path, class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500" %>
