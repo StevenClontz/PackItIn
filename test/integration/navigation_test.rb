@@ -45,4 +45,16 @@ class NavigationTest < ActionDispatch::IntegrationTest
     assert_select "header button[data-action=?][aria-controls=?]", "nav#toggle", "mobile-menu"
     assert_select "header div#mobile-menu[data-nav-target=?]", "menu"
   end
+
+  test "the brand and page title use APP_NAME when set" do
+    original = ENV["APP_NAME"]
+    ENV["APP_NAME"] = "Troop 123"
+
+    get root_path
+    assert_response :success
+    assert_select "header nav a[href=?]", root_path, text: "Troop 123"
+    assert_select "title", "Troop 123"
+  ensure
+    ENV["APP_NAME"] = original
+  end
 end

@@ -58,6 +58,9 @@ env:
     # Log everything from Rails
     # RAILS_LOG_LEVEL: debug
 
+    # Override the app's display name shown in the nav, page title and PWA manifest (default: "Pack It In")
+    # APP_NAME: Troop 123
+
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
 aliases:
