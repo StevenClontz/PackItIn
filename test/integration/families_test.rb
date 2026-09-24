@@ -176,10 +176,6 @@ class FamiliesTest < ActionDispatch::IntegrationTest
   test "admin edits another family without a current password" do
     sign_in_as "adminfamily"
 
-    get edit_family_path(families(:two))
-    assert_response :success
-    assert_select "input[name=?]", "family[current_password]", count: 0
-
     patch family_path(families(:two)), params: { family: { username: "joneses2", password: "newpassword1", password_confirmation: "newpassword1" } }
     assert_redirected_to family_path(families(:two))
     families(:two).reload
@@ -207,9 +203,6 @@ class FamiliesTest < ActionDispatch::IntegrationTest
 
   test "family information never needs the current password, however much of it changes" do
     sign_in_as "examplefamily"
-
-    get edit_family_path(families(:one))
-    assert_select "input[name=?]", "family[current_password]" # offered, but only needed for a new password
 
     patch family_path(families(:one)), params: { family: {
       username: "examplefamily2", name: "The Examples", street_address: "9 Oak Ln", city: "Dallas", state: "tx", zip: "75201"
@@ -241,29 +234,15 @@ class FamiliesTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", edit_family_path(families(:one)), text: "Edit"
   end
 
-  test "changing your own password requires the current password and keeps you signed in" do
+  test "changing your own password keeps you signed in" do
     sign_in_as "examplefamily"
 
-    get edit_family_path(families(:one))
-    assert_select "input[name=?]", "family[current_password]"
-
-    patch family_path(families(:one)), params: { family: { password: "newpassword1", password_confirmation: "newpassword1", current_password: "password123" } }
+    patch family_path(families(:one)), params: { family: { password: "newpassword1", password_confirmation: "newpassword1" } }
     assert_redirected_to family_path(families(:one))
     assert families(:one).reload.valid_password?("newpassword1")
 
     get families_path
     assert_response :success, "should still be signed in after changing password"
-  end
-
-  test "changing your own password with a wrong or missing current password is rejected" do
-    sign_in_as "examplefamily"
-
-    [ "wrong", "" ].each do |current|
-      patch family_path(families(:one)), params: { family: { password: "newpassword1", password_confirmation: "newpassword1", current_password: current } }
-      assert_response :unprocessable_entity
-      assert_select "#error_explanation"
-      assert families(:one).reload.valid_password?("password123"), "password must be unchanged (current_password: #{current.inspect})"
-    end
   end
 
   # --- the admin flag ---

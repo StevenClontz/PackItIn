@@ -27,10 +27,7 @@ class FamiliesController < ApplicationController
     editing_self = @family == current_family
     attrs = update_params
 
-    if editing_self && attrs[:password].present? && !@family.valid_password?(params.dig(:family, :current_password))
-      @family.errors.add(:current_password, params.dig(:family, :current_password).blank? ? :blank : :invalid)
-      render :edit, status: :unprocessable_content
-    elsif @family.update(attrs)
+    if @family.update(attrs)
       bypass_sign_in(@family) if editing_self # a new password would otherwise sign us out
       redirect_to @family, notice: "Family updated."
     else

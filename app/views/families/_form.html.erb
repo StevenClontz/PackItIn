@@ -1,5 +1,4 @@
 <% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
-<% editing_self = family.persisted? && family == current_family %>
 
 <%= form_with(model: family) do |f| %>
   <%= render "devise/shared/error_messages", resource: family %>
@@ -10,6 +9,14 @@
   </div>
 
   <%= render "families/address_fields", f: f %>
+
+  <hr class="text-gray-400 my-5">
+  <h3 class="mb-6 text-xl font-bold">Security</h3>
+
+  <div class="mb-4 flex items-center gap-2">
+    <%= f.check_box :password_only %>
+    <%= f.label :password_only, "Require password to log in", class: "font-medium" %>
+  </div>
 
   <div class="mb-4">
     <%= f.label :password, class: "mb-1 block font-medium" %>
@@ -23,20 +30,6 @@
     <%= f.label :password_confirmation, class: "mb-1 block font-medium" %>
     <%= f.password_field :password_confirmation, autocomplete: "new-password", class: input_class %>
   </div>
-
-  <% if editing_self %>
-    <div class="mb-4">
-      <%= f.label :current_password, class: "mb-1 block font-medium" %>
-      <p class="mb-1 text-sm text-gray-500">Required only if you are changing your password.</p>
-      <%= f.password_field :current_password, autocomplete: "current-password", class: input_class %>
-    </div>
-  <% end %>
-
-  <div class="mb-4 flex items-center gap-2">
-    <%= f.check_box :password_only %>
-    <%= f.label :password_only, "Require password to log in", class: "font-medium" %>
-  </div>
-  <p class="mb-4 text-sm text-gray-500">Disables the family name + street address login for this family.</p>
 
   <% if current_family.admin? && family != current_family %>
     <div class="mb-4 flex items-center gap-2">
