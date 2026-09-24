@@ -2,7 +2,8 @@
   <h1 class="font-bold text-4xl mb-4"><%= app_name %></h1>
   <p class="text-gray-700">
     <% if family_signed_in? %>
-      Signed in as <strong><%= current_family.username %></strong>.
+      Signed in as <strong><%= current_family.username %></strong>
+      (<%= link_to "view", family_path(current_family), class: "text-blue-600 hover:underline" %>)
     <% end %>
   </p>
 

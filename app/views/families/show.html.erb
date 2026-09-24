@@ -17,8 +17,6 @@
     <% end %>
     <dt class="font-medium">Administrator</dt>
     <dd><%= @family.admin? ? "Yes" : "No" %></dd>
-    <dt class="font-medium">Created</dt>
-    <dd><%= l @family.created_at.to_date, format: :long %></dd>
   </dl>
 
   <div class="flex items-center gap-4">
