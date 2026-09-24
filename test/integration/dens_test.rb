@@ -28,12 +28,13 @@ class DensTest < ActionDispatch::IntegrationTest
     assert_select "#den_bear li", text: /Ben Jones.*Bear.*The Joneses/
   end
 
-  test "non-admin sees no person links, their own family linked, and other families plain" do
+  test "non-admin sees links only for their own family and its people, others plain" do
     sign_in_as "examplefamily"
     get dens_path
 
-    assert_select "#den_lion a", text: "Lily Smith", count: 0
+    assert_select "#den_lion a[href=?]", person_path(people(:smith_lion)), text: "Lily Smith"
     assert_select "#den_lion a[href=?]", family_path(families(:one)), text: "The Example Family"
+    assert_select "#den_bear a", text: "Ben Jones", count: 0
     assert_select "#den_bear a", text: "The Joneses", count: 0
   end
 

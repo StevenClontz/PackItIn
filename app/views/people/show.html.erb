@@ -15,6 +15,8 @@
     <dd><%= @person.email.presence || "—" %></dd>
     <dt class="font-medium">Phone number</dt>
     <dd><%= @person.formatted_phone_number || "—" %></dd>
+    <dt class="font-medium">Scouting America ID</dt>
+    <dd><%= @person.scouting_america_id.presence || "—" %></dd>
     <dt class="font-medium">Family</dt>
     <dd><%= link_to @family.username, family_path(@family), class: "text-blue-600 hover:underline" %></dd>
   </dl>

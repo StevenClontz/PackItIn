@@ -29,5 +29,10 @@
     <%= f.telephone_field :phone_number, autocomplete: "tel", class: input_class %>
   </div>
 
+  <div class="mb-4">
+    <%= f.label :scouting_america_id, "Scouting America ID", class: "mb-1 block font-medium" %>
+    <%= f.text_field :scouting_america_id, class: input_class %>
+  </div>
+
   <%= f.submit class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
 <% end %>

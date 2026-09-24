@@ -5,24 +5,28 @@ smith_dad:
   den: adult
   email: sam@example.com
   phone_number: "5125551234"
+  scouting_america_id: "SA-100001"
 
 smith_lion:
   family: one
   first_name: Lily
   last_name: Smith
   den: lion
+  scouting_america_id: "SA-100002"
 
 jones_bear:
   family: two
   first_name: Ben
   last_name: Jones
   den: bear
+  scouting_america_id: "SA-100003"
 
 jones_dad:
   family: two
   first_name: Tom
   last_name: Jones
   den: adult
+  scouting_america_id: "SA-100004"
 
 # The following people exist only to give every regular den at least 3 scouts.
 garcia_tiger:
@@ -30,141 +34,165 @@ garcia_tiger:
   first_name: Mia
   last_name: Garcia
   den: tiger
+  scouting_america_id: "SA-100005"
 
 garcia_wolf:
   family: three
   first_name: Leo
   last_name: Garcia
   den: wolf
+  scouting_america_id: "SA-100006"
 
 garcia_mom:
   family: three
   first_name: Carlos
   last_name: Garcia
   den: adult
+  scouting_america_id: "SA-100007"
 
 nguyen_webelos:
   family: four
   first_name: Anna
   last_name: Nguyen
   den: webelos
+  scouting_america_id: "SA-100008"
 
 nguyen_aol:
   family: four
   first_name: Kai
   last_name: Nguyen
   den: aol
+  scouting_america_id: "SA-100009"
 
 nguyen_mom:
   family: four
   first_name: Linh
   last_name: Nguyen
   den: adult
+  scouting_america_id: "SA-100010"
 
 patel_lion:
   family: five
   first_name: Priya
   last_name: Patel
   den: lion
+  scouting_america_id: "SA-100011"
 
 patel_bear:
   family: five
   first_name: Arjun
   last_name: Patel
   den: bear
+  scouting_america_id: "SA-100012"
 
 patel_dad:
   family: five
   first_name: Raj
   last_name: Patel
   den: adult
+  scouting_america_id: "SA-100013"
 
 chen_tiger:
   family: six
   first_name: Mei
   last_name: Chen
   den: tiger
+  scouting_america_id: "SA-100014"
 
 chen_wolf:
   family: six
   first_name: Alex
   last_name: Chen
   den: wolf
+  scouting_america_id: "SA-100015"
 
 chen_dad:
   family: six
   first_name: Wei
   last_name: Chen
   den: adult
+  scouting_america_id: "SA-100016"
 
 rivera_webelos:
   family: seven
   first_name: Sofia
   last_name: Rivera
   den: webelos
+  scouting_america_id: "SA-100017"
 
 rivera_aol:
   family: seven
   first_name: Diego
   last_name: Rivera
   den: aol
+  scouting_america_id: "SA-100018"
 
 rivera_mom:
   family: seven
   first_name: Elena
   last_name: Rivera
   den: adult
+  scouting_america_id: "SA-100019"
 
 kim_lion:
   family: eight
   first_name: Noah
   last_name: Kim
   den: lion
+  scouting_america_id: "SA-100020"
 
 kim_bear:
   family: eight
   first_name: Ella
   last_name: Kim
   den: bear
+  scouting_america_id: "SA-100021"
 
 kim_dad:
   family: eight
   first_name: David
   last_name: Kim
   den: adult
+  scouting_america_id: "SA-100022"
 
 okafor_tiger:
   family: nine
   first_name: Zara
   last_name: Okafor
   den: tiger
+  scouting_america_id: "SA-100023"
 
 okafor_wolf:
   family: nine
   first_name: Femi
   last_name: Okafor
   den: wolf
+  scouting_america_id: "SA-100024"
 
 okafor_mom:
   family: nine
   first_name: Chioma
   last_name: Okafor
   den: adult
+  scouting_america_id: "SA-100025"
 
 anderson_webelos:
   family: ten
   first_name: Nia
   last_name: Anderson
   den: webelos
+  scouting_america_id: "SA-100026"
 
 anderson_aol:
   family: ten
   first_name: Chidi
   last_name: Anderson
   den: aol
+  scouting_america_id: "SA-100027"
 
 anderson_dad:
   family: ten
   first_name: Mark
   last_name: Anderson
   den: adult
+  scouting_america_id: "SA-100028"

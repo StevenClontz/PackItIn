@@ -9,7 +9,8 @@ module PeopleHelper
   private
 
   def den_badge_text(person)
-    return person.den_label if person.family_dens.empty?
-    "#{person.den_label} (#{person.family_dens.map { |den| I18n.t("people.dens.#{den}") }.join('/')})"
+    text = person.family_dens.empty? ? person.den_label : "#{person.den_label} (#{person.family_dens.map { |den| I18n.t("people.dens.#{den}") }.join('/')})"
+    return text if person.scouting_america_id.present?
+    "#{text} · #{I18n.t('people.unregistered')}"
   end
 end

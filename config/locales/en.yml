@@ -30,6 +30,7 @@
 en:
   hello: "Hello world"
   people:
+    unregistered: "Unregistered"
     dens:
       adult: "Adult"
       lion: "Lion"

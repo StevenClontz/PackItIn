@@ -144,6 +144,22 @@ class PeopleTest < ActionDispatch::IntegrationTest
     assert_response :see_other
   end
 
+  test "admin sets a person's Scouting America ID" do
+    sign_in_as "adminfamily"
+    newt = families(:one).people.create!(first_name: "Newt", last_name: "Smith", den: "tiger")
+
+    get person_path(newt)
+    assert_select "dt", "Scouting America ID"
+    assert_select "dd", "—"
+
+    patch person_path(newt), params: { person: { scouting_america_id: "SA-999999" } }
+    assert_redirected_to family_path(families(:one))
+    assert_equal "SA-999999", newt.reload.scouting_america_id
+
+    get person_path(newt)
+    assert_select "dd", "SA-999999"
+  end
+
   test "the family cannot be reassigned through params" do
     sign_in_as "adminfamily"
 
