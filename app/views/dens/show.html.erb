@@ -11,7 +11,7 @@
       <% else %>
         <ul class="list-disc pl-5 text-sm text-gray-700">
           <% group.youth.each do |person| %>
-            <li><%= person.full_name %> <%= den_badge(person) %> <span class="text-gray-500">(<%= person.family.name %>)</span></li>
+            <li><%= person_name_or_link(person) %> <%= den_badge(person) %> <span class="text-gray-500">(<%= family_name_or_link(person.family) %>)</span></li>
           <% end %>
         </ul>
       <% end %>
@@ -22,7 +22,7 @@
       <% else %>
         <ul class="list-disc pl-5 text-sm text-gray-700">
           <% group.adults.each do |person| %>
-            <li><%= person.full_name %> <%= den_badge(person) %> <span class="text-gray-500">(<%= person.family.name %>)</span></li>
+            <li><%= person_name_or_link(person) %> <%= den_badge(person) %> <span class="text-gray-500">(<%= family_name_or_link(person.family) %>)</span></li>
           <% end %>
         </ul>
       <% end %>
@@ -36,7 +36,7 @@
     <% else %>
       <ul class="list-disc pl-5 text-sm text-gray-700">
         <% @other_personnel.each do |person| %>
-          <li><%= person.full_name %> <%= den_badge(person) %> <span class="text-gray-500">(<%= person.family.name %>)</span></li>
+          <li><%= person_name_or_link(person) %> <%= den_badge(person) %> <span class="text-gray-500">(<%= family_name_or_link(person.family) %>)</span></li>
         <% end %>
       </ul>
     <% end %>
