@@ -4,7 +4,10 @@
 # A street address is a weak secret, so attempts are rate-limited, and admins and families that
 # opted into password-only login can never sign in this way.
 class Families::SessionsController < Devise::SessionsController
-  prepend_before_action :require_no_authentication, only: :create_with_address
+  # Rails de-duplicates before_actions by method name regardless of :only, so re-declaring
+  # require_no_authentication here (rather than adding a second only: :create_with_address one)
+  # must list every action needing it, or it silently drops Devise's :new/:create protection.
+  prepend_before_action :require_no_authentication, only: %i[new create create_with_address]
 
   rate_limit to: 10, within: 3.minutes, only: :create_with_address,
              with: -> { redirect_to new_family_session_path, alert: "Too many attempts. Please try again in a few minutes." }

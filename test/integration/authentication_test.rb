@@ -44,6 +44,16 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "a", "Log in"
   end
 
+  test "a signed-in family visiting the sign-in page is redirected home" do
+    post family_session_path, params: { family: { login: "examplefamily", password: "password123" } }
+
+    get new_family_session_path
+    assert_redirected_to root_path
+
+    post family_session_path, params: { family: { login: "examplefamily", password: "password123" } }
+    assert_redirected_to root_path
+  end
+
   # --- sign in with family + street address ---
 
   def sign_in_with_address(family, street_address)
