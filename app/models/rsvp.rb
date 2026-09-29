@@ -3,7 +3,7 @@ class Rsvp < ApplicationRecord
   belongs_to :person
   belongs_to :rsvp_option, optional: true
 
-  enum :status, { attending: 0, maybe: 1, not_attending: 2 }, validate: true
+  enum :status, { attending: 0, maybe: 1, not_attending: 2 }, validate: true, scopes: false
 
   before_validation { self.rsvp_option = nil if not_attending? }
 
