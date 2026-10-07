@@ -10,7 +10,9 @@
 
   <div class="mb-4">
     <%= f.label :description, class: "mb-1 block font-medium" %>
-    <%= f.text_area :description, rows: 4, class: input_class %>
+    <p class="mb-1 text-sm text-gray-500">Supports Markdown. Paste or drop images and PDFs to attach them.</p>
+    <%= f.text_area :description, rows: 4, class: input_class,
+          data: { controller: "markdown-editor", markdown_editor_upload_url_value: event_uploads_path } %>
   </div>
 
   <div class="mb-4">

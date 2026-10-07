@@ -233,13 +233,12 @@ class EventsTest < ActionDispatch::IntegrationTest
     assert_response :see_other
   end
 
-  test "event description is escaped" do
+  test "raw HTML in an event description is dropped" do
     events(:campout).update!(description: "<script>alert(1)</script>")
     sign_in_as "examplefamily"
 
     get event_path(events(:campout))
-    assert_no_match "<script>alert(1)</script>", response.body
-    assert_match "&lt;script&gt;", response.body
+    assert_no_match "alert(1)", response.body
   end
 
   test "a multi-day event shows both full timestamps" do
@@ -285,5 +284,17 @@ class EventsTest < ActionDispatch::IntegrationTest
     assert_redirected_to event_path(events(:campout))
     follow_redirect!
     assert_match "Fall Campout has Event Account activity and can&#39;t be deleted", response.body
+  end
+
+  test "event descriptions render as markdown" do
+    events(:pack_meeting).update!(description: "Bring **snacks**.")
+    get event_path(events(:pack_meeting))
+    assert_select ".prose strong", "snacks"
+  end
+
+  test "the event form uses the markdown editor" do
+    sign_in_as "adminfamily"
+    get edit_event_path(events(:pack_meeting))
+    assert_select "textarea[data-controller=markdown-editor][data-markdown-editor-upload-url-value=?]", event_uploads_path
   end
 end

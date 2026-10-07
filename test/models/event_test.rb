@@ -121,4 +121,22 @@ class EventTest < ActiveSupport::TestCase
       assert events(:campout).destroy
     end
   end
+
+  test "attaches uploaded files linked from the description, once each" do
+    blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new("flyer"), filename: "flyer.pdf", content_type: "application/pdf")
+    url = "/rails/active_storage/blobs/redirect/#{blob.signed_id}/flyer.pdf"
+    event = build_event(description: "See [the flyer](#{url}).")
+
+    event.save!
+    assert_equal [ blob ], event.description_files.blobs.to_a
+
+    event.update!(description: "Updated. [Flyer](#{url}), again [here](#{url}).")
+    assert_equal [ blob ], event.reload.description_files.blobs.to_a
+  end
+
+  test "ignores blob links with invalid signed ids" do
+    event = build_event(description: "![x](/rails/active_storage/blobs/redirect/bogus/x.png)")
+    event.save!
+    assert_not event.description_files.attached?
+  end
 end

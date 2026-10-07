@@ -10,6 +10,15 @@ module ApplicationHelper
     time.strftime("%b %-d, %Y %-I:%M %p %Z")
   end
 
+  # Admin-written markdown as sanitized HTML. Raw HTML in the source is dropped, not rendered.
+  def markdown(text)
+    html = Commonmarker.to_html(text.to_s.encode(Encoding::UTF_8), options: {
+      extension: { strikethrough: true, table: true, autolink: true, tasklist: true },
+      render: { unsafe: false }
+    })
+    sanitize(html)
+  end
+
   # The app's display name, e.g. in the nav and page title. Override per deployment with APP_NAME.
   def app_name
     ENV.fetch("APP_NAME", "Pack It In")

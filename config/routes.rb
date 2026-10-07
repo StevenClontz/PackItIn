@@ -18,6 +18,8 @@ Rails.application.routes.draw do
     resources :rsvp_options, except: %i[index show]
   end
   resource :dens, only: :show
+  # ActiveStorage direct uploads for the event description editor, limited to people who can create events.
+  post "event_uploads", to: "event_uploads#create", as: :event_uploads
 
   root "home#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

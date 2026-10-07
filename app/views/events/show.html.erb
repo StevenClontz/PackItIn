@@ -3,7 +3,7 @@
   <p class="mb-4 text-gray-700"><%= event_time_range(@event) %></p>
 
   <% if @event.description.present? %>
-    <div class="mb-6"><%= simple_format(h(@event.description)) %></div>
+    <div class="prose mb-6 max-w-none"><%= markdown(@event.description) %></div>
   <% end %>
 
   <% if @options.any? || can?(:create, RsvpOption) %>

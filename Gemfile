@@ -75,3 +75,5 @@ gem "json", "< 3"
 
 # Double-entry ledger for family and pack fund money accounts
 gem "double_entry"
+
+gem "commonmarker", "~> 2.10"
