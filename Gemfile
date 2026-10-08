@@ -71,7 +71,7 @@ gem "devise", "~> 5.0"
 gem "cancancan", "~> 3.6"
 
 # activesupport 8.1 passes JSON.parse an options hash positionally, which json 3.x removed.
-gem "json", "< 3"
+gem "json", "< 4"
 
 # Double-entry ledger for family and pack fund money accounts
 gem "double_entry"
