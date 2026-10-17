@@ -68,7 +68,7 @@ group :test do
 end
 
 gem "devise", "~> 5.0"
-gem "cancancan", "~> 3.6"
+gem "cancancan", "~> 3.7"
 
 # activesupport 8.1 passes JSON.parse an options hash positionally, which json 3.x removed.
 gem "json", "< 3"
