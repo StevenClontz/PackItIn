@@ -1,0 +1,12 @@
+<%= render "footer" %>
+<%= @person.family.name %> has <%= @payment.outstanding.format %> due for <%= @event.title %> (<%= event_time_range(@event) %>).
+
+<% @payment.line_items.each do |item| %>
+- <%= item.person.full_name %>, <%= item.option.name %>: <%= item.cost.format %>
+<% end %>
+<% unless @payment.paid.zero? %>
+- Already paid: -<%= @payment.paid.format %>
+<% end %>
+
+Pay from your Scout Account on the event page (your balance is <%= @person.family.balance.format %>):
+<%= event_url(@event) %>

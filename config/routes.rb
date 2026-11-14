@@ -15,9 +15,17 @@ Rails.application.routes.draw do
     resource :rsvp, only: :update
     resource :payment, only: :create, controller: "event_payments"
     resource :account, only: :show
+    resource :announcement, only: %i[new create], controller: "event_announcements"
     resources :rsvp_options, except: %i[index show]
   end
   resource :dens, only: :show
+  patch "people/:id/notifications", to: "notification_preferences#update", as: :person_notifications
+
+  # One-click unsubscribe from pack email. GET only shows a confirmation (mail scanners follow links);
+  # POST unsubscribes, as does the RFC 8058 List-Unsubscribe-Post request mail clients send.
+  get "unsubscribe/:token", to: "unsubscribes#show", as: :unsubscribe
+  post "unsubscribe/:token", to: "unsubscribes#create"
+  delete "unsubscribe/:token", to: "unsubscribes#destroy"
   # ActiveStorage direct uploads for the event description editor, limited to people who can create events.
   post "event_uploads", to: "event_uploads#create", as: :event_uploads
 

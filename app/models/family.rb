@@ -73,6 +73,11 @@ class Family < ApplicationRecord
     people.select { |person| person.adult? && person.email.present? }.map(&:email)
   end
 
+  # The adults who get pack announcements and reminders (see Person.notifiable).
+  def notifiable_people
+    people.notifiable
+  end
+
   # Devise mail (password resets) goes out through the job queue rather than during the request.
   def send_devise_notification(notification, *args)
     devise_mailer.send(notification, self, *args).deliver_later

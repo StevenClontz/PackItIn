@@ -1,0 +1,21 @@
+<%= render "footer" %>
+<%= @event.title %>
+<%= event_time_range(@event) %>
+<% if @note.present? %>
+
+<%= @note %>
+<% end %>
+<% if @event.description.present? %>
+
+<%= @event.description %>
+<% end %>
+<% if @event.rsvp_options.any?(&:costed?) %>
+
+Ways to attend:
+<% @event.rsvp_options.each do |option| %>
+- <%= option.name %><%= " - #{option.cost_summary}" if option.costed? %>
+<% end %>
+<% end %>
+
+Please RSVP by <%= format_event_time(@event.rsvp_closes_at) %>:
+<%= event_url(@event) %>

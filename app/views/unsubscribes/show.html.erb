@@ -1,0 +1,13 @@
+<div class="mx-auto w-full max-w-md">
+  <h2 class="mb-4 text-2xl font-bold">Pack emails</h2>
+
+  <% if @person.email_opt_out? %>
+    <p class="mb-4 text-gray-700"><strong><%= @person.email %></strong> doesn't get event announcements or reminders.</p>
+    <%= button_to "Get pack emails again", unsubscribe_path(params[:token]), method: :delete, class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+  <% else %>
+    <p class="mb-4 text-gray-700">Stop event announcements and reminders to <strong><%= @person.email %></strong>?</p>
+    <%= button_to "Unsubscribe", unsubscribe_path(params[:token]), method: :post, class: "rounded-md bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-500 cursor-pointer" %>
+  <% end %>
+
+  <p class="mt-6 text-sm text-gray-500">Password reset emails are always sent, since you ask for those yourself.</p>
+</div>

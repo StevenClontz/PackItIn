@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_14_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_14_000002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -79,10 +79,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_000001) do
   end
 
   create_table "events", force: :cascade do |t|
+    t.datetime "announced_at"
     t.datetime "created_at", null: false
     t.text "description"
     t.datetime "ends_at", null: false
+    t.datetime "payment_reminder_sent_at"
     t.datetime "rsvp_deadline_at"
+    t.datetime "rsvp_reminder_sent_at"
     t.datetime "starts_at", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
@@ -120,6 +123,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_000001) do
     t.datetime "created_at", null: false
     t.integer "den", null: false
     t.string "email"
+    t.boolean "email_opt_out", default: false, null: false
     t.integer "family_id", null: false
     t.string "first_name", null: false
     t.string "last_name", null: false
