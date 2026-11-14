@@ -6,7 +6,12 @@
     <p class="mb-6 text-sm text-gray-500">Event: <%= link_to @owner.title, event_path(@owner), class: "text-blue-600 hover:underline" %></p>
   <% end %>
 
-  <p class="mb-6 text-lg">Balance: <strong><%= money(@owner.balance) %></strong></p>
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <p class="text-lg">Balance: <strong><%= money(@owner.balance) %></strong></p>
+    <% if @owner.is_a?(Family) && OnlinePayment.enabled? && can?(:create, OnlinePayment.new(family: @owner)) %>
+      <%= link_to "Add money", new_family_online_payment_path(@owner), class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500" %>
+    <% end %>
+  </div>
 
   <h3 class="mb-2 text-lg font-semibold">Statement</h3>
   <%= render "ledger/statement", lines: @lines %>

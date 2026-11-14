@@ -6,6 +6,7 @@ class Family < ApplicationRecord
   include HasLedgerAccount
 
   has_many :people, dependent: :destroy
+  has_many :online_payments, dependent: :destroy
 
   # Not a DB column: the sign-in form's identifier field, which accepts a username or a person's
   # email/phone number (see .find_for_database_authentication and config.authentication_keys).

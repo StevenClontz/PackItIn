@@ -8,7 +8,9 @@ Rails.application.routes.draw do
   resources :families do
     resources :people, shallow: true, except: :index
     resource :account, only: :show
+    resources :online_payments, only: %i[new create show], path: "add_money"
   end
+  post "stripe/webhook", to: "stripe_webhooks#create", as: :stripe_webhook
   resources :funds
   resources :ledger_transactions, only: %i[new create]
   resources :events do

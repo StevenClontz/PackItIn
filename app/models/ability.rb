@@ -23,6 +23,7 @@ class Ability
       # A family's own Scout Account is private to it. Fund and Event Account ledgers are
       # admin-only for now, pending a future pack-wide transparency dashboard.
       can :view_account, Family, id: family.id
+      can %i[create read], OnlinePayment, family_id: family.id
 
       # People are only visible to their own family, and only admins can change them.
       can :read, Person, family_id: family.id
