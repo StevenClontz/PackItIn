@@ -1,1 +1,6 @@
 <%= yield %>
+<% if content_for?(:footer) %>
+
+--
+<%= yield :footer %>
+<% end %>

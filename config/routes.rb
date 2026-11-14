@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   # Devise only handles signing in and out (under /account, so /families is free for the resourceful CRUD
   # below). Families are created and edited, by admins and by the family itself, through FamiliesController.
-  devise_for :families, path: "account", controllers: { sessions: "families/sessions" }
+  devise_for :families, path: "account", controllers: { sessions: "families/sessions", passwords: "families/passwords" }
   devise_scope :family do
     post "account/sign_in/address", to: "families/sessions#create_with_address", as: :address_family_session
   end
@@ -22,6 +22,8 @@ Rails.application.routes.draw do
   post "event_uploads", to: "event_uploads#create", as: :event_uploads
 
   root "home#index"
+
+  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
