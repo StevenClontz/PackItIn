@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   post "stripe/webhook", to: "stripe_webhooks#create", as: :stripe_webhook
   resources :funds
   resources :ledger_transactions, only: %i[new create]
+  resources :fundraiser_credits, only: %i[new create], path: "fundraisers"
   resources :events do
     resource :rsvp, only: :update
     resource :payment, only: :create, controller: "event_payments"
