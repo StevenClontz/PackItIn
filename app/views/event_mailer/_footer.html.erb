@@ -1,0 +1,4 @@
+<% content_for :footer do %>
+  You're getting this because you're an adult in <%= @person.family.name %> in <%= app_name %>.
+  <%= link_to "Unsubscribe from pack emails", @unsubscribe_url, style: "color: #6b7280;" %>.
+<% end %>

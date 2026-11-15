@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_235037) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_14_000003) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -79,10 +79,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_235037) do
   end
 
   create_table "events", force: :cascade do |t|
+    t.datetime "announced_at"
     t.datetime "created_at", null: false
     t.text "description"
     t.datetime "ends_at", null: false
+    t.datetime "payment_reminder_sent_at"
     t.datetime "rsvp_deadline_at"
+    t.datetime "rsvp_reminder_sent_at"
     t.datetime "starts_at", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
@@ -97,11 +100,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_235037) do
     t.string "name", null: false
     t.boolean "password_only", default: false, null: false
     t.datetime "remember_created_at"
+    t.datetime "reset_password_sent_at"
+    t.string "reset_password_token"
     t.integer "state", null: false
     t.string "street_address", null: false
     t.datetime "updated_at", null: false
     t.string "username", null: false
     t.string "zip", null: false
+    t.index ["reset_password_token"], name: "index_families_on_reset_password_token", unique: true
     t.index ["username"], name: "index_families_on_username", unique: true
   end
 
@@ -113,10 +119,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_235037) do
     t.index ["name"], name: "index_funds_on_name", unique: true
   end
 
+  create_table "online_payments", force: :cascade do |t|
+    t.bigint "amount_cents", null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.integer "family_id", null: false
+    t.bigint "fee_cents", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.string "stripe_checkout_session_id"
+    t.string "stripe_payment_intent_id"
+    t.datetime "updated_at", null: false
+    t.index ["family_id"], name: "index_online_payments_on_family_id"
+    t.index ["stripe_checkout_session_id"], name: "index_online_payments_on_stripe_checkout_session_id", unique: true
+  end
+
   create_table "people", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "den", null: false
     t.string "email"
+    t.boolean "email_opt_out", default: false, null: false
     t.integer "family_id", null: false
     t.string "first_name", null: false
     t.string "last_name", null: false
@@ -155,6 +176,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_235037) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "online_payments", "families"
   add_foreign_key "people", "families"
   add_foreign_key "rsvp_options", "events"
   add_foreign_key "rsvps", "events"

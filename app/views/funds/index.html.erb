@@ -4,6 +4,7 @@
     <span class="flex items-center gap-4">
       <% if can? :create, LedgerTransaction %>
         <%= link_to "New transaction", new_ledger_transaction_path, class: "text-blue-600 hover:underline" %>
+        <%= link_to "Record fundraiser", new_fundraiser_credit_path, class: "text-blue-600 hover:underline" %>
       <% end %>
       <% if can? :create, Fund %>
         <%= link_to "New fund", new_fund_path, class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500" %>

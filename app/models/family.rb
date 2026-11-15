@@ -1,11 +1,12 @@
 class Family < ApplicationRecord
   # No :validatable (requires an email column) and no email-based modules
   # (:recoverable, :confirmable); validations are declared below.
-  devise :database_authenticatable, :rememberable
+  devise :database_authenticatable, :rememberable, :recoverable
 
   include HasLedgerAccount
 
   has_many :people, dependent: :destroy
+  has_many :online_payments, dependent: :destroy
 
   # Not a DB column: the sign-in form's identifier field, which accepts a username or a person's
   # email/phone number (see .find_for_database_authentication and config.authentication_keys).
@@ -66,6 +67,21 @@ class Family < ApplicationRecord
   # A family's money account is called its Scout Account in the UI.
   def ledger_account_label
     "Scout Account"
+  end
+
+  # Where the family's mail goes: its adults' email addresses. Youth emails never get account mail.
+  def email_addresses
+    people.select { |person| person.adult? && person.email.present? }.map(&:email)
+  end
+
+  # The adults who get pack announcements and reminders (see Person.notifiable).
+  def notifiable_people
+    people.notifiable
+  end
+
+  # Devise mail (password resets) goes out through the job queue rather than during the request.
+  def send_devise_notification(notification, *args)
+    devise_mailer.send(notification, self, *args).deliver_later
   end
 
   private

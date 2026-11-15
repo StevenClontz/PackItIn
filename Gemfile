@@ -59,6 +59,9 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Opens sent mail in the browser at /letter_opener instead of delivering it
+  gem "letter_opener_web", "~> 3.0"
 end
 
 group :test do
@@ -77,3 +80,4 @@ gem "json", "< 3"
 gem "double_entry"
 
 gem "commonmarker", "~> 2.10"
+gem "stripe", "~> 21.0"

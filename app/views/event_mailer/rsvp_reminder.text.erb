@@ -1,0 +1,9 @@
+<%= render "footer" %>
+RSVPs for <%= @event.title %> (<%= event_time_range(@event) %>) close <%= format_event_time(@event.rsvp_closes_at) %>.
+
+Still waiting to hear about:
+<% @payment.blockers.each do |blocker| %>
+- <%= blocker %>
+<% end %>
+
+RSVP now: <%= event_url(@event) %>

@@ -1,0 +1,27 @@
+<div class="mx-auto w-full max-w-md">
+  <h2 class="mb-1 text-2xl font-bold">Email families about <%= @event.title %></h2>
+  <p class="mb-6 text-sm text-gray-500"><%= event_time_range(@event) %></p>
+
+  <% if @event.announced_at %>
+    <p class="mb-4 rounded-md bg-yellow-50 px-4 py-2 text-sm text-yellow-800">
+      This event was already announced <%= format_event_time(@event.announced_at) %>. Sending again emails everyone again.
+    </p>
+  <% end %>
+
+  <p class="mb-4 text-gray-700">
+    The email has the event's time, description, ways to attend and RSVP deadline, with a link to RSVP.
+    It goes to <strong><%= pluralize(@recipient_count, "adult") %></strong> with an email address who haven't unsubscribed.
+  </p>
+
+  <%= form_with(url: event_announcement_path(@event), method: :post) do |f| %>
+    <div class="mb-4">
+      <%= f.label :note, "Add a note (optional)", class: "mb-1 block font-medium" %>
+      <%= f.text_area :note, rows: 4, class: "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+      <p class="mt-1 text-sm text-gray-500">Shown above the event details, e.g. "Sign-ups are filling fast!"</p>
+    </div>
+
+    <%= f.submit "Send email", data: { turbo_confirm: "Email #{pluralize(@recipient_count, 'adult')} now?" }, class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+  <% end %>
+
+  <p class="mt-6 text-sm"><%= link_to "Back to event", event_path(@event), class: "text-blue-600 hover:underline" %></p>
+</div>

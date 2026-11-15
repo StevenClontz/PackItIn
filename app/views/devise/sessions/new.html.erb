@@ -42,6 +42,9 @@
       </div>
     <% end %>
 
-    <%= f.submit "Log in with password", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <%= f.submit "Log in with password", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+      <%= link_to "Forgot your password?", new_family_password_path, class: "text-sm text-blue-600 hover:underline" %>
+    </div>
   <% end %>
 </div>

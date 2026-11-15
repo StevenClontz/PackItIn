@@ -6,6 +6,12 @@ class Person < ApplicationRecord
 
   before_validation :normalize_contact_info
 
+  # The one-click unsubscribe link in pack emails. It never expires, so links in old emails keep working.
+  generates_token_for :unsubscribe
+
+  # Adults with an email address who haven't unsubscribed: who gets announcements and reminders.
+  scope :notifiable, -> { where(den: :adult, email_opt_out: false).where.not(email: nil) }
+
   validates :first_name, :last_name, :den, presence: true
   validates :email, uniqueness: { case_sensitive: false },
                      format: { with: URI::MailTo::EMAIL_REGEXP, message: "must be a valid email address" }, allow_blank: true
@@ -39,6 +45,10 @@ class Person < ApplicationRecord
   def family_dens
     return [] unless adult? && family
     self.class.regular_dens & family.people.pluck(:den)
+  end
+
+  def notifiable?
+    adult? && email.present? && !email_opt_out?
   end
 
   def formatted_phone_number

@@ -1,0 +1,56 @@
+<% credit = @fundraiser_credit %>
+<div class="mx-auto w-full max-w-2xl">
+  <h2 class="mb-1 text-2xl font-bold">Review: <%= credit.name %></h2>
+  <p class="mb-6 text-sm text-gray-500">Nothing has been recorded yet.</p>
+
+  <div class="mb-6 overflow-x-auto rounded-md border border-gray-200">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-gray-50 text-gray-700">
+        <tr>
+          <th class="px-4 py-2 font-medium">Family</th>
+          <th class="px-4 py-2 text-right font-medium">Sales</th>
+          <th class="px-4 py-2 text-right font-medium">Scout Account (<%= credit.percent_label %>)</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% credit.lines.each do |line| %>
+          <tr>
+            <td class="px-4 py-2"><%= line.family.name %></td>
+            <td class="px-4 py-2 text-right"><%= money(line.sales) %></td>
+            <td class="px-4 py-2 text-right"><%= money(line.share) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot class="bg-gray-50 font-medium">
+        <tr>
+          <td class="px-4 py-2">Total</td>
+          <td class="px-4 py-2 text-right"><%= money(credit.total_sales) %></td>
+          <td class="px-4 py-2 text-right"><%= money(credit.total_scout_share) %></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <ul class="mb-6 list-disc pl-5 text-sm text-gray-700">
+    <% if credit.record_proceeds? %>
+      <li><%= money(credit.total_sales) %> in sales is deposited into <strong><%= credit.fund.name %></strong>.</li>
+    <% end %>
+    <li><%= money(credit.total_scout_share) %> moves from <strong><%= credit.fund.name %></strong> to <%= pluralize(credit.lines.count { |line| line.share.positive? }, "Scout Account") %>.</li>
+    <li>The pack keeps <%= money(credit.pack_share) %> in <strong><%= credit.fund.name %></strong>.</li>
+  </ul>
+
+  <div>
+    <%= form_with(model: credit, url: fundraiser_credits_path) do |f| %>
+      <%= f.hidden_field :name %>
+      <%= f.hidden_field :fund_id %>
+      <%= f.hidden_field :scout_share_percent %>
+      <%= f.hidden_field :record_proceeds, value: credit.record_proceeds? ? "1" : "0" %>
+      <% credit.sales.each do |family_id, amount| %>
+        <%= hidden_field_tag "fundraiser_credit[sales][#{family_id}]", amount, id: nil %>
+      <% end %>
+      <%= hidden_field_tag :confirm, "1", id: nil %>
+      <%= f.submit "Record fundraiser", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+      <%= f.submit "Make changes", name: "edit", class: "ml-4 text-blue-600 hover:underline cursor-pointer" %>
+    <% end %>
+  </div>
+</div>

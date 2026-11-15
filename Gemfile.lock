@@ -85,7 +85,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.26.0)
       msgpack (~> 1.5)
-    brakeman (8.0.6)
+    brakeman (8.1.0)
       racc
     builder (3.3.0)
     bundler-audit (0.9.3)
@@ -101,6 +101,8 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
+    childprocess (5.1.0)
+      logger (~> 1.5)
     commonmarker (2.10.0)
       rb_sys (~> 0.9)
     commonmarker (2.10.0-aarch64-linux)
@@ -175,6 +177,17 @@ GEM
       thor (~> 1.3)
       zeitwerk (>= 2.6.18, < 3.0)
     language_server-protocol (3.17.0.6)
+    launchy (3.1.1)
+      addressable (~> 2.8)
+      childprocess (~> 5.0)
+      logger (~> 1.6)
+    letter_opener (1.10.0)
+      launchy (>= 2.2, < 4)
+    letter_opener_web (3.0.0)
+      actionmailer (>= 6.1)
+      letter_opener (~> 1.9)
+      railties (>= 6.1)
+      rexml
     lint_roller (1.1.0)
     logger (1.7.0)
     loofah (2.25.2)
@@ -374,6 +387,9 @@ GEM
       ostruct
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
+    stripe (21.0.0)
+      bigdecimal
+      logger
     tailwindcss-rails (4.6.0)
       railties (>= 7.0.0)
       tailwindcss-ruby (~> 4.0)
@@ -438,6 +454,7 @@ DEPENDENCIES
   jbuilder
   json (< 3)
   kamal
+  letter_opener_web (~> 3.0)
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.3, >= 8.1.3.1)
@@ -448,6 +465,7 @@ DEPENDENCIES
   solid_queue
   sqlite3 (>= 2.1)
   stimulus-rails
+  stripe (~> 21.0)
   tailwindcss-rails
   thruster
   turbo-rails

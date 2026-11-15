@@ -1,0 +1,23 @@
+<%= render "footer" %>
+<h1 style="margin: 0 0 4px; font-size: 22px;"><%= @event.title %></h1>
+<p style="margin: 0 0 16px; color: #374151;"><%= event_time_range(@event) %></p>
+
+<% if @note.present? %>
+  <div style="margin: 0 0 16px; padding: 12px; background: #eff6ff; border-radius: 6px;"><%= simple_format(@note, {}, wrapper_tag: "p") %></div>
+<% end %>
+
+<% if @event.description.present? %>
+  <div style="margin: 0 0 16px;"><%= markdown(@event.description) %></div>
+<% end %>
+
+<% if @event.rsvp_options.any?(&:costed?) %>
+  <p style="margin: 0 0 8px; font-weight: bold;">Ways to attend</p>
+  <ul style="margin: 0 0 16px; padding-left: 20px;">
+    <% @event.rsvp_options.each do |option| %>
+      <li><%= option.name %><%= " - #{option.cost_summary}" if option.costed? %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<p style="margin: 0 0 16px;">Please RSVP by <strong><%= format_event_time(@event.rsvp_closes_at) %></strong>.</p>
+<p style="margin: 0;"><%= link_to "RSVP on #{app_name}", event_url(@event), style: "display: inline-block; padding: 10px 16px; background: #2563eb; color: #ffffff; border-radius: 6px; text-decoration: none; font-weight: bold;" %></p>
