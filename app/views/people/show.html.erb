@@ -13,6 +13,10 @@
     <dd><%= @person.den_label %></dd>
     <dt class="font-medium">Email</dt>
     <dd><%= @person.email.presence || "—" %></dd>
+    <% if @person.adult? && @person.email.present? %>
+      <dt class="font-medium">Pack emails</dt>
+      <dd><%= @person.email_opt_out? ? "Unsubscribed" : "Subscribed" %></dd>
+    <% end %>
     <dt class="font-medium">Phone number</dt>
     <dd><%= @person.formatted_phone_number || "—" %></dd>
     <dt class="font-medium">Scouting America ID</dt>

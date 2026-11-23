@@ -1,0 +1,24 @@
+<% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+<div class="mx-auto w-full max-w-md">
+  <h2 class="mb-6 text-2xl font-bold">Choose a new password</h2>
+
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+    <%= f.hidden_field :reset_password_token %>
+
+    <div class="mb-4">
+      <%= f.label :password, "New password", class: "mb-1 block font-medium" %>
+      <% if @minimum_password_length %>
+        <p class="mb-1 text-sm text-gray-500"><%= @minimum_password_length %> characters minimum</p>
+      <% end %>
+      <%= f.password_field :password, autofocus: true, autocomplete: "new-password", class: input_class %>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :password_confirmation, "Confirm new password", class: "mb-1 block font-medium" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: input_class %>
+    </div>
+
+    <%= f.submit "Change my password", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+  <% end %>
+</div>

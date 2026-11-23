@@ -46,6 +46,12 @@
             <%= den_badge(person) %>
           </span>
           <span class="flex items-center gap-4 text-sm">
+            <% if person.adult? && person.email.present? && can?(:update_notifications, person) %>
+              <%= button_to person.email_opt_out? ? "Emails off" : "Emails on", person_notifications_path(person), method: :patch,
+                    params: { email_opt_out: person.email_opt_out? ? "0" : "1" },
+                    title: person.email_opt_out? ? "Turn pack emails on for #{person.first_name}" : "Turn pack emails off for #{person.first_name}",
+                    class: "rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer #{person.email_opt_out? ? 'bg-gray-100 text-gray-500' : 'bg-green-100 text-green-800'}" %>
+            <% end %>
             <% if can? :update, person %>
               <%= link_to "Edit", edit_person_path(person), class: "text-blue-600 hover:underline" %>
             <% end %>
