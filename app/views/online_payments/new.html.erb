@@ -1,0 +1,28 @@
+<% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+<div class="mx-auto w-full max-w-md">
+  <h2 class="mb-1 text-2xl font-bold">Add money to your Scout Account</h2>
+  <p class="mb-6 text-sm text-gray-500"><%= @family.name %> · current balance <%= money(@family.balance) %></p>
+
+  <%= form_with(model: @online_payment, url: family_online_payments_path(@family)) do |f| %>
+    <%= render "devise/shared/error_messages", resource: @online_payment %>
+
+    <div class="mb-4">
+      <%= f.label :amount_dollars, "Amount", class: "mb-1 block font-medium" %>
+      <div class="flex items-center gap-2">
+        <span class="text-gray-500">$</span>
+        <%= f.text_field :amount_dollars, inputmode: "decimal", autofocus: true, placeholder: "50.00", class: input_class %>
+      </div>
+      <p class="mt-1 text-sm text-gray-500">
+        Between <%= Money.new(OnlinePayment::MIN_CENTS).format %> and <%= Money.new(OnlinePayment::MAX_CENTS).format(no_cents_if_whole: true) %>.
+        <% if OnlinePayment.fee_for(10_000).positive? %>
+          A card processing fee is added at checkout (<%= Money.new(OnlinePayment.fee_for(10_000)).format %> on $100) so the pack receives your full deposit.
+        <% end %>
+      </p>
+    </div>
+
+    <%= f.submit "Continue to secure checkout", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+  <% end %>
+
+  <p class="mt-6 text-sm text-gray-500">Payment is handled by Stripe. Card details never touch <%= app_name %>.</p>
+  <p class="mt-2 text-sm"><%= link_to "Back to Scout Account", family_account_path(@family), class: "text-blue-600 hover:underline" %></p>
+</div>

@@ -1,0 +1,26 @@
+<% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+<div class="mb-4">
+  <%= f.label :name, "Fundraiser", class: "mb-1 block font-medium" %>
+  <%= f.text_field :name, placeholder: "Fall popcorn sale", maxlength: 120, class: input_class %>
+  <p class="mt-1 text-sm text-gray-500">Shown on every statement line.</p>
+</div>
+
+<div class="mb-4">
+  <%= f.label :fund_id, "Pack fund", class: "mb-1 block font-medium" %>
+  <%= f.select :fund_id, Fund.order(:name).pluck(:name, :id), { prompt: "Select a fund" }, class: input_class %>
+  <p class="mt-1 text-sm text-gray-500">The pack's share stays here, and Scout Account credits are paid from it.</p>
+</div>
+
+<div class="mb-4">
+  <%= f.label :scout_share_percent, "Scout Account share (%)", class: "mb-1 block font-medium" %>
+  <%= f.text_field :scout_share_percent, inputmode: "decimal", class: "#{input_class} max-w-32" %>
+  <p class="mt-1 text-sm text-gray-500">The percentage of each family's sales credited to its Scout Account.</p>
+</div>
+
+<div class="mb-6 flex items-start gap-2">
+  <%= f.check_box :record_proceeds, class: "mt-1" %>
+  <span>
+    <%= f.label :record_proceeds, "Also record the sales money coming in to the fund" %>
+    <span class="block text-sm text-gray-500">Leave this off if you already deposited the proceeds into the fund.</span>
+  </span>
+</div>

@@ -80,3 +80,4 @@ gem "json", "< 3"
 gem "double_entry"
 
 gem "commonmarker", "~> 2.10"
+gem "stripe", "~> 21.0"

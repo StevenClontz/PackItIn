@@ -1,0 +1,28 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "9963f3c8cdd0aa70f67d19da97b407bcfefbd9ff3cf0341541df19adc42c88e8",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/online_payments_controller.rb",
+      "line": 23,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(OnlinePayment.gateway.create_checkout_session(Family.find(params[:family_id]).online_payments.build(:amount_dollars => params.dig(:online_payment, :amount_dollars)), :success_url => family_online_payment_url(Family.find(params[:family_id]), Family.find(params[:family_id]).online_payments.build(:amount_dollars => params.dig(:online_payment, :amount_dollars))), :cancel_url => new_family_online_payment_url(Family.find(params[:family_id]))).url, :allow_other_host => true, :status => :see_other)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OnlinePaymentsController",
+        "method": "create"
+      },
+      "user_input": "OnlinePayment.gateway.create_checkout_session(Family.find(params[:family_id]).online_payments.build(:amount_dollars => params.dig(:online_payment, :amount_dollars)), :success_url => family_online_payment_url(Family.find(params[:family_id]), Family.find(params[:family_id]).online_payments.build(:amount_dollars => params.dig(:online_payment, :amount_dollars))), :cancel_url => new_family_online_payment_url(Family.find(params[:family_id]))).url",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": "Redirects to the Checkout URL Stripe returns for the session we just created, not to user input."
+    }
+  ],
+  "brakeman_version": "8.1.0"
+}

@@ -1,0 +1,27 @@
+<div class="mx-auto w-full max-w-2xl">
+  <h2 class="mb-2 text-2xl font-bold">Record a fundraiser</h2>
+  <p class="mb-6 text-sm text-gray-500">Enter each family's sales. You'll review the credits before anything is recorded.</p>
+
+  <%= form_with(model: @fundraiser_credit, url: fundraiser_credits_path) do |f| %>
+    <%= render "devise/shared/error_messages", resource: @fundraiser_credit %>
+    <%= render "settings", f: f %>
+
+    <h3 class="mb-2 text-lg font-semibold">Sales by family</h3>
+    <div class="mb-6 divide-y divide-gray-200 rounded-md border border-gray-200">
+      <% @families.each do |family| %>
+        <% id = "fundraiser_credit_sales_#{family.id}" %>
+        <div class="flex items-center justify-between gap-4 px-4 py-2">
+          <%= label_tag id, family.name, class: "font-medium" %>
+          <span class="flex items-center gap-1">
+            <span class="text-gray-500">$</span>
+            <%= text_field_tag "fundraiser_credit[sales][#{family.id}]", @fundraiser_credit.sales[family.id.to_s], id: id, inputmode: "decimal", autocomplete: "off", placeholder: "0.00", class: "w-28 rounded-md border border-gray-300 px-2 py-1 text-right" %>
+          </span>
+        </div>
+      <% end %>
+    </div>
+
+    <%= f.submit "Review", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+  <% end %>
+
+  <p class="mt-6 text-sm"><%= link_to "Back to funds", funds_path, class: "text-blue-600 hover:underline" %></p>
+</div>

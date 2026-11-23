@@ -1,6 +1,7 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require_relative "support/fake_stripe_gateway"
 
 # Tests run inside a transaction; tell double_entry so its own locking transaction is allowed to nest in it.
 DoubleEntry::Locking.configuration.running_inside_transactional_fixtures = true
@@ -13,7 +14,12 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
-    # Add more helper methods to be used by all tests here...
+    # Stripe is never called from tests; see test/support/fake_stripe_gateway.rb.
+    setup do
+      @stripe = FakeStripeGateway.new
+      OnlinePayment.gateway = @stripe
+      ENV["STRIPE_WEBHOOK_SECRET"] = FakeStripeGateway::WEBHOOK_SECRET
+    end
 
     # "family:12" / "fund:3" / "outside", as the transaction form submits accounts.
     def ledger_ref(account)
