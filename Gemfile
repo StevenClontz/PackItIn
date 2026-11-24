@@ -80,3 +80,6 @@ gem "json", "< 3"
 gem "double_entry"
 
 gem "commonmarker", "~> 2.10"
+
+# Builds the subscribable iCalendar feed of pack events
+gem "icalendar", "~> 2.10"

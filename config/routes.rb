@@ -19,6 +19,7 @@ Rails.application.routes.draw do
     resources :rsvp_options, except: %i[index show]
   end
   resource :dens, only: :show
+  get "calendar.ics", to: "calendars#show", as: :calendar, format: false, defaults: { format: :ics }
   patch "people/:id/notifications", to: "notification_preferences#update", as: :person_notifications
 
   # One-click unsubscribe from pack email. GET only shows a confirmation (mail scanners follow links);
