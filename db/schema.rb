@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_14_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_001936) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -119,6 +119,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_000002) do
     t.index ["name"], name: "index_funds_on_name", unique: true
   end
 
+  create_table "leaderships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "den"
+    t.integer "person_id", null: false
+    t.integer "role", null: false
+    t.datetime "updated_at", null: false
+    t.index ["person_id", "role", "den"], name: "index_leaderships_on_person_id_and_role_and_den", unique: true
+    t.index ["person_id"], name: "index_leaderships_on_person_id"
+  end
+
   create_table "people", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "den", null: false
@@ -162,6 +172,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_000002) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "leaderships", "people"
   add_foreign_key "people", "families"
   add_foreign_key "rsvp_options", "events"
   add_foreign_key "rsvps", "events"

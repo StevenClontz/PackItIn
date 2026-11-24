@@ -1,6 +1,7 @@
 class Person < ApplicationRecord
   belongs_to :family
   has_many :rsvps, dependent: :destroy
+  has_many :leaderships, dependent: :destroy
 
   enum :den, { adult: 0, lion: 1, tiger: 2, wolf: 3, bear: 4, webelos: 5, aol: 6, other_youth: 7 }, validate: true
 
@@ -13,6 +14,7 @@ class Person < ApplicationRecord
   scope :notifiable, -> { where(den: :adult, email_opt_out: false).where.not(email: nil) }
 
   validates :first_name, :last_name, :den, presence: true
+  validate :leaders_stay_adults
   validates :email, uniqueness: { case_sensitive: false },
                      format: { with: URI::MailTo::EMAIL_REGEXP, message: "must be a valid email address" }, allow_blank: true
   validates :phone_number, uniqueness: true,
@@ -57,6 +59,12 @@ class Person < ApplicationRecord
   end
 
   private
+
+  # Leadership roles are for adults; moving a leader into a youth den would leave them orphaned.
+  def leaders_stay_adults
+    return if adult? || !den_changed? || leaderships.none?
+    errors.add(:den, "can't be a youth den while this person holds a leadership role")
+  end
 
   # Blank strings would collide on the unique index; punctuation in a phone number would not
   # match the normalized digits-only value used for login lookups (see Family#login).

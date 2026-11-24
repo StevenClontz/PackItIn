@@ -1,0 +1,8 @@
+sam_cubmaster:
+  person: smith_dad
+  role: cubmaster
+
+tom_bear_den_leader:
+  person: jones_dad
+  role: den_leader
+  den: bear

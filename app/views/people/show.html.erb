@@ -23,7 +23,50 @@
     <dd><%= @person.scouting_america_id.presence || "—" %></dd>
     <dt class="font-medium">Family</dt>
     <dd><%= link_to @family.username, family_path(@family), class: "text-blue-600 hover:underline" %></dd>
+    <% if @person.adult? %>
+      <dt class="font-medium">Leadership roles</dt>
+      <dd id="leadership_roles">
+        <% leaderships = @person.leaderships.in_role_order.to_a %>
+        <% if leaderships.empty? %>
+          —
+        <% else %>
+          <ul>
+            <% leaderships.each do |leadership| %>
+              <li class="flex items-center gap-3">
+                <%= leadership.label %>
+                <% if can? :destroy, leadership %>
+                  <%= button_to "Remove", leadership_path(leadership), method: :delete, data: { turbo_confirm: "Remove #{leadership.label} from #{@person.full_name}?" }, class: "text-sm text-red-600 hover:underline cursor-pointer" %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      </dd>
+    <% end %>
   </dl>
+
+  <% if @person.adult? && can?(:create, Leadership) %>
+    <% leadership = @leadership || Leadership.new %>
+    <% select_class = "rounded-md border border-gray-300 px-2 py-1" %>
+    <section id="add_leadership" class="mb-6 rounded-md border border-gray-200 p-4">
+      <h3 class="mb-2 font-semibold">Add a leadership role</h3>
+      <%= form_with(model: leadership, url: person_leaderships_path(@person)) do |f| %>
+        <%= render "devise/shared/error_messages", resource: leadership %>
+        <div class="flex flex-wrap items-end gap-3">
+          <div>
+            <%= f.label :role, class: "mb-1 block text-sm font-medium" %>
+            <%= f.select :role, Leadership.role_options, { prompt: "Select a role" }, class: select_class %>
+          </div>
+          <div>
+            <%= f.label :den, class: "mb-1 block text-sm font-medium" %>
+            <%= f.select :den, Leadership.den_options, { include_blank: "—" }, class: select_class %>
+          </div>
+          <%= f.submit "Add", class: "rounded-md bg-blue-600 px-4 py-1.5 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+        </div>
+        <p class="mt-1 text-xs text-gray-500">Choose a den only for Den Leader and Assistant Den Leader.</p>
+      <% end %>
+    </section>
+  <% end %>
 
   <div class="flex items-center gap-4">
     <% if can? :update, @person %>

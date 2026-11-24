@@ -31,6 +31,17 @@ en:
   hello: "Hello world"
   people:
     unregistered: "Unregistered"
+    leadership_roles:
+      cubmaster: "Cubmaster"
+      assistant_cubmaster: "Assistant Cubmaster"
+      committee_chair: "Committee Chair"
+      committee_member: "Committee Member"
+      treasurer: "Treasurer"
+      secretary: "Secretary"
+      chartered_org_rep: "Chartered Organization Representative"
+      pack_trainer: "Pack Trainer"
+      den_leader: "Den Leader"
+      assistant_den_leader: "Assistant Den Leader"
     dens:
       adult: "Adult"
       lion: "Lion"

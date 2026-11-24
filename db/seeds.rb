@@ -35,6 +35,11 @@ if Rails.env.development?
     Person.find_or_initialize_by(family: family, first_name: attrs["first_name"], last_name: attrs["last_name"]).tap { |person| person.update!(attrs) }
   end
 
+  # `person: smith_dad` in leaderships.yml is a fixture label; matched on person + role + den.
+  fixture_rows.call("leaderships").each_value do |attrs|
+    Leadership.find_or_create_by!(person: people.fetch(attrs.fetch("person")), role: attrs.fetch("role"), den: attrs["den"])
+  end
+
   # Event times in events.yml are relative to when the seeds run, so re-seeding moves them forward.
   events = fixture_rows.call("events").transform_values do |attrs|
     Event.find_or_initialize_by(title: attrs.fetch("title")).tap { |event| event.update!(attrs) }

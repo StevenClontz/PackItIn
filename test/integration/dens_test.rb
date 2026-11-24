@@ -81,4 +81,23 @@ class DensTest < ActionDispatch::IntegrationTest
     get dens_path
     assert_select "#other_personnel li", text: /Ada Admin.*Adult.*Pack Administrators/
   end
+
+  test "pack leaders and den leaders are listed" do
+    sign_in_as "examplefamily"
+    get dens_path
+
+    assert_select "#pack_leadership li", text: /Cubmaster: Sam Smith.*The Example Family/
+    assert_select "#den_bear li.leader", text: /Den Leader: Tom Jones.*The Joneses/
+    assert_select "#den_lion", text: /No den leader assigned yet\./
+  end
+
+  test "a leader with no youth in a den isn't repeated under Other Personnel" do
+    ada = families(:admin).people.create!(first_name: "Ada", last_name: "Admin", den: :adult)
+    ada.leaderships.create!(role: :den_leader, den: :tiger)
+    sign_in_as "examplefamily"
+
+    get dens_path
+    assert_select "#den_tiger li.leader", text: /Den Leader: Ada Admin/
+    assert_select "#other_personnel li", text: /Ada Admin/, count: 0
+  end
 end

@@ -10,6 +10,10 @@ class SeedsTest < ActiveSupport::TestCase
     Rails.env = original_env
   end
 
+  def leadership_rows
+    Leadership.joins(:person).order("people.first_name", :role).pluck("people.first_name", :role, :den)
+  end
+
   setup do
     @family_usernames = Family.order(:username).pluck(:username)
     @people = Person.order(:first_name).pluck(:first_name, :last_name, :den)
@@ -23,6 +27,8 @@ class SeedsTest < ActiveSupport::TestCase
     Rsvp.delete_all
     RsvpOption.delete_all
     Event.delete_all
+    @leaderships = leadership_rows
+    Leadership.delete_all
     Person.delete_all
     Family.delete_all
   end
@@ -34,6 +40,13 @@ class SeedsTest < ActiveSupport::TestCase
     assert_equal @people, Person.order(:first_name).pluck(:first_name, :last_name, :den)
     assert_equal %w[adminfamily], Family.where(admin: true).pluck(:username)
     assert_equal %w[Lily Sam], Family.find_by!(username: "examplefamily").people.pluck(:first_name).sort
+  end
+
+  test "seeds recreate the fixture leadership roles" do
+    run_dev_seeds
+
+    assert_equal @leaderships, leadership_rows
+    assert_not_empty @leaderships
   end
 
   test "seeds recreate the fixture events and RSVPs" do

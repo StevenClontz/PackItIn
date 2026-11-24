@@ -121,4 +121,19 @@ class PersonTest < ActiveSupport::TestCase
     assert_not person.valid?
     assert_includes person.errors[:phone_number], "has already been taken"
   end
+
+  test "an adult holding a leadership role can't be moved to a youth den" do
+    sam = people(:smith_dad)
+    assert_not sam.update(den: :wolf)
+    assert_includes sam.errors[:den], "can't be a youth den while this person holds a leadership role"
+
+    sam.leaderships.destroy_all
+    assert sam.reload.update(den: :wolf)
+  end
+
+  test "deleting a person removes their leadership roles" do
+    assert_difference -> { Leadership.count }, -1 do
+      people(:smith_dad).destroy!
+    end
+  end
 end
