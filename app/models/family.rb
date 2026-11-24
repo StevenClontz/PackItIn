@@ -29,22 +29,24 @@ class Family < ApplicationRecord
   validates :password, presence: true, confirmation: true, length: { in: Devise.password_length }, if: :password_required?
 
   scope :non_admin, -> { where(admin: false) }
-  scope :address_login_eligible, -> { where(admin: false, password_only: false) }
 
-  # Addresses are compared as bare sequences of letters and digits, ignoring case, spacing and punctuation.
-  def self.normalize_address(value)
-    value.to_s.downcase.gsub(/[^[:alnum:]]/, "")
-  end
+  # Emailed sign-in: choose the family on the sign-in page, and its adults get a 6-digit code and
+  # a link (Families::EmailLoginsController). Either one signs the family in once.
+  LOGIN_CODE_TTL = 15.minutes
+  MAX_LOGIN_CODE_ATTEMPTS = 5
+  LOGIN_CODE_RESEND_WAIT = 1.minute
 
-  def street_address_matches?(input)
-    expected = self.class.normalize_address(street_address)
-    expected.present? && ActiveSupport::SecurityUtils.secure_compare(expected, self.class.normalize_address(input))
+  # Families with somewhere to send the code: an adult with an email address (see #email_addresses).
+  scope :email_login_eligible, -> { where(id: Person.adult.where.not(email: nil).select(:family_id)) }
+
+  # Tied to login_code_sent_at, so the link dies once it's used, a newer code is sent, or it expires.
+  generates_token_for :email_login, expires_in: LOGIN_CODE_TTL do
+    login_code_sent_at
   end
 
   # Devise calls this to look up the resource being signed in. It's overridden (rather than just
   # listing :email/:phone_number in config.authentication_keys) because those fields live on
-  # Person, not Family: a match resolves to that person's family. Still requires the real
-  # password, so unlike address login this isn't restricted to address_login_eligible families.
+  # Person, not Family: a match resolves to that person's family.
   def self.find_for_database_authentication(warden_conditions)
     login = warden_conditions[:login].to_s.strip
     return nil if login.blank?
@@ -83,7 +85,48 @@ class Family < ApplicationRecord
     devise_mailer.send(notification, self, *args).deliver_later
   end
 
+  # Starts a fresh emailed sign-in, replacing any earlier code and link, and returns the new code.
+  # Only a digest is stored.
+  def start_email_login!
+    code = format("%06d", SecureRandom.random_number(1_000_000))
+    # floor(6): the DB keeps microseconds, and the link token must match the reloaded value.
+    update_columns(login_code_digest: login_code_digest_for(code), login_code_sent_at: Time.current.floor(6), login_code_attempts: 0)
+    code
+  end
+
+  def login_code_pending?
+    login_code_digest.present? && login_code_sent_at&.after?(LOGIN_CODE_TTL.ago) && login_code_attempts < MAX_LOGIN_CODE_ATTEMPTS
+  end
+
+  def recently_sent_login_code?
+    login_code_sent_at.present? && login_code_sent_at.after?(LOGIN_CODE_RESEND_WAIT.ago)
+  end
+
+  # True (and the code is used up) on a match. A miss counts toward MAX_LOGIN_CODE_ATTEMPTS.
+  def verify_login_code(code)
+    return false unless login_code_pending?
+
+    if ActiveSupport::SecurityUtils.secure_compare(login_code_digest, login_code_digest_for(code.to_s.gsub(/\D/, "")))
+      finish_email_login!
+      true
+    else
+      increment!(:login_code_attempts, touch: false)
+      false
+    end
+  end
+
+  # Uses up the pending code and link.
+  def finish_email_login!
+    update_columns(login_code_digest: nil, login_code_sent_at: nil, login_code_attempts: 0)
+  end
+
   private
+
+  # Keyed per family, so the same code for two families never has the same digest.
+  def login_code_digest_for(code)
+    key = Rails.application.key_generator.generate_key("email login code")
+    OpenSSL::HMAC.hexdigest("SHA256", key, "#{id}:#{code}")
+  end
 
   def password_required?
     !persisted? || !password.nil? || !password_confirmation.nil?

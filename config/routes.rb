@@ -1,9 +1,13 @@
 Rails.application.routes.draw do
-  # Devise only handles signing in and out (under /account, so /families is free for the resourceful CRUD
+  # Devise handles password sign-in and sign-out (under /account, so /families is free for the resourceful CRUD
   # below). Families are created and edited, by admins and by the family itself, through FamiliesController.
-  devise_for :families, path: "account", controllers: { sessions: "families/sessions", passwords: "families/passwords" }
+  devise_for :families, path: "account", controllers: { passwords: "families/passwords" }
   devise_scope :family do
-    post "account/sign_in/address", to: "families/sessions#create_with_address", as: :address_family_session
+    post "account/sign_in/email", to: "families/email_logins#create", as: :email_login
+    get "account/sign_in/code", to: "families/email_logins#code", as: :email_login_code
+    post "account/sign_in/code", to: "families/email_logins#verify_code"
+    get "account/sign_in/email/:token", to: "families/email_logins#link", as: :email_login_link
+    post "account/sign_in/email/:token", to: "families/email_logins#use_link"
   end
   resources :families do
     resources :people, shallow: true, except: :index do

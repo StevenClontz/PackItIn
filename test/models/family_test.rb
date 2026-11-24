@@ -64,40 +64,9 @@ class FamilyTest < ActiveSupport::TestCase
     assert_equal "Texas", families(:one).state_label
   end
 
-  test "normalize_address keeps only lowercase letters and digits" do
-    assert_equal "100mainst", Family.normalize_address("  100 Main St.  ")
-    assert_equal "", Family.normalize_address("-- !!")
-    assert_equal "", Family.normalize_address(nil)
-  end
-
-  test "street address matching ignores case, spacing and punctuation" do
-    family = families(:one) # 100 Main St
-    [ "100 Main St", "100 main st.", "100-MAIN   ST", "1 0 0 m a i n s t" ].each do |input|
-      assert family.street_address_matches?(input), input
-    end
-  end
-
-  test "street address matching rejects different or blank input" do
-    family = families(:one)
-    [ "100 Main Street", "101 Main St", "Main St", "", nil, "  ..  " ].each do |input|
-      assert_not family.street_address_matches?(input), input.inspect
-    end
-  end
-
-  test "a punctuation-only street address never matches" do
-    family = build_family(street_address: "---")
-    assert_not family.street_address_matches?("")
-    assert_not family.street_address_matches?("--")
-  end
-
   test "non_admin excludes admin families" do
     assert_equal [ "andersons", "chens", "examplefamily", "garcias", "joneses", "kims", "nguyens", "okafors", "patels", "riveras" ],
                  Family.non_admin.order(:username).pluck(:username)
-  end
-
-  test "address_login_eligible excludes admin and password-only families" do
-    families(:one).update!(password_only: true)
-    assert_equal [ "joneses" ], Family.address_login_eligible.order(:username).pluck(:username)
   end
 
   test "requires a password on create" do
@@ -153,5 +122,63 @@ class FamilyTest < ActiveSupport::TestCase
 
     assert_not families(:two).destroy
     assert_not families(:one).destroy
+  end
+
+  # --- emailed sign-in codes ---
+
+  test "email_login_eligible lists families with an adult email address" do
+    assert_equal [ "examplefamily" ], Family.email_login_eligible.pluck(:username)
+
+    people(:jones_bear).update!(email: "ben@example.com")
+    assert_equal [ "examplefamily" ], Family.email_login_eligible.pluck(:username), "a youth email doesn't count"
+
+    people(:jones_dad).update!(email: "tom@example.com")
+    assert_equal [ "examplefamily", "joneses" ], Family.email_login_eligible.order(:username).pluck(:username)
+  end
+
+  test "a login code is 6 digits, stored only as a digest, and works once" do
+    family = families(:one)
+    code = family.start_email_login!
+
+    assert_match(/\A\d{6}\z/, code)
+    assert_not_equal code, family.reload.login_code_digest
+    assert family.verify_login_code(code)
+    assert_not family.reload.verify_login_code(code)
+  end
+
+  test "a login code tolerates spaces and dashes" do
+    family = families(:one)
+    code = family.start_email_login!
+    assert family.verify_login_code(" #{code[0, 3]}-#{code[3, 3]} ")
+  end
+
+  test "five wrong login codes use the code up" do
+    family = families(:one)
+    code = family.start_email_login!
+    wrong = code == "000000" ? "111111" : "000000"
+
+    5.times { assert_not family.verify_login_code(wrong) }
+    assert_not family.verify_login_code(code)
+  end
+
+  test "a login code expires" do
+    family = families(:one)
+    code = family.start_email_login!
+    travel Family::LOGIN_CODE_TTL + 1.second do
+      assert_not family.verify_login_code(code)
+    end
+  end
+
+  test "a new login code replaces the old code and link" do
+    family = families(:one)
+    old_code = family.start_email_login!
+    old_token = family.generate_token_for(:email_login)
+    assert_equal family, Family.find_by_token_for(:email_login, old_token)
+
+    travel 1.second
+    new_code = family.start_email_login!
+    assert_nil Family.find_by_token_for(:email_login, old_token)
+    assert_not family.verify_login_code(old_code) unless old_code == new_code
+    assert_equal family, Family.find_by_token_for(:email_login, family.generate_token_for(:email_login))
   end
 end

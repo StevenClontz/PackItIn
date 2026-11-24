@@ -1,0 +1,9 @@
+<p>Hello <%= @family.name %>,</p>
+
+<p>Here's your code to log in to <%= app_name %> as <strong><%= @family.name %></strong>:</p>
+
+<p style="margin: 16px 0; font-size: 32px; font-weight: bold; letter-spacing: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;"><%= @code %></p>
+
+<p>Or skip the code: <%= link_to "Log in to #{app_name}", @link, style: "display: inline-block; padding: 8px 16px; background: #2563eb; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600;" %></p>
+
+<p>The code and link work once, for <%= distance_of_time_in_words(Family::LOGIN_CODE_TTL) %>. If nobody in your family asked to log in, you can ignore this email.</p>

@@ -31,7 +31,6 @@ admin:
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 # The following families exist only to give every regular den at least 3 scouts (see people.yml).
-# They're password_only so they don't show up in Family.address_login_eligible-based tests/specs.
 three:
   username: garcias
   name: The Garcias
@@ -39,7 +38,6 @@ three:
   city: Raleigh
   state: nc
   zip: "27601"
-  password_only: true
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 four:
@@ -49,7 +47,6 @@ four:
   city: San Jose
   state: ca
   zip: "95112"
-  password_only: true
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 five:
@@ -59,7 +56,6 @@ five:
   city: Edison
   state: nj
   zip: "08817"
-  password_only: true
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 six:
@@ -69,7 +65,6 @@ six:
   city: Seattle
   state: wa
   zip: "98101"
-  password_only: true
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 seven:
@@ -79,7 +74,6 @@ seven:
   city: Phoenix
   state: az
   zip: "85001"
-  password_only: true
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 eight:
@@ -89,7 +83,6 @@ eight:
   city: Los Angeles
   state: ca
   zip: "90001"
-  password_only: true
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 nine:
@@ -99,7 +92,6 @@ nine:
   city: Atlanta
   state: ga
   zip: "30301"
-  password_only: true
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>
 
 ten:
@@ -109,5 +101,4 @@ ten:
   city: Minneapolis
   state: mn
   zip: "55401"
-  password_only: true
   encrypted_password: <%= Devise::Encryptor.digest(Family, "password123") %>

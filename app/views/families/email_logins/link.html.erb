@@ -1,0 +1,6 @@
+<div class="mx-auto w-full max-w-md">
+  <h2 class="mb-2 text-2xl font-bold">Log in</h2>
+  <p class="mb-6 text-gray-700">Log in to <%= app_name %> as <strong><%= @family.name %></strong>.</p>
+
+  <%= button_to "Log in as #{@family.name}", email_login_link_path(token: params[:token]), class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+</div>

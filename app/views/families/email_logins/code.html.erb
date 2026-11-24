@@ -1,0 +1,26 @@
+<% input_class = "block w-full rounded-md border border-gray-300 px-3 py-2" %>
+<div class="mx-auto w-full max-w-md">
+  <h2 class="mb-2 text-2xl font-bold">Check your email</h2>
+  <p class="mb-2 text-gray-700">
+    We sent a 6-digit code and a sign-in link for <strong><%= @family.name %></strong> to:
+  </p>
+  <ul class="mb-2 list-disc pl-5 font-mono text-sm text-gray-700">
+    <% @family.email_addresses.each do |email| %>
+      <li><%= masked_email(email) %></li>
+    <% end %>
+  </ul>
+  <p class="mb-6 text-sm text-gray-500">They work for <%= distance_of_time_in_words(Family::LOGIN_CODE_TTL) %>.</p>
+
+  <%= form_with(url: email_login_code_path) do |f| %>
+    <div class="mb-4">
+      <%= f.label :code, "Sign-in code", class: "mb-1 block font-medium" %>
+      <%= f.text_field :code, autofocus: true, required: true, inputmode: "numeric", autocomplete: "one-time-code", class: "#{input_class} font-mono text-lg tracking-widest" %>
+    </div>
+    <%= f.submit "Log in", class: "rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-500 cursor-pointer" %>
+  <% end %>
+
+  <div class="mt-6 flex flex-wrap items-center gap-4 text-sm">
+    <%= button_to "Send a new code", email_login_path, params: { family_id: @family.id }, class: "text-blue-600 hover:underline cursor-pointer" %>
+    <%= link_to "Choose a different family or use a password", new_family_session_path, class: "text-blue-600 hover:underline" %>
+  </div>
+</div>
