@@ -201,6 +201,25 @@ class EmailLoginTest < ActionDispatch::IntegrationTest
     store.singleton_class.remove_method(:increment)
   end
 
+  test "entering codes doesn't use up the allowance for requesting them" do
+    # Count for real (the test cache store never does), per key, like the dev and production stores.
+    counts = Hash.new(0)
+    store = ActionController::Base.cache_store
+    store.define_singleton_method(:increment) { |key, amount = 1, **| counts[key] += amount }
+    begin
+      3.times do
+        post email_login_path, params: { family_id: families(:one).id }
+        assert_redirected_to email_login_code_path
+        post email_login_code_path, params: { code: "wrong" }
+        assert_response :unprocessable_content
+      end
+      post email_login_path, params: { family_id: families(:one).id }
+      assert_redirected_to email_login_code_path, "4 requests are under the limit of 5, whatever the code attempts"
+    ensure
+      store.singleton_class.remove_method(:increment)
+    end
+  end
+
   test "requesting codes is rate limited" do
     with_rate_limit_exceeded { request_code families(:one) }
     assert_redirected_to new_family_session_path

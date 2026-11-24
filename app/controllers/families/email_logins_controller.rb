@@ -7,9 +7,10 @@ class Families::EmailLoginsController < ApplicationController
 
   before_action :redirect_signed_in_family
 
-  rate_limit to: 5, within: 15.minutes, only: :create,
+  # Each limit needs its own name: unnamed limits in one controller share a single counter.
+  rate_limit to: 5, within: 15.minutes, only: :create, name: "request-code",
              with: -> { redirect_to new_family_session_path, alert: "Too many sign-in emails requested. Please try again later." }
-  rate_limit to: 10, within: 3.minutes, only: %i[verify_code use_link],
+  rate_limit to: 10, within: 3.minutes, only: %i[verify_code use_link], name: "enter-code",
              with: -> { redirect_to new_family_session_path, alert: "Too many attempts. Please try again in a few minutes." }
 
   # POST /account/sign_in/email
